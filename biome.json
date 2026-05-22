@@ -16,6 +16,7 @@
       "**/*.tsbuildinfo",
       "**/assets/**",
       "**/scripts/reset-project.js",
+      "**/expo-env.d.ts",
       "DOCS/_assets/**"
     ]
   },

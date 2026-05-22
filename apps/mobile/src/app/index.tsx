@@ -1,13 +1,8 @@
-import { Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
 
-export default function HomeScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-background px-6">
-      <Text className="font-display text-6xl text-foreground">RAWSETS</Text>
-      <View className="mt-2 h-2 w-2 bg-primary" />
-      <Text className="mt-8 font-mono text-xs uppercase tracking-widest text-muted">
-        {'// workout tracker · v0.0.1'}
-      </Text>
-    </View>
-  );
+// Root route. Redirige al primer tab del workspace.
+// Cuando metamos auth o landing pública (Fase 2), aquí va la lógica
+// condicional (logged-in → /home, web → /landing, etc.).
+export default function Root() {
+  return <Redirect href="/home" />;
 }

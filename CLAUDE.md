@@ -44,7 +44,38 @@ Monorepo plano con **pnpm workspaces**, sin Turborepo en Fase 1.
 
 ## Comandos
 
-*(Pendientes — se documentarán al hacer scaffolding del monorepo)*
+### Setup
+```bash
+pnpm install                                       # instalar todo el monorepo
+```
+
+### Día a día
+```bash
+pnpm --filter @rawsets/mobile web                  # dev server (web)
+pnpm --filter @rawsets/mobile start                # dev server (universal con QR)
+pnpm lint                                          # lint en todo
+pnpm lint:fix                                      # auto-fix lo que se pueda
+pnpm format                                        # solo formatear
+pnpm typecheck                                     # tipos en todos los workspaces
+```
+
+### Workspaces
+```bash
+pnpm --filter @rawsets/mobile add <paquete>        # instalar en un workspace
+pnpm --filter @rawsets/mobile add -D <paquete>     # devDep
+pnpm add -w <paquete>                              # instalar en la raíz
+pnpm -r --if-present <script>                      # script en todos los workspaces
+```
+
+### Troubleshooting
+```bash
+pnpm --filter @rawsets/mobile web --clear          # limpiar caché de Metro
+rm -rf node_modules apps/*/node_modules apps/mobile/.expo && pnpm install   # reinstalación
+pnpm store prune                                   # purgar caché global de pnpm
+pnpm --filter @rawsets/mobile exec npx expo install --check   # validar deps contra SDK
+```
+
+**Si Metro grita `Unable to resolve module <foo>`** y el módulo está en el ecosistema Expo/RN: añadir el patrón a `.npmrc` (`public-hoist-pattern[]=...`) y `pnpm install`. Ver explicación de fondo en sesión de discovery.
 
 ## Referencias rápidas
 
