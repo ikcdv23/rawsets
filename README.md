@@ -1,4 +1,4 @@
-# RAWSET
+# RAWSETS
 
 > Workout tracker focused on muscle balance analysis. Built with Expo (React Native + Web) and TypeScript.
 
@@ -15,7 +15,7 @@ Expo + React Native + Expo Web · TypeScript · NativeWind · SQLite (expo-sqlit
 ## Estructura prevista (al hacer scaffolding)
 
 ```
-rawset/
+rawsets/
 ├── apps/
 │   ├── mobile/      # Expo app (iOS, Android, Web)
 │   └── api/         # Hono backend (Fase 2)

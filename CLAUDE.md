@@ -4,7 +4,7 @@
 
 ## Qué es esto
 
-RAWSET — app móvil para registrar entrenamientos de gimnasio con énfasis en análisis de balance muscular. Proyecto personal de aprendizaje end-to-end (móvil + backend + DevOps + ML).
+RAWSETS — app móvil para registrar entrenamientos de gimnasio con énfasis en análisis de balance muscular. Proyecto personal de aprendizaje end-to-end (móvil + backend + DevOps + ML).
 
 **Estado actual**: pre-scaffolding. Existen únicamente la ficha técnica de discovery y este CLAUDE.md. Aún no hay código.
 
@@ -23,7 +23,7 @@ Toda decisión de stack, alcance, roadmap, branding y UX vive en [DOCS/ficha-tec
 ## Estructura prevista
 
 ```
-rawset/
+rawsets/
 ├── apps/mobile/        # Expo (iOS, Android, Web) — Fase 1
 ├── apps/api/           # Hono backend — Fase 2
 ├── packages/domain/    # Tipos + lógica pura compartida

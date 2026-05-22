@@ -1,4 +1,4 @@
-# RAWSET — Ficha técnica inicial
+# RAWSETS — Ficha técnica inicial
 
 > Documento vivo. Última actualización: 2026-05-22. Refleja el estado de las decisiones tras la sesión de discovery.
 
@@ -6,7 +6,7 @@
 
 ## 1. Resumen ejecutivo
 
-**RAWSET** es una aplicación móvil multiplataforma (iOS + Android) para registrar entrenamientos de gimnasio. Se diferencia de las apps de referencia (Hevy, Symmetry) por un foco explícito en **análisis de balance muscular** desde el primer momento.
+**RAWSETS** es una aplicación móvil multiplataforma (iOS + Android) para registrar entrenamientos de gimnasio. Se diferencia de las apps de referencia (Hevy, Symmetry) por un foco explícito en **análisis de balance muscular** desde el primer momento.
 
 - **Audiencia inicial**: el autor (Javier) + círculo cercano (amigos, posiblemente un entrenador).
 - **Motivación primaria**: aprendizaje end-to-end (móvil + backend + DevOps + análisis de datos / ML).
@@ -15,8 +15,8 @@
 
 ## 2. Branding e identidad
 
-- **Nombre**: RAWSET (escritura "RAW" + "SET" con énfasis tipográfico en SET). Singular elegido sobre RAWSETS para encajar con el patrón de marcas tech modernas y reforzar el concepto unitario de *"una serie cruda, sin filtros"*.
-- **Tipografía del logo**: bold, sans-serif moderna (a confirmar — pendiente).
+- **Nombre**: RAWSETS (escritura "RAW" + "SETS" con énfasis tipográfico en SETS). Plural mantenido tras explorar singular: el visual del logo y la sonoridad del plural pesan más, y el plural conecta con la idea de "muchas series, sin maquillaje".
+- **Tipografía del logo**: **dirección futurista display** (referencias: Anero, Blackbox, Sentex, Mayhem — pixel-fonts geométricas, angulares, cortes diagonales, sin curvas). Para body/UI: Inter (sans-serif). Para datos numéricos: JetBrains Mono. **Logo en exploración activa** en `DOCS/logo-explorations.html`.
 - **Paleta** (definida vía Adobe Color, inspirada en [Arounda — Supporty](https://arounda.agency)):
   - `#6B21CF` **primary** — violeta, acento funcional principal (botones, FAB, nav).
   - `#B8FA82` **accent** — verde lima, **acento decorativo no semántico** (branding, ilustraciones, blobs). No representa "éxito/OK".
@@ -86,7 +86,7 @@
 - **Razón de elegir monorepo sobre polyrepo**: equipo de 1 persona, un lenguaje principal (TS), apps acopladas que comparten dominio. Polyrepo añadiría versionado de tipos y CI duplicado sin retorno educativo en esta fase.
 
 ```
-rawset/
+rawsets/
 ├── apps/
 │   ├── mobile/               # Expo app (Fase 1)
 │   └── api/                  # Hono backend (Fase 2)
@@ -229,8 +229,8 @@ WorkoutSet
 1. **Pantallas restantes**: wireframes de Rutinas, Sesión activa, Stats, Settings.
 2. **El "bloque gris" del mockup**: qué va ahí (resumen último entrenamiento, racha, sugerencia de sesión, etc.).
 3. **Onboarding / primer arranque**: estado vacío con CTA vs precargar rutinas de ejemplo.
-4. **Branding técnico**: bundle id (propuesta: `com.rawset.app`), nombre del paquete, logo en SVG.
-5. ~~**Ubicación del repo**: confirmar `/home/javier/Personal/rawset/`~~ → **DECIDIDO**: `/home/javier/Personal/RAWSET/` (2026-05-22).
+4. **Branding técnico**: bundle id (propuesta: `com.rawsets.app`), nombre del paquete, **logo definitivo** (en exploración activa — dirección futurista display, referencias tipo Anero/Blackbox/Sentex).
+5. ~~**Ubicación del repo**~~ → **DECIDIDO**: `/home/javier/Personal/RAWSETS/` (2026-05-22).
 6. **CLAUDE.md inicial**: decisiones, comandos, convenciones (a redactar al hacer scaffolding).
 7. **Flujo de trabajo**: ¿commits directos a main o branches/PRs incluso siendo solo tú? ¿Conventional commits?
 8. **Auth**: Better Auth vs Clerk para Fase 2 (no bloquea Fase 1).

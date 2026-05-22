@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAWSETS — Case Study</title>
+<meta name="description" content="Workout tracker focused on muscle balance analysis. Case study técnico del proceso de discovery, decisiones de stack y diseño de marca.">
+<link rel="stylesheet" href="_assets/style.css">
+</head>
+<body>
+
+<!-- ===================================================
+     SHARED TOP-NAV
+=================================================== -->
+<nav class="nav-top">
+  <div class="container">
+    <a href="index.html" class="brand">RAWSETS</a>
+    <div class="links">
+      <a href="index.html" class="active">Case Study</a>
+      <a href="brand-book.html">Brand Book</a>
+      <a href="logo-explorations.html">Logo</a>
+      <a href="ficha-tecnica.md">Ficha técnica</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================================================
+     HERO
+=================================================== -->
+<header class="hero">
+  <div class="hero-blob violet"></div>
+  <div class="hero-blob lime"></div>
+  <div class="container">
+    <span class="eyebrow">CASE STUDY · 2026</span>
+    <h1 class="title-hero" style="margin-top: 32px;">RAWSETS</h1>
+    <p class="hero-tagline">Workout tracker enfocado en análisis de balance muscular. Construido con Expo + React Native + Web. Caso técnico del proceso de discovery, decisiones de stack y diseño de marca.</p>
+    <div class="hero-meta">
+      <div><span>Tipo</span><strong>Side project · Aprendizaje · Portafolio</strong></div>
+      <div><span>Estado</span><strong>Fase 1 — pre-scaffolding</strong></div>
+      <div><span>Stack</span><strong>Expo · TypeScript · Drizzle · NativeWind</strong></div>
+      <div><span>Targets</span><strong>iOS · Android · Web (PWA)</strong></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================================================
+     01 · OVERVIEW
+=================================================== -->
+<section class="section" id="overview">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">01 · Overview</span>
+      <h2 class="title-section">Una app de gym donde el dato importa más que el ego.</h2>
+      <p class="lead">RAWSETS registra entrenamientos y, sobre los mismos datos, hace algo que Hevy y el resto no hacen como prioridad: analiza el <strong>balance muscular</strong> de tu microciclo. Si llevas 18 series de empuje y 4 de tirón, la app te lo dice antes de que la espalda te lo diga.</p>
+    </div>
+
+    <div class="card-grid cols-4">
+      <div class="card overview-card">
+        <div class="label">// Audiencia</div>
+        <div class="value">Gente que entrena con intención</div>
+        <div class="meta">No principiantes, no atletas pro. Personas que llevan ≥1 año y quieren entender sus datos.</div>
+      </div>
+      <div class="card overview-card">
+        <div class="label">// Diferencial</div>
+        <div class="value">Balance muscular como feature núcleo</div>
+        <div class="meta">12 grupos finos en storage, 6 agrupados en UI. Detección de desbalances en tiempo real.</div>
+      </div>
+      <div class="card overview-card">
+        <div class="label">// Plataforma</div>
+        <div class="value">iOS · Android · Web (PWA)</div>
+        <div class="meta">Un solo codebase. Plan B: PWA en iOS hasta justificar pagar Apple Developer Program.</div>
+      </div>
+      <div class="card overview-card">
+        <div class="label">// Fases</div>
+        <div class="value">3 etapas — móvil → backend → ML</div>
+        <div class="meta">Aprender end-to-end sin saltarse capas. Cada fase desbloquea la siguiente.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     02 · PROBLEM
+=================================================== -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">02 · Problem</span>
+      <h2 class="title-section">El gym tiene datos. El fitness tiene cheerleaders.</h2>
+      <p class="lead">La mayoría de apps de fitness ofrecen lo mismo: registrar reps, contar volumen, recordar tu PR. Sobre eso, montan capas de gamificación: badges, rachas con llamas, mensajes motivacionales. RAWSETS apuesta por lo contrario.</p>
+    </div>
+
+    <div class="thesis">
+      <span class="label">// Tesis</span>
+      <p>El progreso en el gym <strong>no se ve, se mide</strong>. Tu cuerpo no necesita aplausos: necesita análisis. Si entrenas en serio durante varios años, lo que falta no son emojis de fuego — falta una herramienta que detecte por ti los puntos ciegos de tu programación.</p>
+    </div>
+
+    <div class="two-col" style="margin-top: 64px;">
+      <div>
+        <h3>Lo que sí somos</h3>
+        <p>Directos. Técnicos. Honestos. Concretos. Para quien va al gym sabiendo lo que hace y quiere ver sus datos sin teatro. Una app que mira tu microciclo y te dice "te falta tirón posterior" en vez de "¡increíble entreno, sigue así! 🔥".</p>
+      </div>
+      <div>
+        <h3>Lo que NO somos</h3>
+        <p>Motivacionales. Gamificados. Wellness-coachy. Sociales (sin feed, sin likes). No enseñamos a hacer una sentadilla — quien usa RAWSETS ya entrena. No ofrecemos planes pre-armados — eres tú quien diseña tu rutina.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     03 · PROCESS & REFERENCES
+=================================================== -->
+<section class="section" id="process">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">03 · Process</span>
+      <h2 class="title-section">Tres referencias, una tesis.</h2>
+      <p class="lead">El proceso de discovery se apoyó en mapear bien el territorio: qué hace cada referente, qué hueco dejan, dónde aterrizar.</p>
+    </div>
+
+    <div class="card-grid cols-3">
+      <div class="card ref-card">
+        <div class="ref-tag">// Benchmark de registro</div>
+        <h4>Hevy</h4>
+        <p>El estándar de facto para registrar entrenamientos. UX impecable, ecosistema social. Cumple el 100% del registro — pero el análisis se queda en la superficie.</p>
+      </div>
+      <div class="card ref-card">
+        <div class="ref-tag">// Inspiración analítica</div>
+        <h4>Symmetry</h4>
+        <p>App con foco en análisis y balance. Buena dirección conceptual. Stack detectado vía ofertas de empleo: Flutter móvil + Django/DRF + Postgres + Redis + Celery.</p>
+      </div>
+      <div class="card ref-card">
+        <div class="ref-tag">// Referencia visual</div>
+        <h4>Arounda / Supporty</h4>
+        <p>Fondo oscuro dominante, acento violeta funcional, verde lima como "vitamina decorativa". Patrón estético del territorio techy/avant-garde.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     04 · TECHNICAL DECISIONS
+=================================================== -->
+<section class="section" id="decisions">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">04 · Technical decisions</span>
+      <h2 class="title-section">Decisiones grandes, explicadas con trade-offs.</h2>
+      <p class="lead">Cada elección de stack se evaluó contra alternativas reales, no contra hombres de paja. Estas son las cuatro decisiones más relevantes para el rumbo del proyecto.</p>
+    </div>
+
+    <div class="decision">
+      <div class="decision-header">
+        <h3>Expo + React Native vs Flutter</h3>
+        <span class="verdict">// Expo elegido</span>
+      </div>
+      <div class="decision-body">
+        <div>
+          <h4>Pros — Expo + RN + TS</h4>
+          <ul class="pros">
+            <li>Reutiliza TypeScript del autor al 100%</li>
+            <li>Tipos compartidos cliente ↔ backend</li>
+            <li>EAS Build resuelve iOS sin Mac</li>
+            <li>OTA updates nativos (EAS Update)</li>
+            <li>Ecosistema y demanda laboral mayor</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Por qué no Flutter</h4>
+          <ul>
+            <li>Dart desde cero — semanas hasta fluidez</li>
+            <li>Rompe los tipos compartidos con backend</li>
+            <li>UI nativa pero rendering propio (menos idiomatic)</li>
+            <li>Ecosistema RN más maduro para integraciones de salud y datos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision">
+      <div class="decision-header">
+        <h3>Monorepo (pnpm workspaces) vs Polyrepo</h3>
+        <span class="verdict">// Monorepo elegido</span>
+      </div>
+      <div class="decision-body">
+        <div>
+          <h4>Pros — Monorepo plano</h4>
+          <ul class="pros">
+            <li>Cambios atómicos cross-app y cross-package</li>
+            <li>Tipos siempre frescos, sin versionar</li>
+            <li>Un solo pipeline de CI</li>
+            <li>Sweet spot: 1 persona, 1 lenguaje, apps acopladas</li>
+            <li>Estándar de facto en ecosistema TS moderno</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Por qué no polyrepo</h4>
+          <ul>
+            <li>Versionado de tipos compartidos = sobrecarga sin retorno</li>
+            <li>Doble CI sin equipos paralelos</li>
+            <li>Sincronización cross-repo añade fricción</li>
+            <li>Pensado para equipos múltiples con ciclos independientes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision">
+      <div class="decision-header">
+        <h3>PWA-ready desde día 1 (Plan B)</h3>
+        <span class="verdict">// Aceptado +10% de coste F1</span>
+      </div>
+      <div class="decision-body">
+        <div>
+          <h4>Por qué la disciplina vale la pena</h4>
+          <ul class="pros">
+            <li>Permite Android nativo + PWA iOS sin pagar Apple ($99/año)</li>
+            <li>No pierde audiencia iOS antes de validar producto</li>
+            <li>Aprovecha que Expo compila también a web vía react-native-web</li>
+            <li>Marca el listón en accesibilidad y SEO desde el principio</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Las reglas de disciplina</h4>
+          <ul>
+            <li>Cada dependencia nueva debe soportar web</li>
+            <li>Pantallas únicas responsivas, no bifurcar UI</li>
+            <li>APIs solo-nativo aisladas tras wrappers con fallback web</li>
+            <li>Probar regularmente <span class="mono">npx expo start --web</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision">
+      <div class="decision-header">
+        <h3>Persistencia local unificada — SQLite + Drizzle</h3>
+        <span class="verdict">// SQLite en los 3 targets</span>
+      </div>
+      <div class="decision-body">
+        <div>
+          <h4>Cómo se resuelve</h4>
+          <ul class="pros">
+            <li>Móvil: <span class="mono">expo-sqlite</span> + driver Drizzle</li>
+            <li>Web: <span class="mono">sqlite-wasm</span> + driver Drizzle web</li>
+            <li>Mismo SQL, mismo schema, misma capa de acceso a datos</li>
+            <li>Schema vive en <span class="mono">packages/domain</span>, compartido con backend Fase 2</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Por qué no IndexedDB o MMKV</h4>
+          <ul>
+            <li>IndexedDB → no es SQL, requiere reescribir queries por target</li>
+            <li>MMKV/AsyncStorage → KV stores, no relacional</li>
+            <li>Sin un único schema compartido, pierdes la ventaja del monorepo</li>
+            <li>SQLite WASM resuelve el caso con cero divergencia conceptual</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     05 · STACK
+=================================================== -->
+<section class="section" id="stack">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">05 · Stack</span>
+      <h2 class="title-section">Stack completo por capa.</h2>
+      <p class="lead">Una vista del stack agrupado por dominio. Las piezas señaladas como <em>Fase 2</em> entran cuando se levanta el backend.</p>
+    </div>
+
+    <div class="card-grid cols-3">
+      <div class="card stack-card">
+        <div class="layer">// Cliente</div>
+        <h4>Móvil + Web</h4>
+        <ul>
+          <li>Expo SDK ≥52</li>
+          <li>React Native + react-native-web</li>
+          <li>TypeScript strict</li>
+          <li>expo-router</li>
+          <li>NativeWind v4</li>
+          <li>Zustand</li>
+          <li>React Hook Form + Zod</li>
+          <li>Victory Native XL</li>
+        </ul>
+      </div>
+      <div class="card stack-card">
+        <div class="layer">// Datos locales</div>
+        <h4>Persistencia</h4>
+        <ul>
+          <li>expo-sqlite (móvil)</li>
+          <li>sqlite-wasm (web)</li>
+          <li>Drizzle ORM</li>
+          <li>drizzle-kit (migraciones)</li>
+          <li>Schema en packages/domain</li>
+        </ul>
+      </div>
+      <div class="card stack-card">
+        <div class="layer">// Build & distrib.</div>
+        <h4>EAS / Web</h4>
+        <ul>
+          <li>EAS Build (iOS + Android)</li>
+          <li>EAS Update (OTA)</li>
+          <li>Expo Go (alpha Fase 1)</li>
+          <li>Vercel / Cloudflare Pages (web)</li>
+        </ul>
+      </div>
+      <div class="card stack-card">
+        <div class="layer">// Backend — Fase 2</div>
+        <h4>API & Auth</h4>
+        <ul>
+          <li>Hono + TypeScript</li>
+          <li>PostgreSQL</li>
+          <li>Drizzle ORM (schema compartido)</li>
+          <li>Better Auth o Clerk</li>
+          <li>Fly.io / Railway</li>
+        </ul>
+      </div>
+      <div class="card stack-card">
+        <div class="layer">// Análisis — Fase 3</div>
+        <h4>ML / Insights</h4>
+        <ul>
+          <li>Python + FastAPI</li>
+          <li>pandas + scikit-learn</li>
+          <li>Microservicio separado</li>
+          <li>Lee del backend principal</li>
+        </ul>
+      </div>
+      <div class="card stack-card">
+        <div class="layer">// DX / Tooling</div>
+        <h4>Workflow</h4>
+        <ul>
+          <li>pnpm workspaces</li>
+          <li>Biome (lint + format)</li>
+          <li>Vitest (lógica de dominio)</li>
+          <li>GitHub Actions (CI)</li>
+          <li>Husky + commitlint</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     06 · BRAND & IDENTITY
+=================================================== -->
+<section class="section" id="brand">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">06 · Brand & Identity</span>
+      <h2 class="title-section">Identidad visual con criterio: paleta, tipografía y logo.</h2>
+      <p class="lead">La marca se construye sobre una paleta definida vía Adobe Color y dos familias tipográficas que separan claramente lo editorial (Inter) de lo técnico (JetBrains Mono). El logo está en exploración activa.</p>
+    </div>
+
+    <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 24px; margin-bottom: 24px;">Paleta — design tokens semánticos</h3>
+    <div class="palette-grid">
+      <div class="palette-card">
+        <div class="palette-swatch" style="background: #6B21CF;"></div>
+        <div class="palette-info">
+          <div class="name">Primary</div>
+          <div class="hex">#6B21CF</div>
+          <div class="role">Violet funcional. CTA, FAB, nav, iconos activos.</div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background: #B8FA82;"></div>
+        <div class="palette-info">
+          <div class="name">Accent</div>
+          <div class="hex">#B8FA82</div>
+          <div class="role">Lime decorativo. Branding y marketing. NO semántico.</div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background: #E11D48;"></div>
+        <div class="palette-info">
+          <div class="name">Destructive</div>
+          <div class="hex">#E11D48</div>
+          <div class="role">Rose. Errores y desbalances del dashboard.</div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background: #1F2937;"></div>
+        <div class="palette-info">
+          <div class="name">Foreground</div>
+          <div class="hex">#1F2937</div>
+          <div class="role">Slate. Texto principal y barras equilibradas.</div>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background: #EDE9FE;"></div>
+        <div class="palette-info">
+          <div class="name">Surface</div>
+          <div class="hex">#EDE9FE</div>
+          <div class="role">Lavender. Cards y superficies elevadas.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="link-card-grid">
+      <a class="link-card" href="brand-book.html">
+        <div class="label">// Deep dive</div>
+        <h4>Brand Book</h4>
+        <p>Construcción del logo, anatomy, app icon "Muscle Grid", tipografías y mockup de landing.</p>
+        <div class="arrow">→ Abrir documento</div>
+      </a>
+      <a class="link-card" href="logo-explorations.html">
+        <div class="label">// Deep dive</div>
+        <h4>Logo Explorations</h4>
+        <p>Seis direcciones de wordmark con tipografías display futuristas. Variantes claro/oscuro, acentos.</p>
+        <div class="arrow">→ Abrir documento</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     07 · PRODUCT ARCHITECTURE
+=================================================== -->
+<section class="section" id="architecture">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">07 · Product architecture</span>
+      <h2 class="title-section">Modelo de datos pensado para análisis desde día 1.</h2>
+      <p class="lead">El núcleo del modelo es la relación entre ejercicios y grupos musculares con pesos primarios/secundarios. Esto permite que el cálculo de balance no sea un parche posterior, sino una consulta sobre datos que ya tienen la forma correcta.</p>
+    </div>
+
+    <div class="data-model"><span class="entity">Exercise</span>
+  <span class="field">id, name, isCustom</span>
+  <span class="field">primaryMuscles:</span>   [MuscleGroup]   <span class="comment">// peso 1.0 en cálculo de balance</span>
+  <span class="field">secondaryMuscles:</span> [MuscleGroup]   <span class="comment">// peso 0.5</span>
+
+<span class="entity">MuscleGroup</span> <span class="comment">(enum, 12 valores finos)</span>
+  pecho, dorsal,
+  hombro_anterior, hombro_medio, hombro_posterior,
+  biceps, triceps, antebrazo,
+  cuadriceps, isquios, gluteo, pantorrilla,
+  core
+
+<span class="entity">Routine</span>
+  <span class="field">id, name, createdAt</span>
+  <span class="field">exercises:</span> [RoutineExercise]   <span class="comment">// ordenado</span>
+
+<span class="entity">RoutineExercise</span>
+  <span class="field">exerciseId, position, targetSets, notes?</span>
+
+<span class="entity">WorkoutSession</span>
+  <span class="field">id, routineId?, startedAt, finishedAt?, notes?</span>
+
+<span class="entity">WorkoutSet</span>
+  <span class="field">id, sessionId, exerciseId, setNumber,</span>
+  <span class="field">weight, reps, rpe?, completed, restSeconds?</span></div>
+
+    <div class="two-col" style="margin-top: 64px;">
+      <div>
+        <h3>Storage fino, UI agrupada</h3>
+        <p>En base de datos se guardan 12 grupos musculares para tener resolución suficiente para análisis futuros (Fase 3 ML). En la UI por defecto se muestran 6 grupos agrupados (Pectoral, Dorsal, Hombros, Brazos, Piernas, Core) para no saturar visualmente. Tap en una barra agrupada expande al detalle fino.</p>
+      </div>
+      <div>
+        <h3>Cálculo de balance</h3>
+        <p>Para cada grupo muscular en el rango temporal (7/14/30 días), se suma <span class="mono">Σ (sets_primarios × 1.0 + sets_secundarios × 0.5)</span>. Un grupo es "desbalanceado" si su valor cae por debajo del 50% de la media del usuario en ese mismo período. La lógica vive en <span class="mono">packages/domain</span> con tests unitarios.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     08 · ROADMAP
+=================================================== -->
+<section class="section" id="roadmap">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">08 · Roadmap</span>
+      <h2 class="title-section">Tres fases que desbloquean capas distintas.</h2>
+      <p class="lead">Cada fase es un objetivo de aprendizaje claro y produce algo demoable. No se salta orden — la Fase 1 alimenta los datos que después la Fase 3 analiza.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="phase current">
+        <div class="phase-tag">// Fase 1 · ACTUAL</div>
+        <h3>MVP móvil local + balance muscular</h3>
+        <ul>
+          <li>App Expo + RN funcionando en iOS y Android</li>
+          <li>Disciplina Plan B: compila también a web</li>
+          <li>Registro de rutinas, sesiones y sets</li>
+          <li>Dashboard de balance muscular</li>
+          <li>Todo local (SQLite). Sin auth, sin sync</li>
+          <li>Distribución alpha vía Expo Go</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="phase-tag">// Fase 2</div>
+        <h3>Backend + DevOps + PWA pública</h3>
+        <ul>
+          <li>Backend Hono + Postgres desplegado</li>
+          <li>Auth + sync entre dispositivos</li>
+          <li>Rutinas compartidas (entrenador → atleta)</li>
+          <li>Modo oscuro activado</li>
+          <li>CI/CD + Docker + observabilidad</li>
+          <li>Landing pública con PWA instalable</li>
+          <li>Google Play (Android nativo)</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="phase-tag">// Fase 3</div>
+        <h3>Análisis / ML</h3>
+        <ul>
+          <li>Microservicio Python (FastAPI)</li>
+          <li>Detección de desbalances persistentes</li>
+          <li>Detección de estancamiento</li>
+          <li>Recomendaciones de ajuste de volumen</li>
+          <li>1RM estimado / periodización sugerida</li>
+          <li>App Store iOS si las métricas justifican</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     09 · STATUS
+=================================================== -->
+<section class="section" id="status">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">09 · Status</span>
+      <h2 class="title-section">Dónde estamos y qué viene.</h2>
+      <p class="lead">Documento vivo. Última revisión: 2026-05-22.</p>
+    </div>
+
+    <div class="status-grid">
+      <div class="status-block done">
+        <h3>Hecho</h3>
+        <ul>
+          <li>Discovery completo y ficha técnica</li>
+          <li>Decisiones de stack cerradas</li>
+          <li>Paleta de marca definida</li>
+          <li>Brand book inicial (HTML)</li>
+          <li>Plan B PWA-ready aceptado</li>
+          <li>Repo local inicializado + primer commit</li>
+          <li>Exploración inicial de logo (6 direcciones)</li>
+        </ul>
+      </div>
+      <div class="status-block next">
+        <h3>Próximos pasos</h3>
+        <ul>
+          <li>Cerrar dirección de logo</li>
+          <li>Wireframes de pantallas pendientes</li>
+          <li>Tagline definitivo</li>
+          <li>Bundle ID y branding técnico</li>
+          <li>Push a GitHub (cuenta personal, repo privado)</li>
+          <li>Scaffolding del monorepo</li>
+          <li>Lista de 40 ejercicios precargados + mapeo a grupos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================
+     FOOTER
+=================================================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="brand">RAWSETS</div>
+    <div class="meta">// Case study · 2026 · Documento vivo · Última actualización 2026-05-22</div>
+  </div>
+</footer>
+
+</body>
+</html>
