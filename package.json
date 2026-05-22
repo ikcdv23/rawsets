@@ -1,0 +1,23 @@
+{
+  "name": "rawsets",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Workout tracker focused on muscle balance analysis. Built with Expo + React Native + Web.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.7.2"
+  }
+}
