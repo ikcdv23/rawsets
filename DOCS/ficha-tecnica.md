@@ -52,8 +52,8 @@
 ### Móvil + Web (mismo codebase)
 | Pieza | Elección |
 |---|---|
-| Framework | Expo SDK ≥52 + React Native + Expo Web (react-native-web) |
-| Lenguaje | TypeScript (strict) |
+| Framework | Expo SDK 56 + React Native 0.85 + Expo Web (react-native-web 0.21) |
+| Lenguaje | TypeScript ~6.0 (strict, noUncheckedIndexedAccess) · React 19.2 |
 | Targets | iOS, Android, Web (PWA) desde día 1 |
 | Navegación | expo-router (file-based, web nativo soportado) |
 | Estilos | NativeWind v4 con design tokens semánticos (funciona en los 3 targets) |

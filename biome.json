@@ -14,6 +14,8 @@
       "**/.expo",
       "**/web-build",
       "**/*.tsbuildinfo",
+      "**/assets/**",
+      "**/scripts/reset-project.js",
       "DOCS/_assets/**"
     ]
   },
