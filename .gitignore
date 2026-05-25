@@ -58,5 +58,7 @@ Thumbs.db
 *.swp
 *.swo
 
-# Claude local cache
-.claude/
+# Claude — solo lo personal/local. Skills, settings.json y resto de .claude/ sí se trackean.
+**/.claude/settings.local.json
+**/.claude/.cache/
+**/.claude/.local/
