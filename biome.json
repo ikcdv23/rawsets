@@ -17,6 +17,7 @@
       "**/assets/**",
       "**/scripts/reset-project.js",
       "**/expo-env.d.ts",
+      "**/drizzle/migrations/**",
       "DOCS/_assets/**"
     ]
   },
