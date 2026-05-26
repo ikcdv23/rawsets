@@ -112,12 +112,16 @@ Exercise
   primaryMuscles:   [MuscleGroup]   # peso 1.0 en cálculo de balance
   secondaryMuscles: [MuscleGroup]   # peso 0.5
 
-MuscleGroup (enum, 12 valores finos)
-  pecho, dorsal,
-  hombro_anterior, hombro_medio, hombro_posterior,
+MuscleGroup (enum, 11 valores planos en Fase 1)
+  pecho, espalda, hombro,
   biceps, triceps, antebrazo,
   cuadriceps, isquios, gluteo, pantorrilla,
   core
+
+# Nota: granularidad simplificada en Fase 1 (YAGNI).
+# La separación fina (hombro anterior/medio/posterior, espalda en dorsal/trapecio/lumbar, etc.)
+# se revisará cuando el uso real revele qué imbalances merecen detección,
+# con ADR + migración. Decisión tomada 2026-05-26.
 
 Routine
   id, name, createdAt
@@ -134,7 +138,7 @@ WorkoutSet
   weight, reps, rpe?, completed, restSeconds?
 ```
 
-**Taxonomía de grupos**: storage fino (12 grupos), visualización agrupada por defecto (6 grupos: Pectoral · Dorsal · Hombros · Brazos · Piernas · Core). Tap en una barra agrupada expande al detalle fino.
+**Taxonomía de grupos en Fase 1**: 11 grupos planos (sin separación fina vs agrupada). La idea original de "12 finos + 6 agrupados" se simplificó por YAGNI — se evaluará retomarla cuando el uso real lo justifique (decisión 2026-05-26).
 
 **Unidades**: kg por defecto, con switch a lb en settings desde el inicio.
 
@@ -169,7 +173,7 @@ WorkoutSet
 - **Rutinas**: crear, editar, duplicar, borrar. Lista ordenada de ejercicios + sets objetivo + notas.
 - **Sesión de entrenamiento**: iniciar desde rutina o vacía. Registro de peso/reps/RPE por set, cronómetro de descanso manual.
 - **Historial**: lista de sesiones por semana, detalle de sesión.
-- **Dashboard de balance muscular**: 6 grupos agrupados con expandible a 12 finos, rangos 7d/14d/mes, marcado de desbalances.
+- **Dashboard de balance muscular**: 11 grupos planos en Fase 1, rangos 7d/14d/mes, marcado de desbalances. Granularidad fina aplazada (ver §6).
 - **Racha de días entrenando** (top-right).
 - **Perfil local mínimo** (top-right): nombre, unidades, umbral de desbalance.
 - **Settings**: tema (preparado pero solo claro activo), unidades, umbral.
@@ -234,7 +238,7 @@ WorkoutSet
 6. **CLAUDE.md inicial**: decisiones, comandos, convenciones (a redactar al hacer scaffolding).
 7. **Flujo de trabajo**: ¿commits directos a main o branches/PRs incluso siendo solo tú? ¿Conventional commits?
 8. **Auth**: Better Auth vs Clerk para Fase 2 (no bloquea Fase 1).
-9. **Lista exacta de 40 ejercicios** y su mapeo a los 12 grupos musculares (puede definirse al arrancar Fase 1).
+9. **Lista exacta de 40 ejercicios** y su mapeo a los 11 grupos musculares (puede definirse al arrancar Fase 1).
 
 ---
 

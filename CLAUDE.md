@@ -34,7 +34,8 @@ Reglas de fondo. Aplican a cualquier interacción con Javier en este repo, no so
 - **Estilo**: la app es **PWA-ready desde día 1** (Plan B). Toda dependencia nueva debe verificarse compatible con web (`react-native-web`). APIs solo-nativo van aisladas detrás de wrappers con fallback web.
 - **Paleta y design tokens**: definidos en la ficha técnica (sección 2). Vivos como CSS vars en [apps/mobile/src/global.css](apps/mobile/src/global.css) y mapeados a clases Tailwind en [apps/mobile/tailwind.config.js](apps/mobile/tailwind.config.js). Usar tokens semánticos (`primary`, `accent`, `destructive`, `surface`, `foreground`), nunca colores literales en componentes.
 - **Path alias**: `@/*` → `apps/mobile/src/*` (definido en [apps/mobile/tsconfig.json](apps/mobile/tsconfig.json)). Usar `@/components/...`, `@/global.css`, etc.
-- **Grupos musculares**: 12 finos en storage, 6 agrupados en UI por defecto. Listado en la ficha técnica (sección 6).
+- **Componentes UI**: por defecto viven en `features/<x>/ui/components/`. Solo suben a `apps/mobile/src/components/` cuando se usan en 2+ features o son chrome global (tab bar, header, design system primitives). Default a feature, no al "shared graveyard".
+- **Grupos musculares**: 11 grupos planos en Fase 1 (pecho, espalda, hombro, biceps, triceps, antebrazo, cuadriceps, isquios, gluteo, pantorrilla, core). Granularidad fina (separar hombro anterior/medio/posterior, espalda en lats/lumbar, etc.) aplazada a Fase 2 con ADR cuando el uso real lo justifique. Ver [DOCS/ficha-tecnica.md](DOCS/ficha-tecnica.md) sección 6.
 - **Unidades**: kg por defecto, lb opcional vía settings. La lógica trabaja siempre en kg internamente.
 
 ## Arquitectura del scaffold actual
