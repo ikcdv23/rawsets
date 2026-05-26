@@ -63,6 +63,7 @@
 | Forms | React Hook Form + Zod |
 | Iconos | lucide-react-native (funciona en web) |
 | Gráficos | Victory Native XL (decisión firme) |
+| Humanoid muscle map | **react-native-body-highlighter** (MIT, Expo-compatible). SVG male/female front/back con 24 grupos musculares. Hero de la pantalla Body. API `data={[{slug, intensity, side}]}` mapea directo a los 11 grupos de RAWSETS (ver §6) + onPress para drill-down. Decidido 2026-05-26. |
 | Tests | Vitest para lógica de dominio |
 | Build/distrib. móvil | EAS Build, EAS Update |
 | Build/distrib. web | Export web + hosting estático (Vercel o Cloudflare Pages en Fase 2) |
@@ -195,20 +196,29 @@ WorkoutSet
 ## 9. UX / UI
 
 ### Navegación
-- **Tab bar inferior tipo pill morada flotante** con FAB central elevado.
-- **4 tabs**: Home (dashboard) · Rutinas · Stats · Settings.
-- **FAB "+"**: inicia entrenamiento. Si hay sesión activa, vuelve a ella.
-- **Top bar**: logo (izquierda) · racha (medalla) + perfil (derecha).
+- **Tab bar inferior píldora flotante con glassmorphism** (`backdrop-filter: blur` + `bg rgba(14,14,14,0.72)`), separada de los bordes del teléfono.
+- **4 tabs**: Home (dashboard) · Rutinas · Body · Settings. *Body* (humanoid + balance + medidas + metas) reemplaza la idea original de "Stats".
+- **Sin FAB central.** Iniciar entreno se hace desde el card "Sesión de hoy" del Home. Si hay sesión activa, la tab bar muta a su **estado "workout activo"**: crece hacia arriba, aparece una *strip* con dot lima pulsante + timer en vivo + ejercicio actual; tap en la strip expande la sheet de logging sets (`workout.html`).
+- **Tab activo = píldora expandida** (`flex-grow: 2`) con bg lima y label visible; el resto muestran sólo icono. Patrón de "navigation rail" iOS/Material 3.
+- **Top bar**: wordmark `RAWSETS.` (peso 900 + punto lima) a la izquierda · icono contextual a la derecha (settings / edit / streak según pantalla).
 
 ### Principios de diseño
-- Densidad alta en la sesión activa (lo más usado).
-- Tema claro Fase 1, oscuro Fase 2 (tokens semánticos desde día 1).
-- Sin onboarding largo: estado vacío con CTA "Crear primera rutina".
-- Teclado numérico custom para registro de sets (más rápido que el del SO).
-- Solo español Fase 1.
+- **Tema oscuro Fase 1** (decisión revisada 2026-05-26 tras pivot de marca a lima sobre dark). Tokens semánticos (`bg-dark`, `bg-card`, `text`, `text-mute`, `lime`, `rose`) preparados; tema claro queda como opción de Fase 2 si surge la necesidad.
+- **Restraint cromático**: el lima es puntual — hero numbers, FAB/CTA primario, indicador activo, dot live. El resto en neutros (text/text-mute/text-dim). Rose sólo para alertas (punto débil, low balance).
+- **Un número hero por pantalla**, gigante (76px+, Inter 900, `tabular-nums`, `letter-spacing -0.04em`). El tamaño contrastado es lo que da impacto.
+- **Tipografía**: Inter en todas las pantallas (`font-variant-numeric: tabular-nums` para números técnicos). JetBrains Mono descartado para UI; Zen Dots reservado al wordmark del logo.
+- **Densidad alta en sesión activa** (lo más usado). Optimizar tap targets y latencia percibida (optimistic updates).
+- **Microinteracciones** como ciudadanos de primera: `scale(0.97)` en `:active`, transiciones spring (`cubic-bezier(0.34, 1.4, 0.64, 1)`), morph del strip a sheet en el workout activo.
+- **Sin onboarding largo**: estado vacío con CTA "Crear primera rutina".
+- **Teclado numérico custom** para registro de sets (más rápido que el del SO).
+- **Solo español Fase 1**.
 
 ### Pantallas decididas
-- **Home (dashboard balance muscular)** — mockup hecho en Figma.
+- **Home (dashboard balance muscular)** — `DOCS/mockups/home-radar.html`. Hero = radar hexagonal de balance muscular.
+- **Active workout (logging sets)** — `DOCS/mockups/workout.html`. Sheet que expande desde la strip de "workout activo" de la tab bar. Lista vertical de tarjetas expandibles + tabla de sets + rest timer inline.
+- **Body (balance + medidas + metas)** — `DOCS/mockups/body.html`. Reemplaza la idea original de "Stats". Tab principal. Hero = humanoid SVG vía `react-native-body-highlighter` con grupos coloreados por balance. Toggle Frente/Espalda, banner de punto débil, grid de medidas, lista de los 11 grupos con scores, card de meta activa.
+
+- **Routines** — `DOCS/mockups/routines.html`. Hero = calendario mensual. Celdas con dot color + letra por tipo de rutina (T/E/P). Días futuros sin asignar = dashed (señal "falta planificar"). Tap día dashed → bottom sheet de asignación. Botón "repetir semana" por fila. Debajo: lista de rutinas guardadas + CTA crear nueva.
 
 ### Pantallas pendientes de wireframe
 - Rutinas (lista, crear, editar).

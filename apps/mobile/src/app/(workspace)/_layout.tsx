@@ -1,8 +1,13 @@
+import { TabBar } from '@/components/layout/tab-bar';
 import { Tabs } from 'expo-router';
 
-// Placeholder: uses expo-router default tab bar.
-// Será reemplazado por nuestro TabBar custom (pill morada + FAB) cuando
-// implementemos src/components/tab-bar.tsx. Brief en F1.6.
 export default function WorkspaceLayout() {
-  return <Tabs screenOptions={{ headerShown: false }} />;
+  return (
+    <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...props} />}>
+      <Tabs.Screen name="home" />
+      <Tabs.Screen name="routines" />
+      <Tabs.Screen name="stats" />
+      <Tabs.Screen name="settings" />
+    </Tabs>
+  );
 }

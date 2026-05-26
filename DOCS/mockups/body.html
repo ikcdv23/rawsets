@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Body (humanoid + balance + medidas)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+    --amber: #F5C24E;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .stage { position: relative; }
+
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+
+  .notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 30;
+  }
+
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  .content {
+    padding: 8px 24px 170px;
+    height: calc(100% - 48px);
+    overflow-y: auto;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* App bar */
+  .app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0 24px;
+  }
+  .app-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+  }
+  .app-title-dot { color: var(--lime); }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    cursor: pointer;
+  }
+
+  /* View toggle (Frente / Espalda) */
+  .view-toggle {
+    display: inline-flex;
+    padding: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .view-toggle button {
+    height: 32px;
+    padding: 0 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .view-toggle button.active {
+    background: var(--lime);
+    color: var(--bg-dark);
+  }
+
+  /* Hero humanoid card */
+  .body-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 16px 16px 18px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .body-card::before {
+    content: '';
+    position: absolute;
+    top: -20%; left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(168, 224, 85, 0.07), transparent 65%);
+    pointer-events: none;
+  }
+
+  .body-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 4px 8px;
+    position: relative;
+  }
+  .body-card-title {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .body-card-range {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+
+  .humanoid-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 460px;
+    margin: 4px 0 8px;
+  }
+
+  /* SVG humanoid */
+  .humanoid {
+    display: block;
+    height: 100%;
+    width: auto;
+  }
+  .humanoid .silhouette path,
+  .humanoid .silhouette circle {
+    fill: rgba(255, 255, 255, 0.025);
+    stroke: rgba(255, 255, 255, 0.10);
+    stroke-width: 1;
+  }
+  .humanoid .muscle {
+    cursor: pointer;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+  }
+  .humanoid .muscle:hover { filter: brightness(1.25); }
+  .humanoid .muscle.hi { fill: rgba(168, 224, 85, 0.55); }
+  .humanoid .muscle.ok { fill: rgba(250, 250, 250, 0.20); }
+  .humanoid .muscle.mid { fill: rgba(245, 194, 78, 0.45); }
+  .humanoid .muscle.lo { fill: rgba(255, 59, 92, 0.55); }
+
+  .humanoid .muscle-shade {
+    fill: url(#shade);
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  .humanoid .view-front,
+  .humanoid .view-back { transition: opacity 0.4s ease; }
+  .humanoid.show-back .view-front { opacity: 0; pointer-events: none; }
+  .humanoid:not(.show-back) .view-back { opacity: 0; pointer-events: none; }
+
+  /* Side legend dots */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .legend-dot.hi { background: var(--lime); }
+  .legend-dot.ok { background: rgba(250, 250, 250, 0.45); }
+  .legend-dot.mid { background: var(--amber); }
+  .legend-dot.lo { background: var(--rose); }
+
+  /* Weak point banner */
+  .weak-point {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 59, 92, 0.08);
+    border: 1px solid rgba(255, 59, 92, 0.25);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  .weak-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(255, 59, 92, 0.18);
+    color: var(--rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .weak-info { flex: 1; }
+  .weak-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--rose);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .weak-text {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 700;
+    margin-top: 2px;
+    letter-spacing: -0.005em;
+  }
+  .weak-arrow {
+    color: var(--text-mute);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 12px;
+  }
+  .eyebrow::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+
+  /* Stats grid medidas */
+  .measures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .measure {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .measure-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 10px;
+  }
+  .measure-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .measure-value {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+  .measure-unit {
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 700;
+  }
+  .measure-trend {
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .measure-trend.up { color: var(--lime); }
+  .measure-trend.down { color: var(--rose); }
+  .measure-trend.flat { color: var(--text-mute); }
+
+  /* Grupos list */
+  .groups {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 4px 16px;
+  }
+  .group-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 36px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-row:last-child { border-bottom: none; }
+  .group-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+  .group-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .group-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .group-bar-fill.hi { background: var(--lime); }
+  .group-bar-fill.ok { background: rgba(250, 250, 250, 0.55); }
+  .group-bar-fill.mid { background: var(--amber); }
+  .group-bar-fill.lo { background: var(--rose); }
+  .group-score {
+    font-size: 14px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    text-align: right;
+  }
+  .group-score.hi { color: var(--lime); }
+  .group-score.lo { color: var(--rose); }
+
+  /* Goal card */
+  .goal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .goal::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(168, 224, 85, 0.10), transparent 65%);
+    pointer-events: none;
+  }
+  .goal-eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .goal-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    position: relative;
+  }
+  .goal-progress-bar {
+    margin-top: 16px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .goal-progress-fill {
+    height: 100%;
+    background: var(--lime);
+    border-radius: 3px;
+  }
+  .goal-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 700;
+    position: relative;
+  }
+  .goal-meta strong {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+  }
+
+  /* Tab bar (idéntica al home-radar) */
+  .tab-bar {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 36px);
+    height: 64px;
+    background: rgba(14, 14, 14, 0.72);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    box-shadow:
+      0 24px 50px rgba(0, 0, 0, 0.55),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    z-index: 10;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
+    color: var(--text-mute);
+    cursor: pointer;
+    font-family: inherit;
+    transition:
+      flex-grow 0.45s cubic-bezier(0.34, 1.4, 0.64, 1),
+      background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.25s ease;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    flex-grow: 2;
+    background: var(--lime);
+    color: var(--bg-dark);
+  }
+  .tab-label {
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      max-width 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+      opacity 0.25s ease 0.08s;
+  }
+  .tab.active .tab-label { max-width: 90px; opacity: 1; }
+  .ic {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .tab.active .ic { stroke-width: 2.6; }
+
+  /* Caption */
+  .caption {
+    position: absolute;
+    bottom: -36px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="app-bar">
+        <div class="app-title">Mi cuerpo<span class="app-title-dot">.</span></div>
+        <div class="icon-btn" aria-label="Editar medidas">
+          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+        </div>
+      </div>
+
+      <div class="view-toggle" role="tablist">
+        <button class="active" data-view="front">Frente</button>
+        <button data-view="back">Espalda</button>
+      </div>
+
+      <article class="body-card">
+        <div class="body-card-header">
+          <span class="body-card-title">Balance muscular</span>
+          <span class="body-card-range">14 días</span>
+        </div>
+
+        <div class="humanoid-wrap">
+          <svg class="humanoid" viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg" aria-label="Humanoid muscle balance">
+            <defs>
+              <radialGradient id="shade" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- ============ SILHOUETTE BASE (compartida) ============ -->
+            <g class="silhouette">
+              <!-- Head -->
+              <ellipse cx="140" cy="42" rx="24" ry="28"/>
+              <!-- Neck -->
+              <path d="M 128 66 Q 128 78 132 84 L 148 84 Q 152 78 152 66 Z"/>
+              <!-- Torso (front body silhouette: shoulders → waist → hips) -->
+              <path d="M 132 82
+                       L 100 92
+                       Q 70 100 56 116
+                       Q 48 128 50 144
+                       L 60 178
+                       Q 64 200 68 220
+                       L 76 250
+                       Q 82 260 88 268
+                       L 192 268
+                       Q 198 260 204 250
+                       L 212 220
+                       Q 216 200 220 178
+                       L 230 144
+                       Q 232 128 224 116
+                       Q 210 100 180 92
+                       L 148 82 Z"/>
+              <!-- Left leg silhouette -->
+              <path d="M 90 268
+                       L 86 320
+                       Q 82 360 84 390
+                       Q 85 410 86 428
+                       L 88 470
+                       Q 90 492 94 510
+                       L 110 514
+                       Q 116 504 118 488
+                       L 122 440
+                       Q 126 410 128 380
+                       L 130 320
+                       Q 132 290 132 268 Z"/>
+              <!-- Right leg silhouette -->
+              <path d="M 190 268
+                       L 194 320
+                       Q 198 360 196 390
+                       Q 195 410 194 428
+                       L 192 470
+                       Q 190 492 186 510
+                       L 170 514
+                       Q 164 504 162 488
+                       L 158 440
+                       Q 154 410 152 380
+                       L 150 320
+                       Q 148 290 148 268 Z"/>
+              <!-- Left arm silhouette -->
+              <path d="M 56 116
+                       Q 42 130 38 152
+                       L 36 200
+                       Q 38 230 42 260
+                       L 48 290
+                       Q 52 308 56 320
+                       L 64 322
+                       Q 68 308 70 290
+                       L 72 260
+                       Q 70 230 68 200
+                       L 66 152
+                       Q 66 130 70 118 Z"/>
+              <!-- Right arm silhouette -->
+              <path d="M 224 116
+                       Q 238 130 242 152
+                       L 244 200
+                       Q 242 230 238 260
+                       L 232 290
+                       Q 228 308 224 320
+                       L 216 322
+                       Q 212 308 210 290
+                       L 208 260
+                       Q 210 230 212 200
+                       L 214 152
+                       Q 214 130 210 118 Z"/>
+            </g>
+
+            <!-- ============ FRONT VIEW muscles ============ -->
+            <g class="view-front">
+              <!-- Hombros frontales -->
+              <ellipse class="muscle ok" cx="74" cy="118" rx="18" ry="20"/>
+              <ellipse class="muscle ok" cx="206" cy="118" rx="18" ry="20"/>
+
+              <!-- Pectorales -->
+              <path class="muscle hi" d="M 108 100
+                       Q 92 105 88 118
+                       Q 88 138 100 148
+                       L 138 148
+                       L 138 102
+                       Q 124 96 108 100 Z"/>
+              <path class="muscle hi" d="M 172 100
+                       Q 188 105 192 118
+                       Q 192 138 180 148
+                       L 142 148
+                       L 142 102
+                       Q 156 96 172 100 Z"/>
+
+              <!-- Bíceps -->
+              <ellipse class="muscle ok" cx="60" cy="170" rx="14" ry="28"/>
+              <ellipse class="muscle ok" cx="220" cy="170" rx="14" ry="28"/>
+
+              <!-- Antebrazos -->
+              <ellipse class="muscle mid" cx="56" cy="240" rx="13" ry="32"/>
+              <ellipse class="muscle mid" cx="224" cy="240" rx="13" ry="32"/>
+
+              <!-- Core / abs -->
+              <path class="muscle mid" d="M 122 152
+                       L 122 250
+                       Q 122 258 130 260
+                       L 150 260
+                       Q 158 258 158 250
+                       L 158 152 Z"/>
+              <!-- Abs grid lines -->
+              <g stroke="rgba(0,0,0,0.25)" stroke-width="1" fill="none" pointer-events="none">
+                <line x1="140" y1="152" x2="140" y2="250"/>
+                <line x1="122" y1="180" x2="158" y2="180"/>
+                <line x1="122" y1="206" x2="158" y2="206"/>
+                <line x1="122" y1="232" x2="158" y2="232"/>
+              </g>
+
+              <!-- Cuádriceps -->
+              <path class="muscle ok" d="M 92 274
+                       Q 84 310 88 350
+                       Q 92 380 100 388
+                       L 128 388
+                       Q 132 350 132 320
+                       L 132 274 Z"/>
+              <path class="muscle ok" d="M 188 274
+                       Q 196 310 192 350
+                       Q 188 380 180 388
+                       L 152 388
+                       Q 148 350 148 320
+                       L 148 274 Z"/>
+
+              <!-- Pantorrillas (front shins, sutiles) -->
+              <ellipse class="muscle mid" cx="104" cy="450" rx="11" ry="32"/>
+              <ellipse class="muscle mid" cx="176" cy="450" rx="11" ry="32"/>
+
+              <!-- subtle highlight shade global -->
+              <ellipse class="muscle-shade" cx="140" cy="220" rx="60" ry="180"/>
+            </g>
+
+            <!-- ============ BACK VIEW muscles ============ -->
+            <g class="view-back">
+              <!-- Hombros traseros -->
+              <ellipse class="muscle ok" cx="74" cy="118" rx="18" ry="20"/>
+              <ellipse class="muscle ok" cx="206" cy="118" rx="18" ry="20"/>
+
+              <!-- Espalda (lats + traps) — flagged LOW -->
+              <path class="muscle lo" d="M 96 96
+                       L 90 130
+                       Q 88 160 92 200
+                       Q 96 230 110 250
+                       L 170 250
+                       Q 184 230 188 200
+                       Q 192 160 190 130
+                       L 184 96
+                       L 148 88
+                       L 132 88 Z"/>
+              <!-- Spine line -->
+              <line x1="140" y1="92" x2="140" y2="250" stroke="rgba(0,0,0,0.30)" stroke-width="1.5" pointer-events="none"/>
+              <!-- Lats divider -->
+              <path d="M 110 170 Q 140 178 170 170" stroke="rgba(0,0,0,0.20)" stroke-width="1" fill="none" pointer-events="none"/>
+
+              <!-- Tríceps -->
+              <ellipse class="muscle ok" cx="60" cy="170" rx="14" ry="28"/>
+              <ellipse class="muscle ok" cx="220" cy="170" rx="14" ry="28"/>
+
+              <!-- Antebrazos -->
+              <ellipse class="muscle mid" cx="56" cy="240" rx="13" ry="32"/>
+              <ellipse class="muscle mid" cx="224" cy="240" rx="13" ry="32"/>
+
+              <!-- Glúteos -->
+              <ellipse class="muscle ok" cx="116" cy="288" rx="22" ry="22"/>
+              <ellipse class="muscle ok" cx="164" cy="288" rx="22" ry="22"/>
+
+              <!-- Isquios (hamstrings) — flagged LOW -->
+              <path class="muscle lo" d="M 92 318
+                       Q 86 350 90 380
+                       Q 94 396 100 400
+                       L 126 400
+                       Q 130 380 130 350
+                       L 130 318 Z"/>
+              <path class="muscle lo" d="M 188 318
+                       Q 194 350 190 380
+                       Q 186 396 180 400
+                       L 154 400
+                       Q 150 380 150 350
+                       L 150 318 Z"/>
+
+              <!-- Pantorrillas (calves, traseras) -->
+              <ellipse class="muscle mid" cx="104" cy="450" rx="12" ry="34"/>
+              <ellipse class="muscle mid" cx="176" cy="450" rx="12" ry="34"/>
+
+              <ellipse class="muscle-shade" cx="140" cy="220" rx="60" ry="180"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot hi"></span>Alto</div>
+          <div class="legend-item"><span class="legend-dot ok"></span>Ok</div>
+          <div class="legend-item"><span class="legend-dot mid"></span>Medio</div>
+          <div class="legend-item"><span class="legend-dot lo"></span>Bajo</div>
+        </div>
+
+        <div class="weak-point">
+          <div class="weak-icon">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="10" x2="12" y2="15"/><circle cx="12" cy="18" r="0.5" fill="currentColor"/></svg>
+          </div>
+          <div class="weak-info">
+            <div class="weak-label">Punto débil</div>
+            <div class="weak-text">Espalda &amp; Isquios — refuerza con tirón</div>
+          </div>
+          <svg class="weak-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </article>
+
+      <div class="eyebrow">Medidas</div>
+
+      <div class="measures">
+        <div class="measure">
+          <div class="measure-label">Peso</div>
+          <div class="measure-row">
+            <span class="measure-value">78.2</span>
+            <span class="measure-unit">kg</span>
+          </div>
+          <div class="measure-trend down">↓ 1.4 kg · mes</div>
+        </div>
+        <div class="measure">
+          <div class="measure-label">Grasa</div>
+          <div class="measure-row">
+            <span class="measure-value">14.2</span>
+            <span class="measure-unit">%</span>
+          </div>
+          <div class="measure-trend down">↓ 0.8 · mes</div>
+        </div>
+        <div class="measure">
+          <div class="measure-label">Masa magra</div>
+          <div class="measure-row">
+            <span class="measure-value">67.1</span>
+            <span class="measure-unit">kg</span>
+          </div>
+          <div class="measure-trend up">↑ 0.4 · mes</div>
+        </div>
+        <div class="measure">
+          <div class="measure-label">IMC</div>
+          <div class="measure-row">
+            <span class="measure-value">23.4</span>
+            <span class="measure-unit"></span>
+          </div>
+          <div class="measure-trend flat">→ estable</div>
+        </div>
+      </div>
+
+      <div class="eyebrow">Grupos musculares</div>
+
+      <div class="groups">
+        <div class="group-row">
+          <span class="group-name">Pecho</span>
+          <div class="group-bar"><div class="group-bar-fill hi" style="width: 92%"></div></div>
+          <span class="group-score hi">92</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Cuádriceps</span>
+          <div class="group-bar"><div class="group-bar-fill ok" style="width: 76%"></div></div>
+          <span class="group-score">76</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Hombros</span>
+          <div class="group-bar"><div class="group-bar-fill ok" style="width: 71%"></div></div>
+          <span class="group-score">71</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Glúteos</span>
+          <div class="group-bar"><div class="group-bar-fill ok" style="width: 70%"></div></div>
+          <span class="group-score">70</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Bíceps</span>
+          <div class="group-bar"><div class="group-bar-fill ok" style="width: 68%"></div></div>
+          <span class="group-score">68</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Tríceps</span>
+          <div class="group-bar"><div class="group-bar-fill ok" style="width: 64%"></div></div>
+          <span class="group-score">64</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Antebrazos</span>
+          <div class="group-bar"><div class="group-bar-fill mid" style="width: 60%"></div></div>
+          <span class="group-score">60</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Pantorrillas</span>
+          <div class="group-bar"><div class="group-bar-fill mid" style="width: 55%"></div></div>
+          <span class="group-score">55</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Core</span>
+          <div class="group-bar"><div class="group-bar-fill mid" style="width: 55%"></div></div>
+          <span class="group-score">55</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Isquios</span>
+          <div class="group-bar"><div class="group-bar-fill lo" style="width: 48%"></div></div>
+          <span class="group-score lo">48</span>
+        </div>
+        <div class="group-row">
+          <span class="group-name">Espalda</span>
+          <div class="group-bar"><div class="group-bar-fill lo" style="width: 38%"></div></div>
+          <span class="group-score lo">38</span>
+        </div>
+      </div>
+
+      <div class="eyebrow">Meta activa</div>
+
+      <article class="goal">
+        <div class="goal-eyebrow">Recomposición</div>
+        <div class="goal-title">Bajar a 75 kg</div>
+        <div class="goal-progress-bar"><div class="goal-progress-fill" style="width: 58%"></div></div>
+        <div class="goal-meta">
+          <span><strong>3.2 kg</strong> restantes</span>
+          <span>ETA <strong>~ 8 sem</strong></span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Tab bar — Body activo -->
+    <nav class="tab-bar" aria-label="Navegación principal">
+      <button type="button" class="tab" data-nav="home-to-workout.html">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M11.3 2.7a1 1 0 0 1 1.4 0l8 7a1 1 0 0 1 .3.75V20a2 2 0 0 1-2 2h-4v-7h-4v7H5a2 2 0 0 1-2-2v-9.55a1 1 0 0 1 .3-.75z" fill="currentColor" stroke="none"/></svg>
+        <span class="tab-label">Home</span>
+      </button>
+      <button type="button" class="tab" data-nav="routines.html">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <span class="tab-label">Rutinas</span>
+      </button>
+      <button type="button" class="tab active">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM7 13c0-1 1-3 5-3s5 2 5 3v1h-3l-1 7h-2l-1-7H7z"/></svg>
+        <span class="tab-label">Body</span>
+      </button>
+      <button type="button" class="tab" data-nav="settings.html">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tab-label">Settings</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <div class="caption">RAWSETS — Body · balance &amp; medidas</div>
+</div>
+
+<script>
+  // Toggle front/back view
+  const humanoid = document.querySelector('.humanoid');
+  const toggleBtns = document.querySelectorAll('.view-toggle button');
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      if (view === 'back') {
+        humanoid.classList.add('show-back');
+      } else {
+        humanoid.classList.remove('show-back');
+      }
+    });
+  });
+
+  // Tab navigation
+  document.querySelectorAll('.tab[data-nav]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = tab.dataset.nav; }, 200);
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Demo transición Home → Workout sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .stage { position: relative; }
+
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+
+  .notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 30;
+  }
+
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 20;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  /* ========== HOME (base) ========== */
+  .home-content {
+    padding: 8px 24px 170px;
+    height: calc(100% - 48px);
+    overflow-y: auto;
+  }
+  .home-content::-webkit-scrollbar { display: none; }
+
+  .app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0 24px;
+  }
+  .wordmark { font-size: 19px; font-weight: 900; letter-spacing: 0.04em; }
+  .wordmark-dot { color: var(--lime); }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0 12px;
+  }
+  .eyebrow::after { content: ''; height: 1px; flex: 1; background: var(--border); }
+
+  .hero-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -20%;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(168, 224, 85, 0.10), transparent 65%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 10px;
+    color: var(--text-mute);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .hero-num {
+    font-size: 76px;
+    font-weight: 900;
+    color: var(--lime);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+  }
+  .hero-num .unit {
+    font-size: 24px;
+    color: var(--text-mute);
+    margin-left: 4px;
+    font-weight: 700;
+  }
+  .hero-sub {
+    margin-top: 6px;
+    padding: 0 6px;
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 500;
+    position: relative;
+  }
+  .hero-sub strong { color: var(--rose); font-weight: 700; }
+
+  /* Radar (hero) */
+  .hero-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 6px;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .hero-card-title { font-size: 13px; font-weight: 800; letter-spacing: -0.005em; }
+  .hero-card-range {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .radar-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 10px;
+  }
+  .radar { display: block; }
+  .radar-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+  .radar-center-value {
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+  .radar-center-unit { font-size: 16px; color: var(--text-mute); font-weight: 700; margin-left: 2px; }
+  .radar-center-label {
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 800;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+
+  /* ========== TAB BAR (workout-active siempre, para el demo) ========== */
+  .tab-bar {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 36px);
+    height: 116px;
+    background: rgba(14, 14, 14, 0.72);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 6px;
+    box-shadow:
+      0 24px 50px rgba(0, 0, 0, 0.55),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    z-index: 15;
+  }
+
+  /* Strip arriba */
+  .workout-strip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 10px 0 14px;
+    height: 52px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 4px;
+    transition: transform 0.15s ease;
+  }
+  .workout-strip:active { transform: scale(0.98); }
+  .workout-strip:hover .workout-exercise-name { color: var(--lime); }
+
+  .workout-pulse {
+    position: relative;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--lime);
+    flex-shrink: 0;
+  }
+  .workout-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--lime);
+    animation: dotPulse 1.8s ease-out infinite;
+  }
+  @keyframes dotPulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  .workout-time {
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--lime);
+  }
+  .workout-divider {
+    width: 1px; height: 18px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .workout-exercise {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .workout-exercise-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    transition: color 0.2s ease;
+  }
+  .workout-exercise-set {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-mute);
+  }
+  .workout-expand {
+    width: 24px; height: 24px;
+    background: transparent;
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 52px;
+  }
+  .tab {
+    flex: 1;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
+    color: var(--text-mute);
+    cursor: pointer;
+    font-family: inherit;
+    transition:
+      flex-grow 0.45s cubic-bezier(0.34, 1.4, 0.64, 1),
+      background-color 0.3s ease,
+      color 0.25s ease;
+  }
+  .tab.active {
+    flex-grow: 2;
+    background: var(--lime);
+    color: var(--bg-dark);
+  }
+  .tab-label {
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease 0.08s;
+  }
+  .tab.active .tab-label { max-width: 90px; opacity: 1; }
+  .ic {
+    width: 20px; height: 20px;
+    stroke: currentColor; fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .tab.active .ic { stroke-width: 2.6; }
+
+  /* ========== BACKDROP ========== */
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .phone.show-sheet .backdrop { opacity: 1; pointer-events: auto; }
+
+  /* ========== WORKOUT SHEET (slide-up) ========== */
+  .workout-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 92%;
+    background: var(--bg-dark);
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    border-top: 1px solid var(--border-strong);
+    z-index: 25;
+    transform: translateY(100%);
+    transition: transform 0.45s cubic-bezier(0.34, 1.25, 0.64, 1);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .phone.show-sheet .workout-sheet { transform: translateY(0); }
+
+  .sheet-handle-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px;
+  }
+  .sheet-handle {
+    width: 38px;
+    height: 4px;
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+
+  /* Sheet header */
+  .sheet-header {
+    padding: 6px 24px 22px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-header::before {
+    content: '';
+    position: absolute;
+    top: -10%; left: 50%;
+    transform: translateX(-50%);
+    width: 320px; height: 200px;
+    background: radial-gradient(ellipse at center, rgba(168, 224, 85, 0.10), transparent 65%);
+    pointer-events: none;
+    filter: blur(8px);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .header-eyebrow .progress {
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    margin-left: 6px;
+  }
+  .header-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .header-close:hover { color: var(--text); }
+  .header-close:active { transform: scale(0.94); }
+
+  .timer-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    position: relative;
+  }
+  .live-dot {
+    position: relative;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--lime);
+    align-self: center;
+    margin-bottom: 4px;
+  }
+  .live-dot::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: var(--lime);
+    animation: dotPulse 1.8s ease-out infinite;
+  }
+  .timer-big {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+  }
+  .timer-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-left: auto;
+    align-self: center;
+    margin-bottom: 4px;
+  }
+  .routine-name-row {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 700;
+    margin-top: 14px;
+    position: relative;
+  }
+  .routine-name-row span {
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-left: 6px;
+  }
+
+  /* Sheet body */
+  .sheet-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px 100px;
+  }
+  .sheet-body::-webkit-scrollbar { display: none; }
+
+  /* Exercise card (expandable como en workout.html) */
+  .exercise {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    transition: border-color 0.2s ease;
+  }
+  .exercise-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .exercise-head:active { transform: scale(0.997); }
+  .ex-status {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+  }
+  .exercise.done .ex-status { background: var(--lime); border-color: var(--lime); color: var(--bg-dark); }
+  .exercise.current .ex-status { border-color: var(--lime); color: var(--lime); }
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.005em;
+    line-height: 1.15;
+  }
+  .ex-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ex-meta .chip { text-transform: uppercase; letter-spacing: 0.14em; font-weight: 800; font-size: 9px; }
+  .ex-meta .dot { color: var(--text-dim); }
+  .exercise.pending .ex-name { color: var(--text-mute); font-weight: 600; }
+  .exercise.done .ex-name { color: var(--text-mute); font-weight: 600; }
+  .ex-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ex-summary {
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+  }
+  .exercise.done .ex-summary { color: var(--lime); }
+  .exercise.current .ex-summary { color: var(--text); }
+  .ex-chevron {
+    width: 20px; height: 20px;
+    color: var(--text-dim);
+    transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .exercise.current .ex-chevron { transform: rotate(180deg); color: var(--text-mute); }
+
+  .exercise-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .exercise.current .exercise-body { max-height: 500px; }
+  .body-inner { padding: 4px 16px 16px; border-top: 1px solid var(--border); }
+
+  /* Sets table */
+  .sets { margin-top: 14px; width: 100%; }
+  .sets-head {
+    display: grid;
+    grid-template-columns: 30px 1fr 70px 60px 38px;
+    gap: 8px;
+    padding: 0 4px 8px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .sets-head span:nth-child(3),
+  .sets-head span:nth-child(4) { text-align: center; }
+  .sets-head span:last-child { text-align: right; padding-right: 2px; }
+
+  .set-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 70px 60px 38px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 4px;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .set-row.active {
+    background: rgba(168, 224, 85, 0.04);
+    border-radius: 8px;
+    border-top-color: rgba(168, 224, 85, 0.15);
+  }
+  .set-num { font-weight: 900; color: var(--text); letter-spacing: -0.02em; }
+  .set-row.done .set-num { color: var(--text-mute); }
+  .set-row.active .set-num { color: var(--lime); }
+  .set-prev { font-size: 11.5px; color: var(--text-mute); font-weight: 600; }
+  .set-prev em { font-style: normal; color: var(--text-dim); }
+  .set-input {
+    height: 34px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s ease;
+  }
+  .set-row.done .set-input { background: transparent; border-color: transparent; }
+  .set-row.active .set-input:focus { border-color: var(--lime); background: rgba(168, 224, 85, 0.04); }
+  .set-check {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    transition: all 0.2s ease;
+  }
+  .set-row.done .set-check { background: var(--lime); border-color: var(--lime); color: var(--bg-dark); }
+  .set-row.active .set-check { border-color: var(--lime); color: var(--lime); }
+  .set-row.active .set-check:hover { background: var(--lime); color: var(--bg-dark); }
+  .set-check:active { transform: scale(0.92); }
+
+  .add-set {
+    margin-top: 10px;
+    width: 100%;
+    height: 42px;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .add-set:hover { color: var(--text); border-color: var(--lime); }
+  .add-set .plus {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* Finish CTA */
+  .finish-cta {
+    position: absolute;
+    bottom: 22px;
+    left: 18px;
+    right: 18px;
+    height: 56px;
+    background: rgba(20, 20, 20, 0.92);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 0 18px;
+    z-index: 5;
+  }
+  .finish-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .finish-stats strong {
+    color: var(--text);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    margin-right: 4px;
+  }
+  .finish-btn {
+    height: 42px;
+    padding: 0 18px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .finish-btn:hover { background: var(--lime-bright); }
+
+  /* Caption */
+  .caption {
+    position: absolute;
+    bottom: -36px;
+    left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+  .hint {
+    position: absolute;
+    top: -42px;
+    left: 0; right: 0;
+    text-align: center;
+    color: var(--lime);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 800;
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="hint" id="hint">↓ tap en el strip "Remo con barra" ↓</div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <!-- HOME content (base) -->
+    <div class="home-content">
+      <div class="app-bar">
+        <div class="wordmark">RAWSETS<span class="wordmark-dot">.</span></div>
+        <div class="icon-btn">
+          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+      </div>
+
+      <article class="hero-card">
+        <div class="hero-card-header">
+          <span class="hero-card-title">Balance muscular</span>
+          <span class="hero-card-range">14 días</span>
+        </div>
+
+        <div class="radar-wrap">
+          <svg class="radar" width="280" height="280" viewBox="0 0 280 280">
+            <polygon points="140,50 218,95 218,185 140,230 62,185 62,95" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <polygon points="140,80 192,110 192,170 140,200 88,170 88,110" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <polygon points="140,110 166,125 166,155 140,170 114,155 114,125" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+            <line x1="140" y1="140" x2="140" y2="50"  stroke="rgba(255,255,255,0.04)"/>
+            <line x1="140" y1="140" x2="218" y2="95"  stroke="rgba(255,255,255,0.04)"/>
+            <line x1="140" y1="140" x2="218" y2="185" stroke="rgba(255,255,255,0.04)"/>
+            <line x1="140" y1="140" x2="140" y2="230" stroke="rgba(255,255,255,0.04)"/>
+            <line x1="140" y1="140" x2="62"  y2="185" stroke="rgba(255,255,255,0.04)"/>
+            <line x1="140" y1="140" x2="62"  y2="95"  stroke="rgba(255,255,255,0.04)"/>
+
+            <polygon points="140,57.2 193,109.4 199.2,174.2 140,189.5 110.4,157.1 84.7,108.0"
+                     fill="rgba(168, 224, 85, 0.18)" stroke="#A8E055" stroke-width="2" stroke-linejoin="round"/>
+
+            <circle cx="140"   cy="57.2"  r="3.5" fill="#A8E055"/>
+            <circle cx="193"   cy="109.4" r="3.5" fill="#A8E055"/>
+            <circle cx="199.2" cy="174.2" r="3.5" fill="#A8E055"/>
+            <circle cx="140"   cy="189.5" r="3.5" fill="#A8E055"/>
+            <circle cx="110.4" cy="157.1" r="4.5" fill="#FF3B5C"/>
+            <circle cx="84.7"  cy="108.0" r="3.5" fill="#A8E055"/>
+
+            <g font-family="Inter, system-ui" font-size="9" font-weight="800" letter-spacing="1.5">
+              <text x="140" y="34"  text-anchor="middle" fill="#8A8A8A">PECHO</text>
+              <text x="140" y="46"  text-anchor="middle" fill="#A8E055" font-size="10" letter-spacing="0">92</text>
+              <text x="232" y="78"  text-anchor="middle" fill="#8A8A8A">BRAZOS</text>
+              <text x="232" y="90"  text-anchor="middle" fill="#FAFAFA" font-size="10" letter-spacing="0">68</text>
+              <text x="232" y="200" text-anchor="middle" fill="#8A8A8A">PIERNAS</text>
+              <text x="232" y="212" text-anchor="middle" fill="#FAFAFA" font-size="10" letter-spacing="0">76</text>
+              <text x="140" y="252" text-anchor="middle" fill="#8A8A8A">CORE</text>
+              <text x="140" y="264" text-anchor="middle" fill="#FAFAFA" font-size="10" letter-spacing="0">55</text>
+              <text x="48"  y="200" text-anchor="middle" fill="#FF3B5C">ESPALDA</text>
+              <text x="48"  y="212" text-anchor="middle" fill="#FF3B5C" font-size="10" letter-spacing="0">38</text>
+              <text x="48"  y="78"  text-anchor="middle" fill="#8A8A8A">HOMBROS</text>
+              <text x="48"  y="90"  text-anchor="middle" fill="#FAFAFA" font-size="10" letter-spacing="0">71</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="hero-sub"><strong>Espalda</strong> bajo rango — hoy toca tirón.</div>
+      </article>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Volumen sem</div>
+          <div class="stat-value">12.4<span style="font-size:16px;color:var(--text-mute);font-weight:700;">t</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Sesiones</div>
+          <div class="stat-value">4<span style="font-size:16px;color:var(--text-mute);font-weight:700;">/5</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">PRs · mes</div>
+          <div class="stat-value" style="color:var(--lime);">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Grupos OK</div>
+          <div class="stat-value" style="color:var(--rose);">8<span style="font-size:16px;color:var(--text-mute);font-weight:700;">/11</span></div>
+        </div>
+      </div>
+
+      <div class="eyebrow">Sesión en curso</div>
+      <div class="hero-card" style="text-align:left; padding:18px;">
+        <div class="hero-label" style="color:var(--lime);">↗ Tap en strip de abajo para volver</div>
+        <div style="font-size:22px;font-weight:900;letter-spacing:-0.03em;margin-top:6px;">Tirón A</div>
+        <div style="font-size:12px;color:var(--text-mute);margin-top:4px;">2 / 6 ejercicios · 42:18</div>
+      </div>
+    </div>
+
+    <!-- BACKDROP (entre home y sheet) -->
+    <div class="backdrop"></div>
+
+    <!-- WORKOUT SHEET (sube desde abajo) -->
+    <div class="workout-sheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+
+      <div class="sheet-header">
+        <div class="header-top">
+          <div class="header-eyebrow">
+            Entreno activo<span class="progress">· 3 / 6</span>
+          </div>
+          <button class="header-close" id="closeBtn" aria-label="Minimizar a tab bar">
+            <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.6;"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="timer-row">
+          <span class="live-dot"></span>
+          <span class="timer-big" id="timer">00:42:18</span>
+          <span class="timer-label">Tiempo total</span>
+        </div>
+
+        <div class="routine-name-row">
+          Tirón A <span>· Espalda + Bíceps</span>
+        </div>
+      </div>
+
+      <div class="sheet-body">
+        <article class="exercise done">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Peso muerto</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span><span class="dot">·</span><span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 6</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise done">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Dominadas lastradas</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span><span class="dot">·</span><span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 8</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise current">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Remo con barra</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span><span class="dot">·</span><span>Serie 3 / 4</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">2 / 4</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+          <div class="exercise-body">
+            <div class="body-inner">
+              <div class="sets">
+                <div class="sets-head">
+                  <span>Set</span><span>Previa</span><span>Kg</span><span>Reps</span><span></span>
+                </div>
+                <div class="set-row done">
+                  <span class="set-num">1</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="62.5" readonly>
+                  <input class="set-input" value="12" readonly>
+                  <button class="set-check">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+                <div class="set-row done">
+                  <span class="set-num">2</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="62.5" readonly>
+                  <input class="set-input" value="12" readonly>
+                  <button class="set-check">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+                <div class="set-row active">
+                  <span class="set-num">3</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="65" inputmode="decimal">
+                  <input class="set-input" value="10" inputmode="numeric">
+                  <button class="set-check">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+                <div class="set-row">
+                  <span class="set-num">4</span>
+                  <span class="set-prev"><em>—</em></span>
+                  <input class="set-input" value="65" inputmode="decimal">
+                  <input class="set-input" value="10" inputmode="numeric">
+                  <button class="set-check">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button class="add-set">
+                <span class="plus">+</span>
+                Añadir serie
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Jalón al pecho</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span><span class="dot">·</span><span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 10</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Curl con barra</div>
+              <div class="ex-meta">
+                <span class="chip">Bíceps</span><span class="dot">·</span><span>3 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">3 × 12</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Curl martillo</div>
+              <div class="ex-meta">
+                <span class="chip">Bíceps</span><span class="dot">·</span><span>3 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">3 × 12</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="finish-cta">
+        <div class="finish-stats">
+          <span><strong>9.2</strong>t</span>
+          <span><strong>14</strong> series</span>
+        </div>
+        <button class="finish-btn">
+          Terminar
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB BAR (always workout-active for the demo) -->
+    <nav class="tab-bar">
+      <button type="button" class="workout-strip" id="strip">
+        <span class="workout-pulse"></span>
+        <span class="workout-time" id="stripTime">00:42:18</span>
+        <span class="workout-divider"></span>
+        <span class="workout-exercise">
+          <span class="workout-exercise-name">Remo con barra</span>
+          <span class="workout-exercise-set">Serie 3 / 4 · 65 kg</span>
+        </span>
+        <span class="workout-expand">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+        </span>
+      </button>
+
+      <div class="tabs-row">
+        <button type="button" class="tab active">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M11.3 2.7a1 1 0 0 1 1.4 0l8 7a1 1 0 0 1 .3.75V20a2 2 0 0 1-2 2h-4v-7h-4v7H5a2 2 0 0 1-2-2v-9.55a1 1 0 0 1 .3-.75z" fill="currentColor" stroke="none"/></svg>
+          <span class="tab-label">Home</span>
+        </button>
+        <button type="button" class="tab" data-nav="routines.html">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          <span class="tab-label">Rutinas</span>
+        </button>
+        <button type="button" class="tab" data-nav="body.html">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M12 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM7 13c0-1 1-3 5-3s5 2 5 3v1h-3l-1 7h-2l-1-7H7z"/></svg>
+          <span class="tab-label">Body</span>
+        </button>
+        <button type="button" class="tab" data-nav="settings.html">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="tab-label">Settings</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+
+  <div class="caption">RAWSETS — Demo · Home → Workout sheet (slide-up)</div>
+</div>
+
+<script>
+  const phone = document.querySelector('.phone');
+  const strip = document.getElementById('strip');
+  const closeBtn = document.getElementById('closeBtn');
+  const backdrop = document.querySelector('.backdrop');
+  const hint = document.getElementById('hint');
+
+  // Open sheet
+  strip.addEventListener('click', () => {
+    phone.classList.add('show-sheet');
+    hint.style.display = 'none';
+  });
+
+  // Close sheet
+  closeBtn.addEventListener('click', () => {
+    phone.classList.remove('show-sheet');
+  });
+
+  // Backdrop tap closes
+  backdrop.addEventListener('click', () => {
+    phone.classList.remove('show-sheet');
+  });
+
+  // Live timer
+  const timerEl = document.getElementById('timer');
+  const stripTimeEl = document.getElementById('stripTime');
+  let secs = 42 * 60 + 18;
+  const fmt = n => String(n).padStart(2, '0');
+  const formatTime = s => `${fmt(Math.floor(s/3600))}:${fmt(Math.floor((s%3600)/60))}:${fmt(s%60)}`;
+  setInterval(() => {
+    secs += 1;
+    timerEl.textContent = formatTime(secs);
+    stripTimeEl.textContent = formatTime(secs);
+  }, 1000);
+
+  // Tab navigation (otros tabs)
+  document.querySelectorAll('.tab[data-nav]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = tab.dataset.nav; }, 200);
+    });
+  });
+</script>
+
+</body>
+</html>

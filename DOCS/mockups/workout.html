@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Workout activo (logging sets)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .stage { position: relative; }
+
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+
+  .notch {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 30;
+  }
+
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 20;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  /* Sheet header — sticky, contiene el hero del timer */
+  .sheet-header {
+    position: relative;
+    padding: 6px 24px 22px;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-header::before {
+    content: '';
+    position: absolute;
+    top: -10%; left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 200px;
+    background: radial-gradient(ellipse at center, rgba(168, 224, 85, 0.10), transparent 65%);
+    pointer-events: none;
+    filter: blur(8px);
+    z-index: 0;
+  }
+
+  .drag-handle {
+    width: 38px;
+    height: 4px;
+    background: var(--border-strong);
+    border-radius: 999px;
+    margin: 4px auto 14px;
+    position: relative;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .header-eyebrow .progress {
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    margin-left: 6px;
+  }
+  .header-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.2s ease;
+  }
+  .header-close:hover { color: var(--text); }
+  .header-close:active { transform: scale(0.95); }
+
+  /* Timer hero */
+  .timer-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .live-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--lime);
+    flex-shrink: 0;
+    align-self: center;
+    margin-bottom: 4px;
+  }
+  .live-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--lime);
+    animation: dotPulse 1.8s ease-out infinite;
+  }
+  @keyframes dotPulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+
+  .timer {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+  }
+  .timer-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-left: auto;
+    align-self: center;
+    margin-bottom: 4px;
+  }
+
+  .routine-name {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 700;
+    margin-top: 14px;
+    letter-spacing: -0.005em;
+    position: relative;
+    z-index: 1;
+  }
+  .routine-name span {
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-left: 6px;
+  }
+
+  /* Content scrollable */
+  .content {
+    height: calc(100% - 48px);
+    overflow-y: auto;
+    padding-bottom: 100px;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  .list {
+    padding: 18px 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Exercise card base */
+  .exercise {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .exercise-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .exercise-head:active { transform: scale(0.997); }
+
+  .ex-status {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+  }
+  .exercise.done .ex-status {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: var(--bg-dark);
+  }
+  .exercise.current .ex-status {
+    border-color: var(--lime);
+    color: var(--lime);
+  }
+
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.005em;
+    line-height: 1.15;
+  }
+  .ex-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ex-meta .chip {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 800;
+    font-size: 9px;
+  }
+  .ex-meta .dot { color: var(--text-dim); }
+
+  .exercise.pending .ex-name { color: var(--text-mute); font-weight: 600; }
+  .exercise.done .ex-name { color: var(--text-mute); font-weight: 600; }
+
+  .ex-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .ex-summary {
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+  }
+  .exercise.done .ex-summary { color: var(--lime); }
+  .exercise.current .ex-summary { color: var(--text); }
+
+  .ex-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--text-dim);
+    transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .exercise.current .ex-chevron { transform: rotate(180deg); color: var(--text-mute); }
+
+  /* Expanded body */
+  .exercise-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .exercise.current .exercise-body { max-height: 600px; }
+
+  .body-inner {
+    padding: 4px 16px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
+
+  /* Sets table */
+  .sets {
+    margin-top: 14px;
+    width: 100%;
+  }
+  .sets-head {
+    display: grid;
+    grid-template-columns: 30px 1fr 70px 60px 38px;
+    gap: 8px;
+    align-items: center;
+    padding: 0 4px 8px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .sets-head span:nth-child(3),
+  .sets-head span:nth-child(4) { text-align: center; }
+  .sets-head span:last-child { text-align: right; padding-right: 2px; }
+
+  .set-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 70px 60px 38px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 4px;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.2s ease;
+  }
+  .set-row.active {
+    background: rgba(168, 224, 85, 0.04);
+    border-radius: 8px;
+    border-top-color: rgba(168, 224, 85, 0.15);
+  }
+
+  .set-num {
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .set-row.done .set-num { color: var(--text-mute); }
+  .set-row.active .set-num { color: var(--lime); }
+
+  .set-prev {
+    font-size: 11.5px;
+    color: var(--text-mute);
+    font-weight: 600;
+  }
+  .set-prev em {
+    font-style: normal;
+    color: var(--text-dim);
+  }
+
+  .set-input {
+    height: 34px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    width: 100%;
+  }
+  .set-row.done .set-input {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text);
+    font-weight: 800;
+  }
+  .set-row.active .set-input:focus {
+    border-color: var(--lime);
+    background: rgba(168, 224, 85, 0.04);
+  }
+
+  .set-check {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    transition: all 0.2s ease;
+  }
+  .set-row.done .set-check {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: var(--bg-dark);
+  }
+  .set-row.active .set-check {
+    border-color: var(--lime);
+    color: var(--lime);
+  }
+  .set-row.active .set-check:hover {
+    background: var(--lime);
+    color: var(--bg-dark);
+  }
+  .set-check:active { transform: scale(0.92); }
+
+  /* Add set */
+  .add-set {
+    margin-top: 10px;
+    width: 100%;
+    height: 42px;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .add-set:hover {
+    color: var(--text);
+    border-color: var(--lime);
+  }
+  .add-set:active { transform: scale(0.99); }
+  .add-set .plus {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* Rest timer inline (oculto por defecto, JS lo activa) */
+  .rest-bar {
+    margin-top: 12px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .exercise.resting .rest-bar { display: flex; }
+
+  .rest-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .rest-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .rest-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .rest-time {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-top: 3px;
+  }
+  .rest-skip {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .rest-skip:hover { color: var(--text); border-color: var(--text-mute); }
+
+  /* Finish CTA flotante abajo */
+  .finish-cta {
+    position: absolute;
+    bottom: 22px;
+    left: 18px;
+    right: 18px;
+    height: 56px;
+    background: rgba(20, 20, 20, 0.88);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 0 18px;
+    z-index: 10;
+    box-shadow:
+      0 24px 50px rgba(0,0,0,0.55),
+      0 4px 12px rgba(0,0,0,0.3);
+  }
+  .finish-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .finish-stats strong {
+    color: var(--text);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    margin-right: 4px;
+  }
+  .finish-btn {
+    height: 42px;
+    padding: 0 18px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .finish-btn:hover { background: var(--lime-bright); }
+  .finish-btn:active { transform: scale(0.98); }
+
+  /* Caption fuera del phone */
+  .caption {
+    position: absolute;
+    bottom: -36px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+
+  /* Toggle state for demo */
+  .state-toggle {
+    position: absolute;
+    top: -36px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .state-toggle button {
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .state-toggle button.active {
+    background: var(--lime);
+    color: var(--bg-dark);
+    border-color: var(--lime);
+  }
+
+  .ic {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="state-toggle">
+    <button class="active" data-state="logging">Logging set</button>
+    <button data-state="resting">Resting</button>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+      <header class="sheet-header">
+        <div class="drag-handle"></div>
+
+        <div class="header-top">
+          <div class="header-eyebrow">
+            Entreno activo<span class="progress">· 3 / 6</span>
+          </div>
+          <button class="header-close" aria-label="Minimizar a tab bar">
+            <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.6;"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="timer-row">
+          <span class="live-dot"></span>
+          <span class="timer">00:42:18</span>
+          <span class="timer-label">Tiempo total</span>
+        </div>
+
+        <div class="routine-name">
+          Tirón A <span>· Espalda + Bíceps</span>
+        </div>
+      </header>
+
+      <div class="list">
+
+        <!-- Ejercicio completado -->
+        <article class="exercise done">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Peso muerto</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span>
+                <span class="dot">·</span>
+                <span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 6</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <!-- Ejercicio completado -->
+        <article class="exercise done">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Dominadas lastradas</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span>
+                <span class="dot">·</span>
+                <span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 8</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <!-- Ejercicio actual (expandido) -->
+        <article class="exercise current" id="current-ex">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Remo con barra</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span>
+                <span class="dot">·</span>
+                <span>Serie 3 / 4</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">2 / 4</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <div class="exercise-body">
+            <div class="body-inner">
+              <div class="sets">
+                <div class="sets-head">
+                  <span>Set</span>
+                  <span>Previa</span>
+                  <span>Kg</span>
+                  <span>Reps</span>
+                  <span></span>
+                </div>
+
+                <div class="set-row done">
+                  <span class="set-num">1</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="62.5" readonly>
+                  <input class="set-input" value="12" readonly>
+                  <button class="set-check" aria-label="Serie completada">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+
+                <div class="set-row done">
+                  <span class="set-num">2</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="62.5" readonly>
+                  <input class="set-input" value="12" readonly>
+                  <button class="set-check" aria-label="Serie completada">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+
+                <div class="set-row active">
+                  <span class="set-num">3</span>
+                  <span class="set-prev">62 × 12</span>
+                  <input class="set-input" value="65" inputmode="decimal">
+                  <input class="set-input" value="10" inputmode="numeric">
+                  <button class="set-check" aria-label="Confirmar serie">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+
+                <div class="set-row">
+                  <span class="set-num">4</span>
+                  <span class="set-prev"><em>—</em></span>
+                  <input class="set-input" value="65" inputmode="decimal">
+                  <input class="set-input" value="10" inputmode="numeric">
+                  <button class="set-check" aria-label="Confirmar serie">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <button class="add-set">
+                <span class="plus">+</span>
+                Añadir serie
+              </button>
+
+              <div class="rest-bar">
+                <div class="rest-icon">
+                  <svg viewBox="0 0 24 24" style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6M12 5V2"/></svg>
+                </div>
+                <div class="rest-meta">
+                  <span class="rest-label">Descanso</span>
+                  <span class="rest-time" id="rest-time">01:24</span>
+                </div>
+                <button class="rest-skip">Saltar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Ejercicios pendientes -->
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Jalón al pecho</div>
+              <div class="ex-meta">
+                <span class="chip">Espalda</span>
+                <span class="dot">·</span>
+                <span>4 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">4 × 10</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Curl con barra</div>
+              <div class="ex-meta">
+                <span class="chip">Bíceps</span>
+                <span class="dot">·</span>
+                <span>3 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">3 × 12</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="exercise pending">
+          <div class="exercise-head">
+            <span class="ex-status">
+              <svg viewBox="0 0 24 24" style="width:11px;height:11px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/></svg>
+            </span>
+            <div class="ex-info">
+              <div class="ex-name">Curl martillo</div>
+              <div class="ex-meta">
+                <span class="chip">Bíceps</span>
+                <span class="dot">·</span>
+                <span>3 series</span>
+              </div>
+            </div>
+            <div class="ex-right">
+              <span class="ex-summary">3 × 12</span>
+              <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- Floating finish CTA -->
+    <div class="finish-cta">
+      <div class="finish-stats">
+        <span><strong>9.2</strong>t</span>
+        <span><strong>14</strong> series</span>
+      </div>
+      <button class="finish-btn">
+        Terminar
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Active workout · logging sets</div>
+</div>
+
+<script>
+  // State toggle (logging vs resting)
+  const toggleBtns = document.querySelectorAll('.state-toggle button');
+  const currentEx = document.getElementById('current-ex');
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const state = btn.dataset.state;
+      if (state === 'resting') {
+        currentEx.classList.add('resting');
+      } else {
+        currentEx.classList.remove('resting');
+      }
+    });
+  });
+
+  // Live workout timer (header hero)
+  const timerEl = document.querySelector('.timer');
+  let totalSeconds = 42 * 60 + 18;
+  const fmt = n => String(n).padStart(2, '0');
+  const formatTime = s => `${fmt(Math.floor(s/3600))}:${fmt(Math.floor((s%3600)/60))}:${fmt(s%60)}`;
+  setInterval(() => {
+    totalSeconds += 1;
+    timerEl.textContent = formatTime(totalSeconds);
+  }, 1000);
+
+  // Rest countdown
+  const restEl = document.getElementById('rest-time');
+  let restSeconds = 84;
+  const fmtRest = s => `${fmt(Math.floor(s/60))}:${fmt(s%60)}`;
+  setInterval(() => {
+    if (currentEx.classList.contains('resting') && restSeconds > 0) {
+      restSeconds -= 1;
+      restEl.textContent = fmtRest(restSeconds);
+    }
+  }, 1000);
+
+  // Set check toggle (demo)
+  document.querySelectorAll('.set-row .set-check').forEach(check => {
+    check.addEventListener('click', e => {
+      const row = check.closest('.set-row');
+      row.classList.toggle('done');
+      row.classList.remove('active');
+    });
+  });
+
+  // Click on exercise head → switch which is current (demo only)
+  document.querySelectorAll('.exercise-head').forEach(head => {
+    head.addEventListener('click', e => {
+      const ex = head.closest('.exercise');
+      // Solo expandimos si es current; otros podrían navegar a su detalle
+      if (!ex.classList.contains('current')) return;
+    });
+  });
+</script>
+
+</body>
+</html>
