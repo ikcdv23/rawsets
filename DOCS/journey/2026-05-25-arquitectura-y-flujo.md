@@ -98,8 +98,9 @@ Tras cerrar arquitectura, Javier verbalizó: *"Esto que siento ahora es un chute
   - `?? DOCS/journey/`
   - `?? apps/mobile/.claude/settings.json`
 - **Decidir herramienta de backlog** (GitHub Issues vs Lumma vs Linear). Mientras tanto, tareas pactadas en conversación.
-- **Próxima pieza de UI**: tab bar — siguiendo `feedback-rawsets-bottom-nav` (dock cóncavo violeta + FAB central). NO es feature en sentido workflow (es chrome global), no tendrá `features/.../` propio.
-- **Primera feature real**: probablemente `workouts/` con `logSet` como caso de uso inaugural. Estrenará Hexagonal de verdad.
+- **Primer trabajo de mañana**: **base de datos antes que nada** (Javier lo cambió al final de la sesión — se siente más cómodo empezando por el cimiento). Implica: schema Drizzle de las entidades del modelo (ficha técnica §7), setup de `expo-sqlite` + driver Drizzle, migraciones, posiblemente seed de los ejercicios iniciales. Probablemente merece un ADR-0002 con convenciones (naming columnas, IDs, timestamps, booleans).
+- **Tab bar custom**: siguiendo `feedback-rawsets-bottom-nav` (dock cóncavo violeta + FAB central). NO es feature en sentido workflow (es chrome global), no tendrá `features/.../` propio. Orden vs DB y vs logSet por decidir mañana en frío.
+- **Primera feature real**: `workouts/` con `logSet` como caso de uso inaugural. Estrenará Hexagonal de verdad. Con DB ya montada, va contra Drizzle+SQLite desde el primer commit (descarta la ruta A "in-memory primero" que se planteó en sesión).
 
 ## Notas para el yo-del-futuro
 
