@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Finish workout summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.08) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  .content {
+    padding: 12px 24px 120px;
+    height: calc(100% - 48px);
+    overflow-y: auto;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Hero header */
+  .finish-hero {
+    text-align: center;
+    padding: 12px 0 24px;
+    position: relative;
+  }
+  .finish-badge {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    position: relative;
+    animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .finish-badge::after {
+    content: '';
+    position: absolute; inset: -10px;
+    border-radius: 50%;
+    border: 2px solid var(--lime);
+    opacity: 0;
+    animation: ring 1.5s ease-out 0.3s infinite;
+  }
+  @keyframes ring {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  .finish-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .finish-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+  .finish-sub {
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  /* Stats grid */
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+  .stat-value .unit { font-size: 16px; color: var(--text-mute); font-weight: 700; margin-left: 2px; }
+  .stat-value.hi { color: var(--lime); }
+
+  /* Eyebrow */
+  .eyebrow {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0 12px;
+  }
+  .eyebrow::after { content: ''; height: 1px; flex: 1; background: var(--border); }
+
+  /* PR cards */
+  .pr-card {
+    background: linear-gradient(135deg, rgba(168,224,85,0.10), var(--bg-card) 60%);
+    border: 1px solid rgba(168,224,85,0.25);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .pr-star {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pr-info { flex: 1; }
+  .pr-name { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
+  .pr-detail { font-size: 11px; color: var(--lime); font-weight: 700; margin-top: 2px; }
+  .pr-val {
+    font-size: 20px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--lime);
+  }
+  .pr-val .u { font-size: 12px; color: var(--text-mute); font-weight: 700; }
+
+  /* Balance impact */
+  .balance {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px 16px;
+  }
+  .balance-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .balance-row:last-child { border-bottom: none; }
+  .balance-name {
+    font-size: 13px;
+    font-weight: 700;
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .balance-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .balance-fill { height: 100%; background: var(--lime); border-radius: 3px; }
+  .balance-delta {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    width: 42px;
+    text-align: right;
+  }
+
+  /* CTA */
+  .cta-row {
+    position: absolute;
+    bottom: 24px;
+    left: 24px; right: 24px;
+    display: flex;
+    gap: 10px;
+    z-index: 5;
+  }
+  .save-btn {
+    flex: 1;
+    height: 56px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .save-btn:hover { background: var(--lime-bright); }
+  .save-btn:active { transform: scale(0.99); }
+  .share-btn {
+    width: 56px; height: 56px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .share-btn:hover { border-color: var(--lime); color: var(--lime); }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="finish-hero">
+        <div class="finish-badge">
+          <svg class="ic" viewBox="0 0 24 24" style="width:30px;height:30px;stroke-width:3;"><path d="M5 12l5 5L20 7"/></svg>
+        </div>
+        <div class="finish-eyebrow">Entreno completado</div>
+        <div class="finish-title">Tirón A</div>
+        <div class="finish-sub">Hoy · 48 min · 6 ejercicios</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Volumen</div>
+          <div class="stat-value">9.2<span class="unit">t</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Series</div>
+          <div class="stat-value">22</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Duración</div>
+          <div class="stat-value">48<span class="unit">min</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Récords</div>
+          <div class="stat-value hi">2</div>
+        </div>
+      </div>
+
+      <div class="eyebrow">Récords conseguidos</div>
+
+      <div class="pr-card">
+        <div class="pr-star">
+          <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor" stroke="none"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
+        </div>
+        <div class="pr-info">
+          <div class="pr-name">Peso muerto</div>
+          <div class="pr-detail">↑ +10 kg respecto al anterior</div>
+        </div>
+        <div class="pr-val">150<span class="u"> kg</span></div>
+      </div>
+
+      <div class="pr-card">
+        <div class="pr-star">
+          <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor" stroke="none"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
+        </div>
+        <div class="pr-info">
+          <div class="pr-name">Dominadas lastradas</div>
+          <div class="pr-detail">↑ +2.5 kg respecto al anterior</div>
+        </div>
+        <div class="pr-val">+20<span class="u"> kg</span></div>
+      </div>
+
+      <div class="eyebrow">Impacto en balance</div>
+
+      <div class="balance">
+        <div class="balance-row">
+          <span class="balance-name">Espalda</span>
+          <div class="balance-bar"><div class="balance-fill" style="width:52%"></div></div>
+          <span class="balance-delta">+14</span>
+        </div>
+        <div class="balance-row">
+          <span class="balance-name">Bíceps</span>
+          <div class="balance-bar"><div class="balance-fill" style="width:74%"></div></div>
+          <span class="balance-delta">+6</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cta-row">
+      <button class="save-btn">Guardar entreno</button>
+      <button class="share-btn" aria-label="Compartir">
+        <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v14"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Finish workout summary</div>
+</div>
+
+</body>
+</html>

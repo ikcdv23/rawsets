@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Exercise picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+
+  /* Faux background */
+  .bg-content { position: absolute; inset: 0; padding: 60px 24px; filter: blur(3px); }
+  .bg-line { height: 14px; background: var(--bg-card); border-radius: 7px; margin-bottom: 14px; }
+  .bg-card-faux { height: 120px; background: var(--bg-card); border-radius: 18px; margin-bottom: 16px; }
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+    z-index: 20;
+  }
+
+  /* Sheet (casi full height) */
+  .sheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 88%;
+    background: var(--bg-dark);
+    border-top: 1px solid var(--border-strong);
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.7);
+  }
+
+  .sheet-handle-wrap { display: flex; justify-content: center; padding: 8px 0 6px; }
+  .sheet-handle { width: 38px; height: 4px; background: var(--border-strong); border-radius: 999px; }
+
+  /* Header */
+  .picker-header {
+    padding: 6px 22px 14px;
+  }
+  .picker-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .picker-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+  }
+  .picker-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .picker-close:active { transform: scale(0.94); }
+
+  /* Search */
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 14px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    transition: border-color 0.2s ease;
+  }
+  .search:focus-within { border-color: var(--lime); }
+  .search svg { color: var(--text-mute); flex-shrink: 0; }
+  .search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .search input::placeholder { color: var(--text-dim); font-weight: 500; }
+
+  /* Filter chips */
+  .filters {
+    display: flex;
+    gap: 8px;
+    padding: 14px 22px 12px;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-mute);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .filter.active { background: var(--lime); color: var(--bg-dark); border-color: var(--lime); }
+
+  /* List */
+  .ex-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 22px 120px;
+  }
+  .ex-list::-webkit-scrollbar { display: none; }
+
+  .group-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin: 16px 0 8px;
+  }
+
+  .ex-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .ex-item:active { transform: scale(0.997); }
+  .ex-thumb {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    flex-shrink: 0;
+  }
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.15;
+  }
+  .ex-tag {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  .ex-tag .sec { color: var(--text-dim); }
+  .ex-add {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  .ex-item.selected .ex-add {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: var(--bg-dark);
+  }
+  .ex-item.selected .ex-thumb { border-color: var(--lime); color: var(--lime); }
+
+  /* Bottom CTA */
+  .picker-cta {
+    position: absolute;
+    bottom: 22px;
+    left: 18px; right: 18px;
+    height: 56px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 5;
+    box-shadow: 0 12px 30px rgba(168,224,85,0.18), 0 8px 20px rgba(0,0,0,0.4);
+    transition: all 0.2s ease;
+  }
+  .picker-cta:hover { background: var(--lime-bright); }
+  .picker-cta:active { transform: scale(0.99); }
+  .picker-cta:disabled {
+    background: var(--bg-card);
+    color: var(--text-dim);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .picker-cta .count {
+    background: rgba(10,10,10,0.18);
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+  }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="bg-content">
+      <div class="bg-line" style="width:50%;"></div>
+      <div class="bg-card-faux" style="height:90px;"></div>
+      <div class="bg-card-faux" style="height:70px;"></div>
+    </div>
+    <div class="backdrop"></div>
+
+    <div class="sheet">
+      <div class="sheet-handle-wrap"><div class="sheet-handle"></div></div>
+
+      <div class="picker-header">
+        <div class="picker-header-top">
+          <div class="picker-title">Añadir ejercicio</div>
+          <button class="picker-close" aria-label="Cerrar">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="search">
+          <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" placeholder="Buscar ejercicio...">
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filter active">Todos</div>
+        <div class="filter">Pecho</div>
+        <div class="filter">Espalda</div>
+        <div class="filter">Hombro</div>
+        <div class="filter">Bíceps</div>
+        <div class="filter">Tríceps</div>
+        <div class="filter">Pierna</div>
+        <div class="filter">Core</div>
+      </div>
+
+      <div class="ex-list">
+        <div class="group-label">Espalda</div>
+
+        <div class="ex-item selected">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Peso muerto</div>
+            <div class="ex-tag">Espalda <span class="sec">· Isquios · Glúteo</span></div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:3;"><path d="M5 12l5 5L20 7"/></svg>
+          </button>
+        </div>
+
+        <div class="ex-item selected">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Dominadas</div>
+            <div class="ex-tag">Espalda <span class="sec">· Bíceps</span></div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:3;"><path d="M5 12l5 5L20 7"/></svg>
+          </button>
+        </div>
+
+        <div class="ex-item">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Remo con barra</div>
+            <div class="ex-tag">Espalda <span class="sec">· Bíceps</span></div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div class="ex-item">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Jalón al pecho</div>
+            <div class="ex-tag">Espalda <span class="sec">· Bíceps</span></div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div class="group-label">Bíceps</div>
+
+        <div class="ex-item">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Curl con barra</div>
+            <div class="ex-tag">Bíceps</div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div class="ex-item">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Curl martillo</div>
+            <div class="ex-tag">Bíceps <span class="sec">· Antebrazo</span></div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div class="ex-item">
+          <div class="ex-thumb">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">Curl concentrado</div>
+            <div class="ex-tag">Bíceps</div>
+          </div>
+          <button class="ex-add">
+            <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="picker-cta">
+        Añadir <span class="count">2</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Exercise picker</div>
+</div>
+
+<script>
+  const items = document.querySelectorAll('.ex-item');
+  const cta = document.querySelector('.picker-cta');
+  const countEl = cta.querySelector('.count');
+
+  function refresh() {
+    const n = document.querySelectorAll('.ex-item.selected').length;
+    countEl.textContent = n;
+    cta.disabled = n === 0;
+    // Cambia icono add/check según estado
+    items.forEach(it => {
+      const btn = it.querySelector('.ex-add svg path');
+      if (it.classList.contains('selected')) {
+        btn.setAttribute('d', 'M5 12l5 5L20 7');
+        btn.parentElement.setAttribute('stroke-width', '3');
+      } else {
+        btn.setAttribute('d', 'M12 5v14M5 12h14');
+        btn.parentElement.setAttribute('stroke-width', '2.6');
+      }
+    });
+  }
+
+  items.forEach(it => {
+    it.addEventListener('click', () => {
+      it.classList.toggle('selected');
+      refresh();
+    });
+  });
+
+  // Filters
+  document.querySelectorAll('.filter').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('.filter').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+    });
+  });
+
+  refresh();
+</script>
+
+</body>
+</html>

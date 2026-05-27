@@ -360,7 +360,7 @@
         <div class="app-title">Ajustes<span class="app-title-dot">.</span></div>
       </div>
 
-      <article class="profile">
+      <article class="profile" data-nav="profile.html" style="cursor:pointer;">
         <div class="avatar">JA</div>
         <div class="profile-info">
           <div class="profile-name">Javier</div>
@@ -501,10 +501,10 @@
 </div>
 
 <script>
-  document.querySelectorAll('.tab[data-nav]').forEach(tab => {
-    tab.addEventListener('click', () => {
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => {
       document.body.style.opacity = '0';
-      setTimeout(() => { window.location.href = tab.dataset.nav; }, 200);
+      setTimeout(() => { window.location.href = el.dataset.nav; }, 200);
     });
   });
   document.querySelectorAll('.toggle').forEach(t => {

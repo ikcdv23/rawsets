@@ -852,9 +852,7 @@
     <div class="home-content">
       <div class="app-bar">
         <div class="wordmark">RAWSETS<span class="wordmark-dot">.</span></div>
-        <div class="icon-btn">
-          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/></svg>
-        </div>
+        <div class="icon-btn" data-nav="profile.html" style="font-size:13px;font-weight:900;color:var(--lime);letter-spacing:-0.02em;cursor:pointer;">JA</div>
       </div>
 
       <article class="hero-card">
@@ -1209,11 +1207,11 @@
     stripTimeEl.textContent = formatTime(secs);
   }, 1000);
 
-  // Tab navigation (otros tabs)
-  document.querySelectorAll('.tab[data-nav]').forEach(tab => {
-    tab.addEventListener('click', () => {
+  // Navegación (tabs + avatar)
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => {
       document.body.style.opacity = '0';
-      setTimeout(() => { window.location.href = tab.dataset.nav; }, 200);
+      setTimeout(() => { window.location.href = el.dataset.nav; }, 200);
     });
   });
 </script>

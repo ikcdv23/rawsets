@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Perfil &amp; logros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+    --amber: #F5C24E;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  .content {
+    padding: 8px 24px 40px;
+    height: calc(100% - 48px);
+    overflow-y: auto;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* App bar */
+  .app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 22px;
+  }
+  .icon-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    cursor: pointer;
+  }
+  .icon-btn:active { transform: scale(0.94); }
+
+  /* Profile hero */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .avatar {
+    width: 92px; height: 92px;
+    border-radius: 50%;
+    background: var(--bg-card-2);
+    border: 2px solid var(--lime);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--lime);
+    letter-spacing: -0.03em;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .avatar-rank {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--lime);
+    color: var(--bg-dark);
+    font-size: 10px;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 3px solid var(--bg-dark);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .name { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; }
+  .handle { font-size: 12px; color: var(--text-mute); font-weight: 600; margin-top: 4px; }
+
+  /* Rank progress */
+  .rank-bar-wrap {
+    width: 100%;
+    margin-top: 16px;
+  }
+  .rank-bar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 8px;
+  }
+  .rank-bar-meta .next { color: var(--lime); }
+  .rank-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .rank-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--lime), var(--lime-bright));
+    border-radius: 999px;
+    width: 68%;
+  }
+
+  /* Stats row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 22px 0 8px;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat-value .u { font-size: 12px; color: var(--text-mute); font-weight: 700; }
+  .stat-label {
+    font-size: 9px;
+    color: var(--text-mute);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-top: 8px;
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    font-size: 10px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 26px 0 14px;
+  }
+  .eyebrow::after { content: ''; height: 1px; flex: 1; background: var(--border); }
+  .eyebrow .cnt { color: var(--lime); }
+
+  /* Badges grid */
+  .badges {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .badge {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .badge:active { transform: scale(0.96); }
+  .badge-medal {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .badge-name {
+    font-size: 10.5px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  /* Unlocked */
+  .badge.unlocked { border-color: rgba(168,224,85,0.25); }
+  .badge.unlocked::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(168,224,85,0.12), transparent 65%);
+    pointer-events: none;
+  }
+  .badge.unlocked .badge-medal { background: var(--lime); color: var(--bg-dark); }
+  .badge.unlocked .badge-name { color: var(--text); }
+
+  /* Featured (Vegeta) */
+  .badge.featured .badge-medal {
+    background: linear-gradient(135deg, var(--lime), var(--amber));
+    color: var(--bg-dark);
+    box-shadow: 0 0 20px rgba(168,224,85,0.4);
+  }
+
+  /* Locked */
+  .badge.locked .badge-medal { background: var(--bg-card-2); color: var(--text-dim); border: 1px solid var(--border-strong); }
+  .badge.locked .badge-name { color: var(--text-dim); }
+  .badge-progress {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  /* ===== Achievement detail dialog ===== */
+  .backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+    z-index: 25;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .phone.detail-open .backdrop { opacity: 1; pointer-events: auto; }
+  .detail {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -48%) scale(0.94);
+    width: calc(100% - 56px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 26px;
+    padding: 30px 24px 24px;
+    z-index: 30;
+    text-align: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  .phone.detail-open .detail { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+  .detail-medal {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lime), var(--amber));
+    color: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    box-shadow: 0 0 30px rgba(168,224,85,0.4);
+  }
+  .detail-name { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
+  .detail-phrase {
+    font-size: 15px;
+    color: var(--lime);
+    font-weight: 700;
+    font-style: italic;
+    margin: 10px 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .detail-desc { font-size: 12.5px; color: var(--text-mute); font-weight: 500; line-height: 1.5; }
+  .detail-date {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-top: 16px;
+  }
+  .detail-close {
+    margin-top: 22px;
+    width: 100%;
+    height: 52px;
+    background: var(--bg-card-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+  }
+
+  /* ===== Achievement unlock notification (top banner) ===== */
+  .notif {
+    position: absolute;
+    top: 52px;
+    left: 14px; right: 14px;
+    background: rgba(20,20,20,0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(168,224,85,0.3);
+    border-radius: 18px;
+    padding: 14px 14px 0;
+    z-index: 35;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6), 0 0 24px rgba(168,224,85,0.12);
+    transform: translateY(-160%);
+    transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+    overflow: hidden;
+  }
+  .phone.notif-show .notif { transform: translateY(0); }
+
+  .notif-body {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 14px;
+  }
+  .notif-medal {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lime), var(--amber));
+    color: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(168,224,85,0.4);
+  }
+  .notif-info { flex: 1; min-width: 0; }
+  .notif-eyebrow {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 3px;
+  }
+  .notif-name { font-size: 15px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; }
+  .notif-phrase { font-size: 11.5px; color: var(--text-mute); font-weight: 500; font-style: italic; margin-top: 2px; }
+  .notif-hide {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: flex-start;
+    transition: all 0.2s ease;
+  }
+  .notif-hide:hover { color: var(--text); }
+  .notif-hide:active { transform: scale(0.9); }
+
+  /* Timer bar (auto-dismiss) */
+  .notif-timer {
+    height: 3px;
+    background: var(--lime);
+    border-radius: 999px;
+    margin: 0 -14px;
+    transform-origin: left;
+    animation: timerShrink 5s linear forwards;
+  }
+  .phone.notif-show .notif-timer { animation: timerShrink 5s linear forwards; }
+  @keyframes timerShrink {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+  }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .state-toggle {
+    position: absolute;
+    top: -38px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .state-toggle button {
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="state-toggle">
+    <button id="replayNotif">▶ Reproducir notificación de logro</button>
+  </div>
+
+  <div class="phone notif-show">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="app-bar">
+        <button class="icon-btn" aria-label="Volver" data-nav="home-to-workout.html">
+          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;stroke-width:2.6;"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Ajustes" data-nav="settings.html">
+          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <div class="hero">
+        <div class="avatar">
+          JA
+          <span class="avatar-rank">Nivel 7</span>
+        </div>
+        <div class="name">Javier</div>
+        <div class="handle">@javier · Intermedio</div>
+
+        <div class="rank-bar-wrap">
+          <div class="rank-bar-meta">
+            <span>Nivel 7</span>
+            <span class="next">340 / 500 XP</span>
+          </div>
+          <div class="rank-bar"><div class="rank-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">47</div>
+          <div class="stat-label">Entrenos</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">12<span class="u">d</span></div>
+          <div class="stat-label">Racha</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">14</div>
+          <div class="stat-label">Récords</div>
+        </div>
+      </div>
+
+      <div class="eyebrow">Logros <span class="cnt">4 / 12</span></div>
+
+      <div class="badges">
+        <div class="badge unlocked featured"
+             data-name="¡Es más de 9000!"
+             data-phrase="El scouter no miente."
+             data-desc="Superaste 9000 kg de volumen en un solo entreno."
+             data-date="Desbloqueado · 24 may 2026">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:24px;height:24px;" fill="currentColor" stroke="none"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+          </div>
+          <div class="badge-name">¡Es más de 9000!</div>
+        </div>
+
+        <div class="badge unlocked"
+             data-name="Club de los 100"
+             data-phrase="Bienvenido al club."
+             data-desc="Tu primer levantamiento de 100 kg o más."
+             data-date="Desbloqueado · 10 may 2026">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+          </div>
+          <div class="badge-name">Club de los 100</div>
+        </div>
+
+        <div class="badge unlocked"
+             data-name="Primer paso"
+             data-phrase="Todo empieza con una serie."
+             data-desc="Completaste tu primer entreno en RAWSETS."
+             data-date="Desbloqueado · 2 mar 2026">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M5 12l5 5L20 7"/></svg>
+          </div>
+          <div class="badge-name">Primer paso</div>
+        </div>
+
+        <div class="badge unlocked"
+             data-name="Constancia de hierro"
+             data-phrase="La disciplina pesa menos que el arrepentimiento."
+             data-desc="3 meses siguiendo tu plan sin saltarte semanas."
+             data-date="Desbloqueado · 20 may 2026">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14l2 2 4-4"/></svg>
+          </div>
+          <div class="badge-name">Constancia de hierro</div>
+        </div>
+
+        <div class="badge locked"
+             data-name="Imparable"
+             data-phrase="Bloqueado"
+             data-desc="Mantén una racha de 30 días entrenando."
+             data-date="Progreso · 12 / 30 días">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div class="badge-name">Imparable</div>
+          <div class="badge-progress">12 / 30</div>
+        </div>
+
+        <div class="badge locked"
+             data-name="Equilibrio perfecto"
+             data-phrase="Bloqueado"
+             data-desc="Lleva los 11 grupos musculares por encima de 70 de balance."
+             data-date="Progreso · 8 / 11 grupos">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div class="badge-name">Equilibrio perfecto</div>
+          <div class="badge-progress">8 / 11</div>
+        </div>
+
+        <div class="badge locked"
+             data-name="Madrugador"
+             data-phrase="Bloqueado"
+             data-desc="Completa 10 entrenos antes de las 8:00."
+             data-date="Progreso · 3 / 10">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div class="badge-name">Madrugador</div>
+          <div class="badge-progress">3 / 10</div>
+        </div>
+
+        <div class="badge locked"
+             data-name="Media tonelada"
+             data-phrase="Bloqueado"
+             data-desc="Acumula 500.000 kg de volumen total."
+             data-date="Progreso · 312k / 500k">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div class="badge-name">Media tonelada</div>
+          <div class="badge-progress">312k</div>
+        </div>
+
+        <div class="badge locked"
+             data-name="???"
+             data-phrase="Bloqueado"
+             data-desc="Logro secreto. Sigue entrenando para descubrirlo."
+             data-date="Oculto">
+          <div class="badge-medal">
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M12 17h.01M9.1 9a3 3 0 1 1 4 2.8c-.9.4-1.6 1.2-1.6 2.2"/></svg>
+          </div>
+          <div class="badge-name">Secreto</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievement unlock notification -->
+    <div class="notif">
+      <div class="notif-body">
+        <div class="notif-medal">
+          <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;" fill="currentColor" stroke="none"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+        </div>
+        <div class="notif-info">
+          <div class="notif-eyebrow">Logro desbloqueado</div>
+          <div class="notif-name">¡Es más de 9000!</div>
+          <div class="notif-phrase">El scouter no miente.</div>
+        </div>
+        <button class="notif-hide" id="hideNotif" aria-label="Ocultar">
+          <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M18 15l-6-6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="notif-timer" id="notifTimer"></div>
+    </div>
+
+    <!-- Achievement detail -->
+    <div class="backdrop" id="backdrop"></div>
+    <div class="detail" id="detail">
+      <div class="detail-medal" id="dMedal">
+        <svg class="ic" viewBox="0 0 24 24" style="width:34px;height:34px;" fill="currentColor" stroke="none"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+      </div>
+      <div class="detail-name" id="dName">¡Es más de 9000!</div>
+      <div class="detail-phrase" id="dPhrase">"El scouter no miente."</div>
+      <div class="detail-desc" id="dDesc">Superaste 9000 kg de volumen en un solo entreno.</div>
+      <div class="detail-date" id="dDate">Desbloqueado · 24 may 2026</div>
+      <button class="detail-close" id="dClose">Cerrar</button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Perfil &amp; logros</div>
+</div>
+
+<script>
+  const phone = document.querySelector('.phone');
+
+  // Navegación (back + ajustes)
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = el.dataset.nav; }, 200);
+    });
+  });
+
+  // ---- Notification auto-dismiss + manual hide ----
+  const notifTimer = document.getElementById('notifTimer');
+  let dismissTimeout;
+
+  function showNotif() {
+    phone.classList.add('notif-show');
+    // reinicia animación del timer
+    notifTimer.style.animation = 'none';
+    void notifTimer.offsetWidth;
+    notifTimer.style.animation = 'timerShrink 5s linear forwards';
+    clearTimeout(dismissTimeout);
+    dismissTimeout = setTimeout(hideNotif, 5000);
+  }
+  function hideNotif() {
+    phone.classList.remove('notif-show');
+    clearTimeout(dismissTimeout);
+  }
+
+  document.getElementById('hideNotif').addEventListener('click', hideNotif);
+  document.getElementById('replayNotif').addEventListener('click', showNotif);
+
+  // arranca el timer inicial
+  dismissTimeout = setTimeout(hideNotif, 5000);
+
+  // ---- Badge detail ----
+  const detail = document.getElementById('detail');
+  const dName = document.getElementById('dName');
+  const dPhrase = document.getElementById('dPhrase');
+  const dDesc = document.getElementById('dDesc');
+  const dDate = document.getElementById('dDate');
+  const dMedal = document.getElementById('dMedal');
+
+  document.querySelectorAll('.badge').forEach(b => {
+    b.addEventListener('click', () => {
+      dName.textContent = b.dataset.name;
+      dPhrase.textContent = b.dataset.phrase === 'Bloqueado' ? '' : `"${b.dataset.phrase}"`;
+      dPhrase.style.display = b.dataset.phrase === 'Bloqueado' ? 'none' : 'block';
+      dDesc.textContent = b.dataset.desc;
+      dDate.textContent = b.dataset.date;
+      const locked = b.classList.contains('locked');
+      dMedal.style.background = locked ? 'var(--bg-card-2)' : 'linear-gradient(135deg, var(--lime), var(--amber))';
+      dMedal.style.color = locked ? 'var(--text-dim)' : 'var(--bg-dark)';
+      dMedal.style.boxShadow = locked ? 'none' : '0 0 30px rgba(168,224,85,0.4)';
+      phone.classList.add('detail-open');
+    });
+  });
+  document.getElementById('dClose').addEventListener('click', () => phone.classList.remove('detail-open'));
+  document.getElementById('backdrop').addEventListener('click', () => phone.classList.remove('detail-open'));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Modales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+    --amber: #F5C24E;
+    --teal: #5DD6C8;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+
+  /* Faux background content (blurred behind modal) */
+  .bg-content {
+    position: absolute;
+    inset: 0;
+    padding: 60px 24px;
+    filter: blur(0);
+    transition: filter 0.3s ease;
+  }
+  .phone.modal-open .bg-content { filter: blur(3px); }
+  .bg-line {
+    height: 14px;
+    background: var(--bg-card);
+    border-radius: 7px;
+    margin-bottom: 14px;
+  }
+  .bg-card-faux {
+    height: 120px;
+    background: var(--bg-card);
+    border-radius: 18px;
+    margin-bottom: 16px;
+  }
+
+  /* Backdrop */
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .phone.modal-open .backdrop { opacity: 1; pointer-events: auto; }
+
+  /* Centered dialog */
+  .dialog {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -48%) scale(0.94);
+    width: calc(100% - 56px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 26px;
+    padding: 30px 24px 24px;
+    z-index: 30;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  .modal.active.dialog-modal .dialog {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .modal { display: none; }
+  .modal.active { display: block; }
+
+  .dialog-badge {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .dialog-badge.ok { background: var(--lime); color: var(--bg-dark); }
+  .dialog-badge.danger { background: rgba(255,59,92,0.14); color: var(--rose); }
+  .dialog-badge.pr {
+    background: var(--lime); color: var(--bg-dark);
+  }
+  .dialog-badge.ok::after, .dialog-badge.pr::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px solid var(--lime);
+    opacity: 0;
+    animation: ring 1.5s ease-out infinite;
+  }
+  @keyframes ring {
+    0% { transform: scale(1); opacity: 0.55; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  .modal.active .dialog-badge { animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  .dialog-title {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .dialog-sub {
+    font-size: 13.5px;
+    color: var(--text-mute);
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    padding: 0 6px;
+  }
+  .dialog-sub strong { color: var(--text); font-weight: 700; }
+
+  /* PR value highlight */
+  .pr-value {
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--lime);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    margin: 4px 0 6px;
+  }
+  .pr-value .unit { font-size: 22px; color: var(--text-mute); font-weight: 700; }
+  .pr-delta {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--lime);
+    letter-spacing: -0.005em;
+    margin-bottom: 22px;
+  }
+
+  .dialog-actions { display: flex; flex-direction: column; gap: 10px; }
+  .dialog-actions.row { flex-direction: row; }
+  .mbtn {
+    height: 56px;
+    border-radius: 16px;
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.2s ease;
+    flex: 1;
+  }
+  .mbtn svg { width: 18px; height: 18px; }
+  .mbtn-primary { background: var(--lime); color: var(--bg-dark); }
+  .mbtn-primary:hover { background: var(--lime-bright); }
+  .mbtn-danger { background: var(--rose); color: #fff; }
+  .mbtn-ghost { background: var(--bg-card-2); color: var(--text); border: 1px solid var(--border); }
+  .mbtn-ghost:hover { background: var(--border); }
+  .mbtn:active { transform: scale(0.98); }
+
+  /* Bottom sheet (create routine) */
+  .sheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-strong);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    padding: 8px 22px 28px;
+    z-index: 30;
+    transform: translateY(100%);
+    transition: transform 0.42s cubic-bezier(0.34, 1.25, 0.64, 1);
+    box-shadow: 0 -18px 50px rgba(0,0,0,0.6);
+  }
+  .modal.active.sheet-modal .sheet { transform: translateY(0); }
+
+  .sheet-handle {
+    width: 38px; height: 4px;
+    background: var(--border-strong);
+    border-radius: 999px;
+    margin: 4px auto 18px;
+  }
+  .sheet-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+  .sheet-desc {
+    font-size: 12.5px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  .form-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin: 14px 0 8px;
+    display: block;
+  }
+  .form-input {
+    width: 100%;
+    height: 50px;
+    background: var(--bg-card-2);
+    border: 1.5px solid var(--border);
+    border-radius: 13px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .form-input::placeholder { color: var(--text-dim); font-weight: 500; }
+  .form-input:focus { border-color: var(--lime); }
+
+  .chips-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pick {
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: var(--bg-card-2);
+    border: 1.5px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-mute);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .pick.on { border-color: var(--lime); color: var(--text); background: rgba(168,224,85,0.06); }
+
+  .add-ex-btn {
+    margin-top: 8px;
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 13px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .add-ex-btn:hover { color: var(--text); border-color: var(--lime); }
+
+  .sheet-cta {
+    margin-top: 22px;
+    width: 100%;
+    height: 56px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+  }
+  .sheet-cta:hover { background: var(--lime-bright); }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* State toggle (outside phone) */
+  .state-toggle {
+    position: absolute;
+    top: -42px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+  .state-toggle button {
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .state-toggle button.active { background: var(--lime); color: var(--bg-dark); border-color: var(--lime); }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="state-toggle">
+    <button class="active" data-modal="success">Éxito</button>
+    <button data-modal="create">Crear rutina</button>
+    <button data-modal="pr">Nuevo PR</button>
+    <button data-modal="discard">Descartar</button>
+    <button data-modal="delete">Borrar</button>
+  </div>
+
+  <div class="phone modal-open">
+    <div class="notch"></div>
+
+    <!-- Faux background -->
+    <div class="bg-content">
+      <div class="bg-line" style="width:60%;"></div>
+      <div class="bg-card-faux"></div>
+      <div class="bg-line" style="width:40%;"></div>
+      <div class="bg-card-faux" style="height:80px;"></div>
+      <div class="bg-card-faux" style="height:80px;"></div>
+    </div>
+
+    <div class="backdrop"></div>
+
+    <!-- MODAL: Éxito -->
+    <div class="modal active dialog-modal" data-modal="success">
+      <div class="dialog">
+        <div class="dialog-badge ok">
+          <svg class="ic" viewBox="0 0 24 24" style="width:36px;height:36px;stroke-width:3;"><path d="M5 12l5 5L20 7"/></svg>
+        </div>
+        <div class="dialog-title">¡Rutina creada!</div>
+        <div class="dialog-sub"><strong>Tirón A</strong> está lista. Ya puedes asignarla a tu calendario o empezar a entrenar.</div>
+        <div class="dialog-actions row">
+          <button class="mbtn mbtn-ghost">Más tarde</button>
+          <button class="mbtn mbtn-primary">Entrenar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Crear rutina (sheet) -->
+    <div class="modal sheet-modal" data-modal="create">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Nueva rutina</div>
+        <div class="sheet-desc">Dale un nombre y añade ejercicios.</div>
+
+        <label class="form-label">Nombre</label>
+        <input class="form-input" type="text" placeholder="Ej. Tirón A" value="Tirón A">
+
+        <label class="form-label">Grupos principales</label>
+        <div class="chips-pick">
+          <div class="pick on">Espalda</div>
+          <div class="pick on">Bíceps</div>
+          <div class="pick">Pecho</div>
+          <div class="pick">Hombro</div>
+          <div class="pick">Pierna</div>
+          <div class="pick">Core</div>
+        </div>
+
+        <label class="form-label">Ejercicios</label>
+        <button class="add-ex-btn">
+          <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir ejercicio
+        </button>
+
+        <button class="sheet-cta">Crear rutina</button>
+      </div>
+    </div>
+
+    <!-- MODAL: Nuevo PR -->
+    <div class="modal dialog-modal" data-modal="pr">
+      <div class="dialog">
+        <div class="dialog-badge pr">
+          <svg class="ic" viewBox="0 0 24 24" style="width:36px;height:36px;stroke-width:2.4;" fill="currentColor" stroke="none"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
+        </div>
+        <div class="dialog-title">¡Nuevo récord!</div>
+        <div class="dialog-sub">Press banca — superaste tu marca anterior.</div>
+        <div class="pr-value">85<span class="unit"> kg</span></div>
+        <div class="pr-delta">↑ +5 kg respecto a tu marca anterior</div>
+        <div class="dialog-actions row">
+          <button class="mbtn mbtn-primary">Seguir entrenando</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Descartar entreno -->
+    <div class="modal dialog-modal" data-modal="discard">
+      <div class="dialog">
+        <div class="dialog-badge danger">
+          <svg class="ic" viewBox="0 0 24 24" style="width:34px;height:34px;stroke-width:2.4;"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        </div>
+        <div class="dialog-title">¿Descartar entreno?</div>
+        <div class="dialog-sub">Llevas <strong>2 ejercicios</strong> y <strong>32 min</strong> registrados. Si sales ahora, se perderá.</div>
+        <div class="dialog-actions row">
+          <button class="mbtn mbtn-ghost">Seguir</button>
+          <button class="mbtn mbtn-danger">Descartar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Borrar rutina -->
+    <div class="modal dialog-modal" data-modal="delete">
+      <div class="dialog">
+        <div class="dialog-badge danger">
+          <svg class="ic" viewBox="0 0 24 24" style="width:32px;height:32px;stroke-width:2.4;"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        </div>
+        <div class="dialog-title">¿Borrar "Tirón A"?</div>
+        <div class="dialog-sub">Esta rutina y su asignación en el calendario se eliminarán. Los entrenos ya registrados se conservan.</div>
+        <div class="dialog-actions row">
+          <button class="mbtn mbtn-ghost">Cancelar</button>
+          <button class="mbtn mbtn-danger">Borrar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Modales</div>
+</div>
+
+<script>
+  const phone = document.querySelector('.phone');
+  const modals = document.querySelectorAll('.modal');
+  const toggles = document.querySelectorAll('.state-toggle button');
+
+  function show(name) {
+    modals.forEach(m => m.classList.toggle('active', m.dataset.modal === name));
+    toggles.forEach(t => t.classList.toggle('active', t.dataset.modal === name));
+    phone.classList.add('modal-open');
+  }
+
+  toggles.forEach(t => t.addEventListener('click', () => show(t.dataset.modal)));
+
+  // Backdrop no cierra aquí (es showcase), pero dejamos el patrón listo
+  document.querySelector('.backdrop').addEventListener('click', () => {
+    // En la app real cerraría; aquí mantenemos el modal visible para revisión
+  });
+</script>
+
+</body>
+</html>

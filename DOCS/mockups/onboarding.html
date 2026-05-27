@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.06) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 30;
+  }
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  /* Top bar: back + progress */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 24px 0;
+    height: 56px;
+  }
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .back-btn:hover { color: var(--text); }
+  .back-btn:active { transform: scale(0.94); }
+  .back-btn.hidden { opacity: 0; pointer-events: none; }
+
+  .progress {
+    flex: 1;
+    display: flex;
+    gap: 5px;
+  }
+  .progress-seg {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border-strong);
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-seg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--lime);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .progress-seg.done::after { transform: scaleX(1); }
+  .progress-seg.current::after { transform: scaleX(0.5); }
+
+  /* Step container */
+  .steps {
+    height: calc(100% - 48px - 56px);
+    position: relative;
+  }
+  .step {
+    position: absolute;
+    inset: 0;
+    padding: 16px 24px 120px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+    overflow-y: auto;
+  }
+  .step::-webkit-scrollbar { display: none; }
+  .step.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .step-eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 10px;
+  }
+  .step-title {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+  .step-sub {
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  /* Gender cards */
+  .gender-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .gender-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gender-card:active { transform: scale(0.97); }
+  .gender-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-card-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    transition: all 0.25s ease;
+  }
+  .gender-label {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+    transition: color 0.25s ease;
+  }
+  .gender-card.selected {
+    border-color: var(--lime);
+    background: rgba(168, 224, 85, 0.06);
+  }
+  .gender-card.selected .gender-icon { background: var(--lime); color: var(--bg-dark); }
+  .gender-card.selected .gender-label { color: var(--text); }
+
+  .gender-other {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-mute);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .gender-other.selected { border-color: var(--lime); color: var(--text); background: rgba(168, 224, 85, 0.06); }
+
+  /* Scroll-wheel picker */
+  .picker-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .picker {
+    position: relative;
+    height: 260px;
+    width: 100%;
+    max-width: 220px;
+  }
+  .picker-track {
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    padding: 106px 0;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(transparent, #000 28%, #000 72%, transparent);
+    mask-image: linear-gradient(transparent, #000 28%, #000 72%, transparent);
+  }
+  .picker-track::-webkit-scrollbar { display: none; }
+  .picker-item {
+    height: 48px;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    transition: all 0.18s ease;
+  }
+  .picker-item.near { color: var(--text-mute); font-size: 26px; }
+  .picker-item.selected {
+    color: var(--lime);
+    font-size: 46px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+  .picker-band {
+    position: absolute;
+    top: 50%;
+    left: -10px; right: -10px;
+    transform: translateY(-50%);
+    height: 56px;
+    border-top: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--border-strong);
+    pointer-events: none;
+  }
+  .picker-unit {
+    margin-top: 18px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  /* Activity / goal option list */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.2, 0.64, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .option:active { transform: scale(0.99); }
+  .option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: var(--bg-card-2);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .option-info { flex: 1; }
+  .option-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .option-desc {
+    font-size: 11.5px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-top: 3px;
+  }
+  .option-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: all 0.2s ease;
+  }
+  .option.selected { border-color: var(--lime); background: rgba(168, 224, 85, 0.06); }
+  .option.selected .option-icon { background: var(--lime); color: var(--bg-dark); }
+  .option.selected .option-check { background: var(--lime); border-color: var(--lime); color: var(--bg-dark); }
+
+  /* Profile */
+  .profile-setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .avatar-upload {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px dashed var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 14px;
+    transition: all 0.2s ease;
+  }
+  .avatar-upload:hover { border-color: var(--lime); color: var(--text); }
+  .avatar-badge {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--bg-dark);
+  }
+  .field {
+    width: 100%;
+    margin-top: 18px;
+  }
+  .field-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    height: 52px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .field-input::placeholder { color: var(--text-dim); }
+  .field-input:focus { border-color: var(--lime); }
+
+  /* Summary chips (profile step) */
+  .summary {
+    width: 100%;
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    padding: 8px 12px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .chip strong { color: var(--lime); font-weight: 900; margin-right: 2px; }
+
+  /* Success step */
+  .success {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .success-check {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    position: relative;
+    animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .success-check::after {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid var(--lime);
+    opacity: 0;
+    animation: ring 1.2s ease-out 0.3s infinite;
+  }
+  @keyframes ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+  .success-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    margin-bottom: 12px;
+  }
+  .success-sub {
+    font-size: 14px;
+    color: var(--text-mute);
+    font-weight: 500;
+    line-height: 1.5;
+    max-width: 260px;
+  }
+
+  /* Bottom CTA */
+  .bottom-cta {
+    position: absolute;
+    bottom: 28px;
+    left: 24px;
+    right: 24px;
+    z-index: 10;
+  }
+  .continue-btn {
+    width: 100%;
+    height: 56px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .continue-btn:hover { background: var(--lime-bright); }
+  .continue-btn:active { transform: scale(0.99); }
+  .continue-btn:disabled {
+    background: var(--bg-card);
+    color: var(--text-dim);
+    cursor: not-allowed;
+  }
+  .continue-btn .arr { width: 18px; height: 18px; transition: transform 0.2s ease; }
+  .continue-btn:hover .arr { transform: translateX(4px); }
+
+  .ic {
+    width: 18px; height: 18px;
+    stroke: currentColor; fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .caption {
+    position: absolute;
+    bottom: -36px;
+    left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="top-bar">
+      <button class="back-btn hidden" id="backBtn" aria-label="Atrás">
+        <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="progress" id="progress">
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+      </div>
+    </div>
+
+    <div class="steps">
+
+      <!-- STEP 0: Género -->
+      <section class="step active" data-step="0">
+        <div class="step-eyebrow">Paso 1 de 7</div>
+        <h1 class="step-title">¿Cuál es tu género?</h1>
+        <p class="step-sub">Lo usamos para mostrar tu silueta muscular y ajustar las estimaciones de balance.</p>
+        <div class="gender-grid">
+          <div class="gender-card" data-val="male">
+            <div class="gender-icon">
+              <svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><path d="M14.5 9.5L20 4M20 4h-5M20 4v5"/></svg>
+            </div>
+            <span class="gender-label">Hombre</span>
+          </div>
+          <div class="gender-card" data-val="female">
+            <div class="gender-icon">
+              <svg viewBox="0 0 24 24" style="width:26px;height:26px;" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M12 15v7M9 19h6"/></svg>
+            </div>
+            <span class="gender-label">Mujer</span>
+          </div>
+          <div class="gender-other" data-val="other">Prefiero no decirlo</div>
+        </div>
+      </section>
+
+      <!-- STEP 1: Edad -->
+      <section class="step" data-step="1">
+        <div class="step-eyebrow">Paso 2 de 7</div>
+        <h1 class="step-title">¿Cuántos años tienes?</h1>
+        <p class="step-sub">Ayuda a calibrar recomendaciones de volumen y recuperación.</p>
+        <div class="picker-wrap">
+          <div class="picker" data-picker="age" data-default="27">
+            <div class="picker-track"></div>
+            <div class="picker-band"></div>
+          </div>
+          <div class="picker-unit">Años</div>
+        </div>
+      </section>
+
+      <!-- STEP 2: Peso -->
+      <section class="step" data-step="2">
+        <div class="step-eyebrow">Paso 3 de 7</div>
+        <h1 class="step-title">¿Cuánto pesas?</h1>
+        <p class="step-sub">Puedes cambiarlo cuando quieras desde tu perfil.</p>
+        <div class="picker-wrap">
+          <div class="picker" data-picker="weight" data-default="78">
+            <div class="picker-track"></div>
+            <div class="picker-band"></div>
+          </div>
+          <div class="picker-unit">Kg</div>
+        </div>
+      </section>
+
+      <!-- STEP 3: Altura -->
+      <section class="step" data-step="3">
+        <div class="step-eyebrow">Paso 4 de 7</div>
+        <h1 class="step-title">¿Cuánto mides?</h1>
+        <p class="step-sub">Junto al peso, calculamos tu IMC y composición.</p>
+        <div class="picker-wrap">
+          <div class="picker" data-picker="height" data-default="178">
+            <div class="picker-track"></div>
+            <div class="picker-band"></div>
+          </div>
+          <div class="picker-unit">cm</div>
+        </div>
+      </section>
+
+      <!-- STEP 4: Nivel de actividad -->
+      <section class="step" data-step="4">
+        <div class="step-eyebrow">Paso 5 de 7</div>
+        <h1 class="step-title">¿Tu nivel actual?</h1>
+        <p class="step-sub">Calibramos el volumen inicial sugerido según tu experiencia.</p>
+        <div class="options" data-single="activity">
+          <div class="option" data-val="beginner">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Principiante</div>
+              <div class="option-desc">Menos de 1 año entrenando</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+          <div class="option" data-val="intermediate">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M5 21V10M12 21V4M19 21v-7"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Intermedio</div>
+              <div class="option-desc">1-3 años, técnica sólida</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+          <div class="option" data-val="advanced">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Avanzado</div>
+              <div class="option-desc">3+ años, entreno estructurado</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 5: Metas -->
+      <section class="step" data-step="5">
+        <div class="step-eyebrow">Paso 6 de 7</div>
+        <h1 class="step-title">¿Tu objetivo?</h1>
+        <p class="step-sub">Elige el principal. Podrás añadir más metas después.</p>
+        <div class="options" data-single="goal">
+          <div class="option" data-val="muscle">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M6 7h2v10H6zM16 7h2v10h-2zM8 12h8M3 9h3v6H3zM18 9h3v6h-3z"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Ganar músculo</div>
+              <div class="option-desc">Hipertrofia y volumen</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+          <div class="option" data-val="fatloss">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M12 2c0 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-.5-3-1.5-4 .5 3-1.5 4-2.5 2 0-2 1-4 0-7z"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Perder grasa</div>
+              <div class="option-desc">Recomposición y definición</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+          <div class="option" data-val="strength">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M6.5 6.5l11 11M4 9l-1 1 2 2M15 4l1-1 2 2M20 15l1-1-2-2M9 20l-1 1-2-2"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Fuerza</div>
+              <div class="option-desc">Levantar más peso, powerlifting</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+          <div class="option" data-val="endurance">
+            <div class="option-icon">
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M12 2a10 10 0 1 0 10 10M12 6v6l4 2"/></svg>
+            </div>
+            <div class="option-info">
+              <div class="option-name">Resistencia</div>
+              <div class="option-desc">Acondicionamiento y cardio</div>
+            </div>
+            <span class="option-check">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 6: Perfil -->
+      <section class="step" data-step="6">
+        <div class="step-eyebrow">Paso 7 de 7</div>
+        <h1 class="step-title">Completa tu perfil</h1>
+        <p class="step-sub">Cómo quieres que te llamemos.</p>
+        <div class="profile-setup">
+          <div class="avatar-upload">
+            <svg class="ic" viewBox="0 0 24 24" style="width:32px;height:32px;stroke-width:2;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+            <div class="avatar-badge">
+              <svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.6;"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Nombre</label>
+            <input class="field-input" type="text" placeholder="Tu nombre" value="Javier">
+          </div>
+          <div class="summary">
+            <div class="chip"><strong id="sum-gender">♂</strong> Hombre</div>
+            <div class="chip"><strong id="sum-age">27</strong> años</div>
+            <div class="chip"><strong id="sum-weight">78</strong> kg</div>
+            <div class="chip"><strong id="sum-height">178</strong> cm</div>
+            <div class="chip" id="sum-goal">Ganar músculo</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 7: Success -->
+      <section class="step" data-step="7">
+        <div class="success">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24" style="width:48px;height:48px;" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+          </div>
+          <h1 class="success-title">¡Todo listo!</h1>
+          <p class="success-sub">Tu perfil está configurado. Vamos a crear tu primera rutina y empezar a entrenar.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="bottom-cta">
+      <button class="continue-btn" id="continueBtn">
+        <span id="continueLabel">Continuar</span>
+        <svg class="arr" id="continueArr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Onboarding</div>
+</div>
+
+<script>
+  const TOTAL_INPUT_STEPS = 7; // steps 0..6 tienen progress; 7 = success
+  let current = 0;
+  const state = { gender: null, age: 27, weight: 78, height: 178, activity: null, goal: null };
+
+  const steps = [...document.querySelectorAll('.step')];
+  const segs = [...document.querySelectorAll('.progress-seg')];
+  const backBtn = document.getElementById('backBtn');
+  const continueBtn = document.getElementById('continueBtn');
+  const continueLabel = document.getElementById('continueLabel');
+  const continueArr = document.getElementById('continueArr');
+
+  // ---- Scroll-wheel pickers ----
+  const PICKER_RANGES = {
+    age: { min: 14, max: 90 },
+    weight: { min: 35, max: 160 },
+    height: { min: 130, max: 220 },
+  };
+
+  function buildPicker(picker) {
+    const key = picker.dataset.picker;
+    const range = PICKER_RANGES[key];
+    const track = picker.querySelector('.picker-track');
+    for (let v = range.min; v <= range.max; v++) {
+      const item = document.createElement('div');
+      item.className = 'picker-item';
+      item.textContent = v;
+      item.dataset.value = v;
+      track.appendChild(item);
+    }
+    const items = [...track.querySelectorAll('.picker-item')];
+
+    function update() {
+      const center = track.scrollTop + track.clientHeight / 2;
+      let closest = null, min = Infinity;
+      items.forEach(it => {
+        const itCenter = it.offsetTop + it.offsetHeight / 2;
+        const d = Math.abs(itCenter - center);
+        it.classList.remove('selected', 'near');
+        if (d < min) { min = d; closest = it; }
+      });
+      items.forEach(it => {
+        const itCenter = it.offsetTop + it.offsetHeight / 2;
+        const d = Math.abs(itCenter - center);
+        if (it === closest) {
+          it.classList.add('selected');
+          state[key] = parseInt(it.dataset.value, 10);
+        } else if (d < 56) {
+          it.classList.add('near');
+        }
+      });
+    }
+
+    track.addEventListener('scroll', update);
+
+    // Posición inicial
+    const def = parseInt(picker.dataset.default, 10);
+    const idx = def - range.min;
+    requestAnimationFrame(() => {
+      track.scrollTop = idx * 48;
+      update();
+    });
+
+    picker._update = update;
+  }
+
+  document.querySelectorAll('.picker').forEach(buildPicker);
+
+  // ---- Gender selection ----
+  const genderCards = document.querySelectorAll('[data-step="0"] .gender-card, [data-step="0"] .gender-other');
+  const genderGlyph = { male: '♂', female: '♀', other: '·' };
+  genderCards.forEach(card => {
+    card.addEventListener('click', () => {
+      genderCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.gender = card.dataset.val;
+      refreshContinue();
+    });
+  });
+
+  // ---- Single-select option lists ----
+  document.querySelectorAll('.options[data-single]').forEach(list => {
+    const key = list.dataset.single;
+    list.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        list.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        state[key] = opt.dataset.val;
+        refreshContinue();
+      });
+    });
+  });
+
+  // ---- Step navigation ----
+  function showStep(n) {
+    steps.forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+    // Progress
+    segs.forEach((seg, i) => {
+      seg.classList.remove('done', 'current');
+      if (i < n) seg.classList.add('done');
+      else if (i === n) seg.classList.add('current');
+    });
+    backBtn.classList.toggle('hidden', n === 0);
+    current = n;
+
+    // Re-trigger picker update (layout listo)
+    const activePicker = steps[n].querySelector('.picker');
+    if (activePicker && activePicker._update) requestAnimationFrame(activePicker._update);
+
+    // Success step: cambia CTA
+    if (n === 7) {
+      continueLabel.textContent = 'Crear primera rutina';
+      continueArr.style.display = 'block';
+      backBtn.classList.add('hidden');
+    } else {
+      continueLabel.textContent = 'Continuar';
+    }
+
+    // Rellena summary en step perfil
+    if (n === 6) fillSummary();
+    refreshContinue();
+  }
+
+  function refreshContinue() {
+    let ok = true;
+    if (current === 0) ok = !!state.gender;
+    if (current === 4) ok = !!state.activity;
+    if (current === 5) ok = !!state.goal;
+    continueBtn.disabled = !ok;
+  }
+
+  function fillSummary() {
+    document.getElementById('sum-gender').textContent = genderGlyph[state.gender] || '·';
+    document.getElementById('sum-age').textContent = state.age;
+    document.getElementById('sum-weight').textContent = state.weight;
+    document.getElementById('sum-height').textContent = state.height;
+    const goalNames = { muscle: 'Ganar músculo', fatloss: 'Perder grasa', strength: 'Fuerza', endurance: 'Resistencia' };
+    document.getElementById('sum-goal').textContent = goalNames[state.goal] || 'Sin meta';
+  }
+
+  continueBtn.addEventListener('click', () => {
+    if (continueBtn.disabled) return;
+    if (current < 7) {
+      showStep(current + 1);
+    } else {
+      // Success → entra a la app
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = 'routines.html'; }, 200);
+    }
+  });
+
+  backBtn.addEventListener('click', () => {
+    if (current > 0) showStep(current - 1);
+  });
+
+  showStep(0);
+</script>
+
+</body>
+</html>

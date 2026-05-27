@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Rest timer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.10) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 5;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  /* Overlay full-screen */
+  .rest {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 38%, #16210c 0%, #0A0A0A 60%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 28px 40px;
+    z-index: 4;
+  }
+
+  .rest-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--lime);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 6px;
+  }
+  .rest-eyebrow .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--lime);
+    position: relative;
+  }
+  .rest-eyebrow .dot::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: var(--lime);
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+
+  /* Ring hero */
+  .ring-wrap {
+    position: relative;
+    width: 280px; height: 280px;
+    margin: 36px 0 30px;
+  }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
+  .ring-fill {
+    fill: none;
+    stroke: var(--lime);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 817;
+    stroke-dashoffset: 245;
+    transition: stroke-dashoffset 1s linear;
+    filter: drop-shadow(0 0 8px rgba(168,224,85,0.4));
+  }
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-time {
+    font-size: 76px;
+    font-weight: 900;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+  .ring-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-top: 10px;
+  }
+
+  /* Adjust buttons */
+  .adjust {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  .adjust-btn {
+    height: 50px;
+    padding: 0 22px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+  }
+  .adjust-btn:hover { border-color: var(--lime); }
+  .adjust-btn:active { transform: scale(0.96); }
+
+  /* Next up card */
+  .next-up {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: auto;
+  }
+  .next-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 4px;
+  }
+  .next-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .next-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 600;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .next-set {
+    margin-left: auto;
+    text-align: right;
+  }
+  .next-set-val {
+    font-size: 20px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--lime);
+  }
+
+  /* Skip CTA */
+  .skip-btn {
+    width: 100%;
+    height: 56px;
+    margin-top: 14px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.2s ease;
+  }
+  .skip-btn:hover { background: var(--lime-bright); }
+  .skip-btn:active { transform: scale(0.99); }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="rest">
+      <div class="rest-eyebrow"><span class="dot"></span>Descanso</div>
+
+      <div class="ring-wrap">
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          <circle class="ring-track" cx="140" cy="140" r="130"/>
+          <circle class="ring-fill" id="ring" cx="140" cy="140" r="130"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-time" id="time">01:24</div>
+          <div class="ring-label">Restante</div>
+        </div>
+      </div>
+
+      <div class="adjust">
+        <button class="adjust-btn" id="minus">
+          <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.8;"><path d="M5 12h14"/></svg>
+          15s
+        </button>
+        <button class="adjust-btn" id="plus">
+          <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.8;"><path d="M12 5v14M5 12h14"/></svg>
+          15s
+        </button>
+      </div>
+
+      <div class="next-up">
+        <div>
+          <div class="next-label">Siguiente</div>
+          <div class="next-name">Remo con barra</div>
+          <div class="next-meta">Serie 4 de 4 · 65 kg</div>
+        </div>
+        <div class="next-set">
+          <div class="next-set-val">×10</div>
+        </div>
+      </div>
+
+      <button class="skip-btn">
+        Saltar descanso
+        <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;stroke-width:2.6;"><path d="M5 4l10 8-10 8zM19 5v14"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="caption">RAWSETS — Rest timer overlay</div>
+</div>
+
+<script>
+  const ring = document.getElementById('ring');
+  const timeEl = document.getElementById('time');
+  const CIRC = 2 * Math.PI * 130; // 817
+  let total = 90;
+  let remaining = 84;
+
+  const fmt = n => String(n).padStart(2, '0');
+  function render() {
+    timeEl.textContent = `${fmt(Math.floor(remaining/60))}:${fmt(remaining%60)}`;
+    const frac = remaining / total;
+    ring.style.strokeDashoffset = CIRC * (1 - frac);
+  }
+  ring.style.strokeDasharray = CIRC;
+  render();
+
+  const interval = setInterval(() => {
+    if (remaining > 0) { remaining--; render(); }
+  }, 1000);
+
+  document.getElementById('plus').addEventListener('click', () => {
+    remaining += 15; total = Math.max(total, remaining); render();
+  });
+  document.getElementById('minus').addEventListener('click', () => {
+    remaining = Math.max(0, remaining - 15); render();
+  });
+</script>
+
+</body>
+</html>

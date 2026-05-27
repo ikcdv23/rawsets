@@ -14,19 +14,53 @@ Maquetas HTML de alta fidelidad para iterar UI/UX **antes** de implementarla en 
 ```
 DOCS/mockups/
 ├── README.md              ← este archivo
-├── home.html              ← versión Forge sin radar (referencia base)
-├── home-radar.html        ← Home con radar hexagonal de balance (variante activa)
-├── workout.html           ← active workout, logging sets (✓ aprobado)
+├── index.html             ← entry point → redirige a home-to-workout.html
+│
+│   ── PANTALLAS PRINCIPALES (navegables entre sí vía tab bar) ──
+├── home-to-workout.html   ← ★ HOME CANÓNICO: radar hero + workout sheet (slide-up). Reemplaza home.html
+├── routines.html          ← Rutinas: calendario hero + lista de rutinas
 ├── body.html              ← Body: humanoid + balance + medidas + metas (reemplaza Stats)
-├── routines.html          ← TO DO — calendario hero + lista de rutinas
-├── routine-detail.html    ← TO DO — ver/editar rutina
-├── exercise-picker.html   ← TO DO — bottom sheet para añadir ejercicio
-├── rest-timer.html        ← TO DO — overlay durante workout
-├── finish-workout.html    ← TO DO — summary al terminar
-├── settings.html          ← TO DO — preferencias y unidades
-├── onboarding.html        ← TO DO — primera apertura
-└── empty-states.html      ← TO DO — sin rutinas / sin workouts / sin PRs
+├── settings.html          ← Ajustes: perfil + preferencias + notifs + datos
+│
+│   ── SUB-PANTALLAS ──
+├── auth.html              ← login + register + recuperar contraseña (Fase 2 — backend)
+├── routine-detail.html    ← ver/editar rutina (desde Rutinas)
+├── profile.html           ← perfil + insignias/logros + notificación de logro (desde avatar de Home)
+├── onboarding.html        ← wizard paginado de primera apertura (7 pasos)
+├── finish-workout.html    ← summary tras terminar entreno
+│
+│   ── OVERLAYS / SHEETS ──
+├── exercise-picker.html   ← bottom sheet para añadir ejercicio
+├── rest-timer.html        ← overlay de descanso (ring countdown)
+├── modals.html            ← showcase: éxito, crear rutina, PR, descartar, borrar
+│
+│   ── REFERENCIA ──
+├── components.html        ← galería UX: cargas, checks, toasts, badges, estados vacíos
+├── home.html              ← (legacy) versión Forge sin radar
+└── home-radar.html        ← (legacy) Home con radar aislado, sin transición a workout
 ```
+
+## Mapa de navegación (prototipo navegable)
+
+```
+index.html
+   └→ home-to-workout.html  ←──────────────┐
+        ├ tap strip workout → workout sheet (slide-up, mismo archivo)
+        ├ tap avatar (JA)   → profile.html ─┘ (back vuelve a Home)
+        │                         └ tap medalla → diálogo de logro
+        │                         └ icono ⚙ → settings.html
+        ├ tab Rutinas → routines.html
+        │                  ├ tap rutina → routine-detail.html → "Empezar" → Home
+        │                  └ tap día dashed → sheet de asignar (mismo archivo)
+        ├ tab Body    → body.html
+        └ tab Ajustes → settings.html
+
+auth.html (Fase 2)
+   ├ Login → "Entrar" → home-to-workout.html
+   └ Register → "Crear cuenta" → onboarding.html → "Crear primera rutina" → routines.html
+```
+
+> **Entry point**: en la app real (Fase 2 con backend) → `auth.html` → (si nuevo) `onboarding.html` → Home. En Fase 1 (local, sin cuentas) → primera apertura `onboarding.html`, siguientes → Home. En el prototipo, `index.html` va directo a Home para iterar rápido; auth y onboarding se revisan abriéndolos aparte.
 
 ## Reglas del juego
 

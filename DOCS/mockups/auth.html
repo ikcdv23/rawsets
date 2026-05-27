@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAWSETS — Login / Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0A0A0A;
+    --bg-card: #141414;
+    --bg-card-2: #1A1A1A;
+    --text: #FAFAFA;
+    --text-mute: #8A8A8A;
+    --text-dim: #4A4A4A;
+    --border: #1F1F1F;
+    --border-strong: #2A2A2A;
+    --lime: #A8E055;
+    --lime-bright: #C3F56E;
+    --rose: #FF3B5C;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 30%, #131313 0%, #050505 70%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.3s ease-out;
+    transition: opacity 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .stage { position: relative; }
+  .phone-glow {
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(circle at center, rgba(168, 224, 85, 0.08) 0%, transparent 65%);
+    filter: blur(40px);
+    z-index: -1;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 40;
+  }
+  .status-bar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+
+  .content {
+    padding: 12px 28px 32px;
+    height: calc(100% - 48px);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Brand hero */
+  .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 30px 0 28px;
+  }
+  .brand-mark {
+    width: 64px; height: 64px;
+    border-radius: 20px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 18px;
+    box-shadow: 0 0 30px rgba(168,224,85,0.3);
+  }
+  .wordmark { font-size: 22px; font-weight: 900; letter-spacing: 0.02em; }
+  .wordmark .dot { color: var(--lime); }
+
+  /* View */
+  .view { display: none; flex-direction: column; flex: 1; }
+  .view.active { display: flex; }
+
+  .view-title {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    margin-bottom: 6px;
+  }
+  .view-sub {
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-bottom: 26px;
+    line-height: 1.5;
+  }
+
+  /* Fields */
+  .field { margin-bottom: 14px; }
+  .field-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .field-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 16px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    transition: border-color 0.2s ease;
+  }
+  .field-box:focus-within { border-color: var(--lime); }
+  .field-box svg { color: var(--text-mute); flex-shrink: 0; }
+  .field-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .field-box input::placeholder { color: var(--text-dim); font-weight: 500; }
+  .field-toggle {
+    color: var(--text-mute);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .forgot {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--lime);
+    cursor: pointer;
+    margin-bottom: 22px;
+  }
+
+  /* Primary button */
+  .btn {
+    width: 100%;
+    height: 56px;
+    background: var(--lime);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .btn:hover { background: var(--lime-bright); }
+  .btn:active { transform: scale(0.99); }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 22px 0;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Social */
+  .social { display: flex; gap: 12px; }
+  .social-btn {
+    flex: 1;
+    height: 52px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+  .social-btn:hover { border-color: var(--text-mute); }
+  .social-btn:active { transform: scale(0.98); }
+
+  /* Switch view footer */
+  .switch-foot {
+    margin-top: auto;
+    padding-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-mute);
+    font-weight: 500;
+  }
+  .switch-foot a {
+    color: var(--lime);
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* Back (forgot view) */
+  .back-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+    cursor: pointer;
+    margin-bottom: 18px;
+  }
+  .back-btn:active { transform: scale(0.94); }
+
+  .ic { stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .state-toggle {
+    position: absolute;
+    top: -38px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .state-toggle button {
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    color: var(--text-mute);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+  }
+  .state-toggle button.active { background: var(--lime); color: var(--bg-dark); border-color: var(--lime); }
+
+  .caption {
+    position: absolute;
+    bottom: -36px; left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="phone-glow"></div>
+
+  <div class="state-toggle">
+    <button class="active" data-view="login">Login</button>
+    <button data-view="register">Register</button>
+    <button data-view="forgot">Recuperar</button>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg class="ic" style="width:14px;height:14px;stroke-width:2;" viewBox="0 0 24 24"><path d="M1 11l2-2 2 2M5 13l2-2 2 2M9 15l2-2 2 2M13 17l2-2 2 2"/></svg>
+        <span style="font-size:12px;font-weight:700;">5G</span>
+        <svg class="ic" style="width:22px;height:12px;stroke-width:1.5;" viewBox="0 0 22 12"><rect x="1" y="1" width="17" height="10" rx="2"/><rect x="3" y="3" width="13" height="6" fill="currentColor" stroke="none"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div class="wordmark">RAWSETS<span class="dot">.</span></div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="view active" data-view="login">
+        <div class="view-title">Bienvenido de vuelta</div>
+        <div class="view-sub">Entra para seguir registrando tu progreso.</div>
+
+        <div class="field">
+          <label class="field-label">Email</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input type="email" placeholder="tu@email.com" value="javier@rawsets.app">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Contraseña</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <input type="password" placeholder="••••••••" value="password">
+            <button class="field-toggle" data-toggle>
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="forgot" data-goto="forgot">¿Olvidaste tu contraseña?</div>
+
+        <button class="btn" data-nav="home-to-workout.html">Entrar</button>
+
+        <div class="divider">o continúa con</div>
+        <div class="social">
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-2.9.9-3.7 2.3-1.6 2.8-.4 6.8 1.1 9 .8 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 1.9-1.1 2.7-2.2.8-1.2 1.2-2.4 1.2-2.5-.1 0-2.3-.9-2.3-3.4zM14.2 5.9c.6-.8 1-1.8.9-2.9-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.2z"/></svg>
+            Apple
+          </button>
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor"><path d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.5c-.2 1.3-1 2.4-2 3.1v2.6h3.3c1.9-1.8 3-4.4 3-7.5z"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.7-1.7-5.4-4H3.2v2.6C4.9 19.9 8.2 22 12 22z"/><path d="M6.6 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.2C2.4 8.8 2 10.4 2 12s.4 3.2 1.2 4.6L6.6 14z"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 2.9 14.7 2 12 2 8.2 2 4.9 4.1 3.2 7.4L6.6 10c.7-2.3 2.9-4 5.4-4z"/></svg>
+            Google
+          </button>
+        </div>
+
+        <div class="switch-foot">¿No tienes cuenta? <a data-goto="register">Crear cuenta</a></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="view" data-view="register">
+        <div class="view-title">Crea tu cuenta</div>
+        <div class="view-sub">Empieza a entrenar con análisis de balance muscular.</div>
+
+        <div class="field">
+          <label class="field-label">Nombre</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+            <input type="text" placeholder="Tu nombre">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Email</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input type="email" placeholder="tu@email.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Contraseña</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <input type="password" placeholder="Mínimo 8 caracteres">
+            <button class="field-toggle" data-toggle>
+              <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn" data-nav="onboarding.html" style="margin-top:8px;">Crear cuenta</button>
+
+        <div class="divider">o regístrate con</div>
+        <div class="social">
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor"><path d="M16.4 12.8c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-2.9.9-3.7 2.3-1.6 2.8-.4 6.8 1.1 9 .8 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7 1.3 0 1.7.7 2.9.7 1.2 0 1.9-1.1 2.7-2.2.8-1.2 1.2-2.4 1.2-2.5-.1 0-2.3-.9-2.3-3.4z"/></svg>
+            Apple
+          </button>
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;" fill="currentColor"><path d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.5c-.2 1.3-1 2.4-2 3.1v2.6h3.3c1.9-1.8 3-4.4 3-7.5zM12 22c2.7 0 5-.9 6.6-2.4l-3.3-2.6c-.9.6-2 1-3.3 1-2.5 0-4.7-1.7-5.4-4H3.2v2.6C4.9 19.9 8.2 22 12 22zM6.6 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.2C2.4 8.8 2 10.4 2 12s.4 3.2 1.2 4.6zM12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 2.9 14.7 2 12 2 8.2 2 4.9 4.1 3.2 7.4L6.6 10c.7-2.3 2.9-4 5.4-4z"/></svg>
+            Google
+          </button>
+        </div>
+
+        <div class="switch-foot">¿Ya tienes cuenta? <a data-goto="login">Entrar</a></div>
+      </div>
+
+      <!-- FORGOT -->
+      <div class="view" data-view="forgot">
+        <button class="back-btn" data-goto="login">
+          <svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2.6;"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="view-title">Recuperar acceso</div>
+        <div class="view-sub">Te enviamos un enlace para restablecer tu contraseña.</div>
+
+        <div class="field">
+          <label class="field-label">Email</label>
+          <div class="field-box">
+            <svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <input type="email" placeholder="tu@email.com">
+          </div>
+        </div>
+
+        <button class="btn" data-goto="login" style="margin-top:8px;">Enviar enlace</button>
+
+        <div class="switch-foot">¿Lo recordaste? <a data-goto="login">Volver a entrar</a></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="caption">RAWSETS — Login / Register (Fase 2)</div>
+</div>
+
+<script>
+  const views = document.querySelectorAll('.view');
+  const toggles = document.querySelectorAll('.state-toggle button');
+
+  function showView(name) {
+    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    toggles.forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  }
+
+  toggles.forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => showView(el.dataset.goto));
+  });
+
+  // Password show/hide
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentElement.querySelector('input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  // Navegación a la app
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = el.dataset.nav; }, 200);
+    });
+  });
+</script>
+
+</body>
+</html>
