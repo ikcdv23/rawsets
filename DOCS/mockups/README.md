@@ -17,7 +17,7 @@ DOCS/mockups/
 ├── index.html             ← entry point → redirige a home-to-workout.html
 │
 │   ── PANTALLAS PRINCIPALES (navegables entre sí vía tab bar) ──
-├── home-to-workout.html   ← ★ HOME CANÓNICO: radar hero + workout sheet (slide-up). Reemplaza home.html
+├── home-to-workout.html   ← ★ HOME CANÓNICO: radar hero + workout sheet (slide-up)
 ├── routines.html          ← Rutinas: calendario hero + lista de rutinas
 ├── body.html              ← Body: humanoid + balance + medidas + metas (reemplaza Stats)
 ├── settings.html          ← Ajustes: perfil + preferencias + notifs + datos
@@ -35,10 +35,10 @@ DOCS/mockups/
 ├── modals.html            ← showcase: éxito, crear rutina, PR, descartar, borrar
 │
 │   ── REFERENCIA ──
-├── components.html        ← galería UX: cargas, checks, toasts, badges, estados vacíos
-├── home.html              ← (legacy) versión Forge sin radar
-└── home-radar.html        ← (legacy) Home con radar aislado, sin transición a workout
+└── components.html        ← galería UX: cargas, checks, toasts, badges, estados vacíos
 ```
+
+> Nota: `home.html` y `home-radar.html` (versiones previas del Home) se eliminaron al consolidar el Home en `home-to-workout.html`.
 
 ## Mapa de navegación (prototipo navegable)
 
@@ -64,8 +64,8 @@ auth.html (Fase 2)
 
 ## Reglas del juego
 
-- **Una pantalla por archivo**. No mezclar pantallas en el mismo HTML salvo para variantes (ej. `home.html` vs `home-radar.html`).
-- **Tokens y patrones consistentes**: copiar el bloque `:root` y los patrones visuales del último mockup aprobado (actualmente `home-radar.html`). NO inventar valores nuevos sin razón.
+- **Una pantalla por archivo**. No mezclar pantallas en el mismo HTML salvo para estados de la misma pantalla con toggle JS.
+- **Tokens y patrones consistentes**: copiar el bloque `:root` y los patrones visuales del último mockup aprobado (actualmente `home-to-workout.html`). NO inventar valores nuevos sin razón.
 - **Self-contained**: cada HTML incluye su CSS y assets inline. No dependencias externas salvo Google Fonts.
 - **Mobile-first**: frame de iPhone 16 Pro (390 × 844 px). Solo móvil — la responsividad web vendrá después.
 - **Estados visibles**: cuando una pantalla tenga estados (idle, loading, empty, en curso, error), incluir todos en el mismo HTML con un toggle JS simple.
@@ -73,7 +73,7 @@ auth.html (Fase 2)
 
 ## Patrón visual canónico
 
-Ver memoria `feedback-rawsets-mockup-discipline.md` y el archivo `home-radar.html` como referencia. Patrones obligatorios:
+Ver memoria `feedback-rawsets-mockup-discipline.md` y el archivo `home-to-workout.html` como referencia. Patrones obligatorios:
 
 - Fondo dark con radial gradient sutil.
 - Halo lima exterior del phone (blur 40px, alpha bajo).
@@ -88,7 +88,7 @@ Ver memoria `feedback-rawsets-mockup-discipline.md` y el archivo `home-radar.htm
 
 1. **Active workout (logging sets)** — ✓ `workout.html`.
 2. **Body** — humanoid + balance + medidas. Reemplaza la idea original de "Stats". Tab principal. ✓ `body.html`.
-3. **Home** — refinar `home-radar.html` si hace falta.
+3. **Home** — refinar `home-to-workout.html` si hace falta.
 4. **Routines** — calendario hero + lista. Ver notas abajo.
 5. **Routine detail** — ver/editar rutina concreta.
 6. Exercise picker (sheet).
