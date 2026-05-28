@@ -11,6 +11,7 @@ import { JetBrainsMono_400Regular, JetBrainsMono_700Bold } from '@expo-google-fo
 import { ZenDots_400Regular } from '@expo-google-fonts/zen-dots';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -26,9 +27,15 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#fff' } }} />
-    </>
+    // Marco mobile-first: en web el contenido se limita a ~440px y se centra
+    // (el fondo oscuro rellena los lados). En móvil real, max-w no aplica → ancho completo.
+    <View className="flex-1 items-center bg-background">
+      <StatusBar style="light" />
+      <View className="w-full max-w-[440px] flex-1">
+        <Stack
+          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0A0A0A' } }}
+        />
+      </View>
+    </View>
   );
 }

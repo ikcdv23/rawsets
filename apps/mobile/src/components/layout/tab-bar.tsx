@@ -1,154 +1,119 @@
-import { BarChart3, BookMarked, Home, type LucideIcon, Plus, Settings } from 'lucide-react-native';
-import { Pressable, View, useWindowDimensions } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { BookMarked, Home, type LucideIcon, PersonStanding, Settings } from 'lucide-react-native';
+import { useEffect } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-// Tipo mínimo de las props que nos da expo-router como `tabBar` callback.
-// No importamos `BottomTabBarProps` directamente porque expo-router empaqueta
-// una versión interna de react-navigation/bottom-tabs y los tipos del paquete
-// público no son compatibles. Definimos lo que realmente usamos.
+/**
+ * TabBar — píldora flotante de navegación.
+ *
+ * El tab activo CRECE con un muelle (como el mockup). Animamos `flexGrow`
+ * directamente (no `layout`): así reflowea el layout de verdad y los iconos
+ * NO se estiran — el bug del scale que tenía la versión con LinearTransition.
+ *
+ * Recibe `state` y `navigation` de expo-router (callback `tabBar`).
+ */
 type TabBarRoute = { key: string; name: string };
 type TabBarProps = {
   state: { index: number; routes: TabBarRoute[] };
   navigation: { navigate: (name: string) => void };
 };
 
-const ICONS: Record<string, LucideIcon> = {
-  home: Home,
-  routines: BookMarked,
-  stats: BarChart3,
-  settings: Settings,
+// OJO: expo-router nombra las rutas por la RUTA del archivo, no por la carpeta.
+// `app/(workspace)/home/index.tsx` → la ruta se llama "home/index" (no "home").
+// Las sub-pantallas (settings/profile/index, routines/[id]) NO son tabs → se ignoran.
+const TABS: Record<string, { Icon: LucideIcon; label: string }> = {
+  'home/index': { Icon: Home, label: 'Home' },
+  'routines/index': { Icon: BookMarked, label: 'Rutinas' },
+  'body/index': { Icon: PersonStanding, label: 'Body' },
+  'settings/index': { Icon: Settings, label: 'Ajustes' },
 };
 
-// Constantes visuales del dock + notch.
-const DOCK_HEIGHT = 72;
-const NOTCH_RADIUS = 38;
-const NOTCH_DEPTH = 26;
-const FAB_SIZE = 60;
-// Color literal porque SVG fill no soporta clases NativeWind directas.
-// Mantener sincronizado con --color-primary en global.css.
-const VIOLET = 'rgb(107, 33, 207)';
+// lucide recibe el color como prop JS (no como clase), por eso van en hex.
+const ICON_ACTIVE = '#0A0A0A'; // sobre fondo lima
+const ICON_INACTIVE = '#8A8A8A'; // muted
 
-/** Genera el path SVG del dock con el notch cóncavo centrado. */
-function buildDockPath(width: number): string {
-  const cx = width / 2;
-  const r = NOTCH_RADIUS;
-  const d = NOTCH_DEPTH;
+// Muelle: rebote suave con overshoot, como el cubic-bezier del mockup.
+const GROW_SPRING = { damping: 14, stiffness: 170, mass: 0.9 };
 
-  // Path: rectángulo del dock con un dip cóncavo arriba en el centro.
-  // Los cubic Beziers crean la transición suave entre el borde recto y la curva del notch.
-  return [
-    'M 0 0',
-    `L ${cx - r - 14} 0`,
-    `C ${cx - r - 2} 0, ${cx - r + 4} ${d}, ${cx} ${d}`,
-    `C ${cx + r - 4} ${d}, ${cx + r + 2} 0, ${cx + r + 14} 0`,
-    `L ${width} 0`,
-    `L ${width} ${DOCK_HEIGHT}`,
-    `L 0 ${DOCK_HEIGHT}`,
-    'Z',
-  ].join(' ');
-}
-
-export function TabBar({ state, navigation }: TabBarProps) {
-  const { width } = useWindowDimensions();
-
-  // Split icons 2 + 2 alrededor del FAB.
-  const leftRoutes = state.routes.slice(0, 2);
-  const rightRoutes = state.routes.slice(2, 4);
-
-  return (
-    <View
-      className="absolute bottom-0 left-0 right-0"
-      style={{ height: DOCK_HEIGHT + FAB_SIZE / 2 }}
-      pointerEvents="box-none"
-    >
-      {/* Fondo SVG con el notch cóncavo */}
-      <Svg width={width} height={DOCK_HEIGHT} style={{ position: 'absolute', bottom: 0 }}>
-        <Path d={buildDockPath(width)} fill={VIOLET} />
-      </Svg>
-
-      {/* Iconos: 2 izquierda + 2 derecha. Mismo offset desde el centro. */}
-      <View
-        className="absolute bottom-0 left-0 right-0 flex-row items-center"
-        style={{ height: DOCK_HEIGHT }}
-      >
-        <View className="flex-1 flex-row items-center justify-around">
-          {leftRoutes.map((route, idx) => (
-            <TabIcon
-              key={route.key}
-              route={route}
-              isActive={state.index === idx}
-              onPress={() => navigation.navigate(route.name)}
-            />
-          ))}
-        </View>
-        <View style={{ width: NOTCH_RADIUS * 2 + 28 }} />
-        <View className="flex-1 flex-row items-center justify-around">
-          {rightRoutes.map((route, idx) => (
-            <TabIcon
-              key={route.key}
-              route={route}
-              isActive={state.index === idx + 2}
-              onPress={() => navigation.navigate(route.name)}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/* FAB sobresaliendo encima del notch */}
-      <View
-        className="absolute left-1/2"
-        style={{
-          top: 0,
-          marginLeft: -FAB_SIZE / 2,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Acción primaria"
-          className="items-center justify-center rounded-full bg-primary-bright active:opacity-80"
-          style={{
-            width: FAB_SIZE,
-            height: FAB_SIZE,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.25,
-            shadowRadius: 8,
-            elevation: 6,
-          }}
-          onPress={() => {
-            // TODO: acción primaria por decidir según pantalla.
-          }}
-        >
-          <Plus color="#ffffff" size={28} strokeWidth={2.5} />
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
-function TabIcon({
-  route,
+// Un tab. Es su propio componente porque usa hooks (useSharedValue, etc.),
+// y los hooks no pueden ir dentro de un .map.
+function Tab({
+  tab,
   isActive,
   onPress,
 }: {
-  route: TabBarRoute;
+  tab: { Icon: LucideIcon; label: string };
   isActive: boolean;
   onPress: () => void;
 }) {
-  const Icon = ICONS[route.name];
-  if (!Icon) return null;
+  // flexGrow animado: 2 cuando activo, 1 cuando no.
+  const grow = useSharedValue(isActive ? 2 : 1);
+
+  useEffect(() => {
+    grow.value = withSpring(isActive ? 2 : 1, GROW_SPRING);
+  }, [isActive, grow]);
+
+  // Estilo animado: en cada frame aplica el flexGrow actual del muelle.
+  const animatedStyle = useAnimatedStyle(() => ({ flexGrow: grow.value }));
+
+  const Icon = tab.Icon;
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={isActive ? { selected: true } : {}}
-      accessibilityLabel={route.name}
-      onPress={() => {
-        if (!isActive) onPress();
+    <Animated.View style={[{ flexBasis: 0 }, animatedStyle]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={isActive ? { selected: true } : {}}
+        accessibilityLabel={tab.label}
+        onPress={onPress}
+        // Visuales con className (Pressable normal → NativeWind sí aplica).
+        className={[
+          'h-[52px] flex-row items-center justify-center gap-2 rounded-full active:opacity-80',
+          isActive ? 'bg-primary' : '',
+        ].join(' ')}
+      >
+        <Icon
+          color={isActive ? ICON_ACTIVE : ICON_INACTIVE}
+          size={20}
+          strokeWidth={isActive ? 2.6 : 2.2}
+        />
+        {isActive ? (
+          <Text className="font-sans-bold text-[11px] uppercase tracking-[1px] text-background">
+            {tab.label}
+          </Text>
+        ) : null}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+export function TabBar({ state, navigation }: TabBarProps) {
+  return (
+    <View
+      className="absolute bottom-6 left-[18px] right-[18px] h-16 flex-row items-center gap-1 rounded-full border border-border-strong bg-surface/95 px-1.5"
+      style={{
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.4,
+        shadowRadius: 24,
+        elevation: 12,
       }}
-      className="h-12 w-12 items-center justify-center"
     >
-      <Icon color={isActive ? '#B8FA82' : '#ffffff'} size={24} strokeWidth={isActive ? 2.6 : 2} />
-    </Pressable>
+      {state.routes.map((route, idx) => {
+        const tab = TABS[route.name];
+        if (!tab) return null; // sub-pantallas (perfil, detalle) no se pintan
+
+        const isActive = state.index === idx;
+        return (
+          <Tab
+            key={route.key}
+            tab={tab}
+            isActive={isActive}
+            onPress={() => {
+              if (!isActive) navigation.navigate(route.name);
+            }}
+          />
+        );
+      })}
+    </View>
   );
 }
