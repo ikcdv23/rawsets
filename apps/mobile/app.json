@@ -37,7 +37,8 @@
           }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-image"
     ],
     "experiments": {
       "reactCompiler": true

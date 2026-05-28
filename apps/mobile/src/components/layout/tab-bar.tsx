@@ -1,3 +1,8 @@
+import { ActiveWorkoutStrip } from '@/features/workouts/ui/components/active-workout-strip';
+import {
+  formatElapsed,
+  useWorkoutSession,
+} from '@/features/workouts/ui/contexts/workout-session-context';
 import { BookMarked, Home, type LucideIcon, PersonStanding, Settings } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -6,11 +11,16 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 /**
  * TabBar — píldora flotante de navegación.
  *
- * El tab activo CRECE con un muelle (como el mockup). Animamos `flexGrow`
- * directamente (no `layout`): así reflowea el layout de verdad y los iconos
- * NO se estiran — el bug del scale que tenía la versión con LinearTransition.
+ * Dos estados según `useWorkoutSession()`:
+ *  - SIN entreno activo → altura 64, solo los 4 tabs.
+ *  - CON entreno activo → altura 116, arriba aparece el ActiveWorkoutStrip.
  *
- * Recibe `state` y `navigation` de expo-router (callback `tabBar`).
+ * NOTA importante: la altura del CONTENEDOR es estática (className condicional),
+ * NO animada. Animar la altura con Animated.View + position:absolute en web
+ * rompía el layout del Stack vecino (el flex de Tabs colapsaba). El morph es
+ * "instantáneo" — los tabs internos sí siguen animando su flexGrow.
+ *
+ * El tap en el strip → openSheet(): lo abre el WorkoutSheet (Modal).
  */
 type TabBarRoute = { key: string; name: string };
 type TabBarProps = {
@@ -18,9 +28,6 @@ type TabBarProps = {
   navigation: { navigate: (name: string) => void };
 };
 
-// OJO: expo-router nombra las rutas por la RUTA del archivo, no por la carpeta.
-// `app/(workspace)/home/index.tsx` → la ruta se llama "home/index" (no "home").
-// Las sub-pantallas (settings/profile/index, routines/[id]) NO son tabs → se ignoran.
 const TABS: Record<string, { Icon: LucideIcon; label: string }> = {
   'home/index': { Icon: Home, label: 'Home' },
   'routines/index': { Icon: BookMarked, label: 'Rutinas' },
@@ -28,15 +35,11 @@ const TABS: Record<string, { Icon: LucideIcon; label: string }> = {
   'settings/index': { Icon: Settings, label: 'Ajustes' },
 };
 
-// lucide recibe el color como prop JS (no como clase), por eso van en hex.
-const ICON_ACTIVE = '#0A0A0A'; // sobre fondo lima
-const ICON_INACTIVE = '#8A8A8A'; // muted
+const ICON_ACTIVE = '#0A0A0A';
+const ICON_INACTIVE = '#8A8A8A';
 
-// Muelle: rebote suave con overshoot, como el cubic-bezier del mockup.
 const GROW_SPRING = { damping: 14, stiffness: 170, mass: 0.9 };
 
-// Un tab. Es su propio componente porque usa hooks (useSharedValue, etc.),
-// y los hooks no pueden ir dentro de un .map.
 function Tab({
   tab,
   isActive,
@@ -46,14 +49,12 @@ function Tab({
   isActive: boolean;
   onPress: () => void;
 }) {
-  // flexGrow animado: 2 cuando activo, 1 cuando no.
   const grow = useSharedValue(isActive ? 2 : 1);
 
   useEffect(() => {
     grow.value = withSpring(isActive ? 2 : 1, GROW_SPRING);
   }, [isActive, grow]);
 
-  // Estilo animado: en cada frame aplica el flexGrow actual del muelle.
   const animatedStyle = useAnimatedStyle(() => ({ flexGrow: grow.value }));
 
   const Icon = tab.Icon;
@@ -65,7 +66,6 @@ function Tab({
         accessibilityState={isActive ? { selected: true } : {}}
         accessibilityLabel={tab.label}
         onPress={onPress}
-        // Visuales con className (Pressable normal → NativeWind sí aplica).
         className={[
           'h-[52px] flex-row items-center justify-center gap-2 rounded-full active:opacity-80',
           isActive ? 'bg-primary' : '',
@@ -87,33 +87,51 @@ function Tab({
 }
 
 export function TabBar({ state, navigation }: TabBarProps) {
+  const { activeWorkout, elapsedSeconds, openSheet } = useWorkoutSession();
+  const hasWorkout = activeWorkout !== null;
+
   return (
     <View
-      className="absolute bottom-6 left-[18px] right-[18px] h-16 flex-row items-center gap-1 rounded-full border border-border-strong bg-surface/95 px-1.5"
-      style={{
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.4,
-        shadowRadius: 24,
-        elevation: 12,
-      }}
+      className={[
+        // Glassmorphism: 80% surface + backdrop-blur. En web `backdrop-blur-xl`
+        // genera el efecto "cristal esmerilado" del mockup. En nativo, NativeWind
+        // no aplica backdrop-filter — convendrá usar `expo-blur` si llegamos.
+        'absolute bottom-6 left-[18px] right-[18px] flex-col justify-end gap-1 rounded-[28px] border border-border-strong bg-surface/80 p-1.5 backdrop-blur-xl',
+        hasWorkout ? 'h-[116px]' : 'h-16',
+      ].join(' ')}
+      style={{ boxShadow: '0 12px 24px rgba(0, 0, 0, 0.4)', elevation: 12 }}
     >
-      {state.routes.map((route, idx) => {
-        const tab = TABS[route.name];
-        if (!tab) return null; // sub-pantallas (perfil, detalle) no se pintan
+      {hasWorkout ? (
+        <ActiveWorkoutStrip
+          elapsedLabel={formatElapsed(elapsedSeconds)}
+          exerciseName={activeWorkout.currentExercise?.name ?? null}
+          setLabel={
+            activeWorkout.currentExercise
+              ? `Serie ${activeWorkout.currentExercise.setNumber} de ${activeWorkout.currentExercise.totalSets}`
+              : null
+          }
+          onPress={openSheet}
+        />
+      ) : null}
 
-        const isActive = state.index === idx;
-        return (
-          <Tab
-            key={route.key}
-            tab={tab}
-            isActive={isActive}
-            onPress={() => {
-              if (!isActive) navigation.navigate(route.name);
-            }}
-          />
-        );
-      })}
+      <View className="h-[52px] flex-row items-center gap-1">
+        {state.routes.map((route, idx) => {
+          const tab = TABS[route.name];
+          if (!tab) return null;
+
+          const isActive = state.index === idx;
+          return (
+            <Tab
+              key={route.key}
+              tab={tab}
+              isActive={isActive}
+              onPress={() => {
+                if (!isActive) navigation.navigate(route.name);
+              }}
+            />
+          );
+        })}
+      </View>
     </View>
   );
 }

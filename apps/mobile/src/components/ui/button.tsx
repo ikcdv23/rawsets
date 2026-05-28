@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, type PressableProps, Text } from 'react-native';
 
@@ -18,6 +19,11 @@ type ButtonProps = {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  // Icono opcional de lucide-react-native. Se pinta a la derecha por defecto
+  // (afín a CTAs tipo "Iniciar sesión →"). El componente decide color/tamaño
+  // según la variante/size para no romper el contrato de estilo.
+  icon?: LucideIcon;
+  iconPosition?: 'left' | 'right';
   // Permite a quien lo usa ajustar SOLO el layout (ej. 'flex-1' en una fila),
   // sin tocar las clases de variante/tamaño que controla el componente.
   className?: string;
@@ -48,14 +54,33 @@ const sizeText: Record<ButtonSize, string> = {
   sm: 'text-[13px]',
 };
 
+// Color del icono: hex porque lucide recibe color como prop JS, no clase.
+// Mantener sincronizado con los tokens (foreground / background / white).
+const iconColor: Record<ButtonVariant, string> = {
+  primary: '#0A0A0A',
+  secondary: '#FAFAFA',
+  destructive: '#FFFFFF',
+};
+
+const iconPixelSize: Record<ButtonSize, number> = {
+  md: 18,
+  sm: 16,
+};
+
 export function Button({
   children,
   variant = 'primary',
   size = 'md',
+  icon: Icon,
+  iconPosition = 'right',
   disabled,
   className,
   ...rest
 }: ButtonProps) {
+  const iconNode = Icon ? (
+    <Icon color={iconColor[variant]} size={iconPixelSize[size]} strokeWidth={2.4} />
+  ) : null;
+
   return (
     // Pressable (no TouchableOpacity): es el componente táctil moderno de RN,
     // expone el estado `pressed` y NativeWind mapea ese estado a la variante `active:`.
@@ -72,12 +97,14 @@ export function Button({
       ].join(' ')}
       {...rest}
     >
+      {iconPosition === 'left' ? iconNode : null}
       {/* En RN TODO texto va dentro de <Text>. Aquí envolvemos la etiqueta
           y le aplicamos peso/color. Sentence case lo decide quien lo usa
           (no forzamos uppercase, fue decisión de diseño). */}
       <Text className={['font-sans-bold tracking-tight', sizeText[size], label[variant]].join(' ')}>
         {children}
       </Text>
+      {iconPosition === 'right' ? iconNode : null}
     </Pressable>
   );
 }

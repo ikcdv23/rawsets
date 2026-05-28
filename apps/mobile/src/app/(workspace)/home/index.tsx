@@ -5,6 +5,7 @@ import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
 import { type RadarAxis, RadarChart } from '@/components/ui/radar-chart';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Stat } from '@/components/ui/stat';
+import { useWorkoutSession } from '@/features/workouts/ui/contexts/workout-session-context';
 import { Info } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -14,7 +15,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 // - MOCK_SESSION: ¿qué pinta el bloque "Sesión de hoy"?
 // Cuando haya datos reales, se sustituyen por hooks/queries.
 const MOCK_HAS_HISTORY: boolean = false;
-const MOCK_SESSION: 'workout' | 'rest' | 'free' = 'free';
+const MOCK_SESSION: 'workout' | 'rest' | 'free' = 'workout';
 
 // Ejes del radar — siempre los mismos labels, con o sin datos.
 const RADAR_DATA: RadarAxis[] = [
@@ -30,6 +31,7 @@ const RADAR_EMPTY: RadarAxis[] = RADAR_DATA.map((a) => ({ label: a.label, value:
 
 export default function HomeScreen() {
   const [radarInfoOpen, setRadarInfoOpen] = useState(false);
+  const { activeWorkout, startWorkout, finishWorkout } = useWorkoutSession();
 
   return (
     <View className="flex-1 bg-background">
@@ -126,13 +128,28 @@ export default function HomeScreen() {
                 Espalda + Bíceps · 6 ejercicios · 22 series
               </Text>
               <View className="mt-4">
-                <Button
-                  onPress={() => {
-                    // TODO: iniciar entreno (el flow de workout es el "jefe final")
-                  }}
-                >
-                  Empezar entreno
-                </Button>
+                {activeWorkout ? (
+                  // Mientras dura el mock-entreno, el botón cierra. Cuando llegue
+                  // el flow real, esto desaparece y el cierre vive en el sheet.
+                  <Button variant="secondary" onPress={finishWorkout}>
+                    Finalizar entreno (dev)
+                  </Button>
+                ) : (
+                  <Button
+                    onPress={() =>
+                      startWorkout({
+                        routineName: 'Tirón A',
+                        currentExercise: {
+                          name: 'Remo con barra',
+                          setNumber: 2,
+                          totalSets: 4,
+                        },
+                      })
+                    }
+                  >
+                    Empezar entreno
+                  </Button>
+                )}
               </View>
             </Card>
           )}
