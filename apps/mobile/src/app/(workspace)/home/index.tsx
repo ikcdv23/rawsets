@@ -5,7 +5,10 @@ import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
 import { type RadarAxis, RadarChart } from '@/components/ui/radar-chart';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Stat } from '@/components/ui/stat';
-import { useWorkoutSession } from '@/features/workouts/ui/contexts/workout-session-context';
+import {
+  type WorkoutExercise,
+  useWorkoutSession,
+} from '@/features/workouts/ui/contexts/workout-session-context';
 import { Info } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -28,6 +31,66 @@ const RADAR_DATA: RadarAxis[] = [
 ];
 
 const RADAR_EMPTY: RadarAxis[] = RADAR_DATA.map((a) => ({ label: a.label, value: 0 }));
+
+// Mock de la rutina "Tirón A" — espejo del mockup workout.html. Estos datos
+// llegarán algún día de la DB (joining routine_exercises + exercises). Por ahora,
+// cableados para que el sheet tenga contenido visible.
+const TIRON_A_EXERCISES: WorkoutExercise[] = [
+  {
+    id: 'ex-1',
+    name: 'Peso muerto',
+    muscleGroup: 'Espalda',
+    targetSets: 4,
+    targetReps: '6',
+    status: 'done',
+    currentSet: null,
+  },
+  {
+    id: 'ex-2',
+    name: 'Dominadas lastradas',
+    muscleGroup: 'Espalda',
+    targetSets: 4,
+    targetReps: '8',
+    status: 'done',
+    currentSet: null,
+  },
+  {
+    id: 'ex-3',
+    name: 'Remo con barra',
+    muscleGroup: 'Espalda',
+    targetSets: 4,
+    targetReps: '10',
+    status: 'current',
+    currentSet: 2,
+  },
+  {
+    id: 'ex-4',
+    name: 'Jalón al pecho',
+    muscleGroup: 'Espalda',
+    targetSets: 4,
+    targetReps: '10',
+    status: 'pending',
+    currentSet: null,
+  },
+  {
+    id: 'ex-5',
+    name: 'Curl con barra',
+    muscleGroup: 'Bíceps',
+    targetSets: 3,
+    targetReps: '12',
+    status: 'pending',
+    currentSet: null,
+  },
+  {
+    id: 'ex-6',
+    name: 'Curl martillo',
+    muscleGroup: 'Bíceps',
+    targetSets: 3,
+    targetReps: '12',
+    status: 'pending',
+    currentSet: null,
+  },
+];
 
 export default function HomeScreen() {
   const [radarInfoOpen, setRadarInfoOpen] = useState(false);
@@ -139,11 +202,8 @@ export default function HomeScreen() {
                     onPress={() =>
                       startWorkout({
                         routineName: 'Tirón A',
-                        currentExercise: {
-                          name: 'Remo con barra',
-                          setNumber: 2,
-                          totalSets: 4,
-                        },
+                        routineSubtitle: 'Día 2 / 5',
+                        exercises: TIRON_A_EXERCISES,
                       })
                     }
                   >

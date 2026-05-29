@@ -45,11 +45,14 @@ export default function RootLayout() {
           <StatusBar style="light" />
           <View className="w-full max-w-[440px] flex-1">
             <Stack
-              screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0A0A0A' } }}
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: '#0A0A0A' },
+              }}
             />
           </View>
-          {/* Sheet vive en el outer View (no junto al Stack) para no romper el
-              flex layout de los screens. Es absolute → no afecta a sus hermanos. */}
+          {/* WorkoutSheet usa plain RN Modal (portal nativo) → no afecta
+              al layout del Stack vecino. */}
           <WorkoutSheet />
         </View>
       </WorkoutSessionProvider>

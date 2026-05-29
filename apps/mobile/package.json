@@ -16,6 +16,7 @@
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo-google-fonts/zen-dots": "^0.4.2",
     "@expo/ui": "~56.0.14",
+    "@gorhom/bottom-sheet": "^5.2.14",
     "drizzle-orm": "^0.45.2",
     "expo": "~56.0.6",
     "expo-constants": "~56.0.16",

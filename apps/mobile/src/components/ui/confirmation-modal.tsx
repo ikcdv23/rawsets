@@ -2,18 +2,11 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Check, type LucideIcon, Trash2 } from 'lucide-react-native';
 import { Modal, Pressable, Text, View } from 'react-native';
 
-/**
- * ConfirmationModal — diálogo de confirmación reutilizable.
- *
- * Reúne piezas: usa el <Button> (no re-implementa botones) e iconos de
- * lucide-react-native (no dibuja SVG a mano).
- */
-
 type Situation = 'success' | 'warning' | 'trash';
 
 type ConfirmationModalProps = {
-  visible: boolean; // si el modal se ve o no (lo controla la pantalla padre)
-  situation?: Situation; // qué icono/color mostrar
+  visible: boolean;
+  situation?: Situation;
   title: string;
   message: string;
   confirmLabel?: string;

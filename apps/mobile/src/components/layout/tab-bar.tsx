@@ -9,18 +9,20 @@ import { Pressable, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 /**
- * TabBar — píldora flotante de navegación.
+ * TabBar — píldora flotante con morph al entrar en modo entreno.
  *
- * Dos estados según `useWorkoutSession()`:
- *  - SIN entreno activo → altura 64, solo los 4 tabs.
- *  - CON entreno activo → altura 116, arriba aparece el ActiveWorkoutStrip.
+ * Animaciones via CSS (NativeWind `transition-*`):
+ *  - Contenedor crece 64 → 116px (transition-[height])
+ *  - Strip dentro: altura 0 → 52 + opacidad 0 → 1 (transition-all)
  *
- * NOTA importante: la altura del CONTENEDOR es estática (className condicional),
- * NO animada. Animar la altura con Animated.View + position:absolute en web
- * rompía el layout del Stack vecino (el flex de Tabs colapsaba). El morph es
- * "instantáneo" — los tabs internos sí siguen animando su flexGrow.
+ * Por qué CSS y no Reanimated: en web (react-native-web), CSS transitions
+ * son GPU-accelerated y más predecibles. En nativo (futuro) las clases
+ * `transition-*` se ignoran — habrá que añadir Reanimated cuando toque.
+ * Ver memoria sobre stack siblings: el sheet vive en portal (BottomSheetModal)
+ * y no rompe el layout vecino.
  *
- * El tap en el strip → openSheet(): lo abre el WorkoutSheet (Modal).
+ * El tab activo crece con muelle (Reanimated) — esa anim sí es interna y
+ * funciona bien en ambos entornos.
  */
 type TabBarRoute = { key: string; name: string };
 type TabBarProps = {
@@ -87,27 +89,29 @@ function Tab({
 }
 
 export function TabBar({ state, navigation }: TabBarProps) {
-  const { activeWorkout, elapsedSeconds, openSheet } = useWorkoutSession();
+  const { activeWorkout, currentExercise, elapsedSeconds, openSheet } = useWorkoutSession();
   const hasWorkout = activeWorkout !== null;
 
   return (
     <View
       className={[
-        // Glassmorphism: 80% surface + backdrop-blur. En web `backdrop-blur-xl`
-        // genera el efecto "cristal esmerilado" del mockup. En nativo, NativeWind
-        // no aplica backdrop-filter — convendrá usar `expo-blur` si llegamos.
-        'absolute bottom-6 left-[18px] right-[18px] flex-col justify-end gap-1 rounded-[28px] border border-border-strong bg-surface/80 p-1.5 backdrop-blur-xl',
+        // rounded-[34px] = pill perfecta en h=64 (34 = h/2) y rounded rectangle
+        // elegante en h=116. rounded-full daba "bocadillo" en altura grande.
+        'absolute bottom-6 left-[18px] right-[18px] flex-col justify-end gap-1 overflow-hidden rounded-[34px] border border-border-strong bg-surface/80 p-1.5 backdrop-blur-xl transition-[height] duration-300 ease-out',
         hasWorkout ? 'h-[116px]' : 'h-16',
       ].join(' ')}
       style={{ boxShadow: '0 12px 24px rgba(0, 0, 0, 0.4)', elevation: 12 }}
     >
+      {/* Strip: render condicional sin wrapper raro — garantiza que el click
+          siempre llegue al Pressable interno. La animación de aparición la
+          hace el contenedor padre (transition-[height] del pill). */}
       {hasWorkout ? (
         <ActiveWorkoutStrip
           elapsedLabel={formatElapsed(elapsedSeconds)}
-          exerciseName={activeWorkout.currentExercise?.name ?? null}
+          exerciseName={currentExercise?.name ?? null}
           setLabel={
-            activeWorkout.currentExercise
-              ? `Serie ${activeWorkout.currentExercise.setNumber} de ${activeWorkout.currentExercise.totalSets}`
+            currentExercise && currentExercise.currentSet !== null
+              ? `Serie ${currentExercise.currentSet} de ${currentExercise.targetSets}`
               : null
           }
           onPress={openSheet}
