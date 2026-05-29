@@ -22,6 +22,5 @@ export const sets = sqliteTable('sets', {
   weight: real('weight').notNull(),
   reps: integer('reps').notNull(),
   rpe: real('rpe'),
-  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
   restSeconds: integer('rest_seconds'),
 });

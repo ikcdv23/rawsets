@@ -99,7 +99,7 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 bg-background">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="gap-3 px-6 pb-32 pt-16">
+        <View className="gap-3 px-6 pb-32 pt-8">
           {/* Top bar: wordmark a la izquierda, avatar (→ perfil) a la derecha. */}
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-sans-black text-2xl tracking-[-0.5px] text-foreground">

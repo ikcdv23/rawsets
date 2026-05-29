@@ -69,7 +69,11 @@ function Tab({
         accessibilityLabel={tab.label}
         onPress={onPress}
         className={[
-          'h-[52px] flex-row items-center justify-center gap-2 rounded-full active:opacity-80',
+          // h-[44px] dentro de un row h-[52px] deja 4px de respiro arriba/abajo:
+          // la pastilla activa NO toca la curva interna del contenedor exterior,
+          // evitando el "cortado/subido" visual cuando el tab activo está en
+          // primera o última posición (las que sufren la curva del pill).
+          'h-[44px] flex-row items-center justify-center gap-2 rounded-full active:opacity-80',
           isActive ? 'bg-primary' : '',
         ].join(' ')}
       >

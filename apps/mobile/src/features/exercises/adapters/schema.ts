@@ -1,9 +1,12 @@
 import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { EQUIPMENT, type Equipment } from '../domain/equipment';
 import { MUSCLE_GROUPS, type MuscleGroup } from '../domain/muscle-groups';
 
 export const exercises = sqliteTable('exercises', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  equipment: text('equipment', { enum: EQUIPMENT }).$type<Equipment>().notNull(),
+  isBodyweight: integer('is_bodyweight', { mode: 'boolean' }).notNull().default(false),
   isCustom: integer('is_custom', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });

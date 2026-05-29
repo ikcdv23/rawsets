@@ -1,5 +1,5 @@
 import { exercises } from '@/features/exercises/adapters/schema';
-import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const routines = sqliteTable('routines', {
   id: text('id').primaryKey(),
@@ -18,6 +18,9 @@ export const routineExercises = sqliteTable(
       .references(() => exercises.id, { onDelete: 'restrict' }),
     position: integer('position').notNull(),
     targetSets: integer('target_sets').notNull(),
+    targetRepsMin: integer('target_reps_min').notNull(),
+    targetRepsMax: integer('target_reps_max').notNull(),
+    targetWeight: real('target_weight'),
     notes: text('notes'),
   },
   (table) => ({

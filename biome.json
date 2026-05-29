@@ -18,7 +18,8 @@
       "**/scripts/reset-project.js",
       "**/expo-env.d.ts",
       "**/drizzle/migrations/**",
-      "DOCS/_assets/**"
+      "DOCS/_assets/**",
+      "**/.obsidian/**"
     ]
   },
   "formatter": {
