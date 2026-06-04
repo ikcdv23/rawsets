@@ -16,21 +16,94 @@ Mapa de las 8 tablas que viven en SQLite local. Resumen de columnas, FKs e invar
   - `restrict` → no permite borrar padre con hijos vivos (referencias a catálogo).
   - `set null` → suaviza el corte (plan vs ejecución).
 
-## Diagrama de dependencias
+## Diagrama de relaciones
 
+Renderizado en GitHub y Obsidian directamente (Mermaid ER). Lectura:
+- `||--o{` = "uno a muchos obligatorio" (un workout tiene muchos sets, cada set debe pertenecer a un workout).
+- `}o--||` = "muchos a uno opcional" (un workout puede o no apuntar a una rutina).
+- Los textos sobre la flecha describen la relación en lenguaje de negocio.
+
+```mermaid
+erDiagram
+    USER_PROFILE {
+        text id PK "= 'me' (singleton)"
+        text goal
+        text unit
+        real body_weight
+    }
+
+    EXERCISES {
+        text id PK
+        text name
+        text equipment
+        bool is_bodyweight
+        bool is_custom
+    }
+
+    EXERCISE_MUSCLE_GROUPS {
+        text exercise_id FK
+        text muscle_group
+        real weight "contribución al grupo"
+    }
+
+    ROUTINES {
+        text id PK
+        text name
+        ts created_at
+    }
+
+    ROUTINE_EXERCISES {
+        text routine_id FK
+        text exercise_id FK
+        int position
+        int target_sets
+        int target_reps_min
+        int target_reps_max
+        real target_weight
+    }
+
+    SCHEDULED_SESSIONS {
+        text id PK
+        ts date UK
+        text routine_id FK "null = descanso"
+    }
+
+    WORKOUTS {
+        text id PK
+        text routine_id FK "null = entreno libre"
+        ts started_at
+        ts finished_at
+    }
+
+    SETS {
+        text id PK
+        text workout_id FK
+        text exercise_id FK
+        int set_number
+        real weight "kg"
+        int reps
+        real rpe
+        int rest_seconds
+    }
+
+    EXERCISES ||--o{ EXERCISE_MUSCLE_GROUPS : "trabaja"
+    EXERCISES ||--o{ ROUTINE_EXERCISES : "se planifica en"
+    ROUTINES ||--o{ ROUTINE_EXERCISES : "contiene"
+    ROUTINES ||--o{ SCHEDULED_SESSIONS : "se asigna en calendario"
+    ROUTINES ||--o{ WORKOUTS : "inspira"
+    WORKOUTS ||--o{ SETS : "registra"
+    EXERCISES ||--o{ SETS : "ejecutado en"
 ```
-user_profile (singleton 'me')        ← sin FKs entrantes; los joins futuros usan id='me'
 
-exercises ──┬─→ exercise_muscle_groups (M:N hacia músculos)
-            ├─→ routine_exercises  (M:N hacia routines)
-            └─→ sets               (FK restrict)
+### Cómo leerlo en tres pasos
 
-routines ──┬─→ routine_exercises   (cascade)
-           ├─→ scheduled_sessions  (set null)
-           └─→ workouts            (set null)
+1. **Catálogo + plan** (parte superior): `EXERCISES` es la "biblioteca de ejercicios". `ROUTINES` son tus plantillas de sesión. Se unen vía `ROUTINE_EXERCISES` — qué ejercicio va en qué rutina, con qué objetivos.
 
-workouts ──→ sets                   (cascade)
-```
+2. **Calendario** (centro): `SCHEDULED_SESSIONS` es tu plan en el tiempo. Una fila por día programado. Apunta a la rutina que toca (o null = descanso).
+
+3. **Realidad** (parte inferior): `WORKOUTS` es lo que **de hecho** hiciste cuando entrenaste. Puede venir de una rutina o ser libre. Dentro hay `SETS` (series concretas con su peso y reps).
+
+> **Diferencia clave**: el plan vive aparte de la ejecución. Borras una rutina → los workouts históricos sobreviven (apuntaban a ella, pasan a `routineId=null`). El dato real nunca se contamina por cambios de plan.
 
 ---
 

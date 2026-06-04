@@ -13,4 +13,8 @@ export const userProfile = sqliteTable('user_profile', {
   birthDate: integer('birth_date', { mode: 'timestamp_ms' }),
   sex: text('sex', { enum: SEXES }).$type<Sex>(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  // null = onboarding pendiente. Timestamp = fecha en que terminó.
+  // Forward-compat: cuando llegue sync, un perfil ya importado vendrá con
+  // este campo set y saltará onboarding directamente.
+  onboardedAt: integer('onboarded_at', { mode: 'timestamp_ms' }),
 });

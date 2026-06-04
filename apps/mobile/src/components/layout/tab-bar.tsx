@@ -30,9 +30,16 @@ type TabBarProps = {
   navigation: { navigate: (name: string) => void };
 };
 
+// Las keys deben matchear los `name` que la TabsNavigator devuelve en
+// `state.routes[i].name`. Esos nombres son:
+//  - Para una ruta single-screen (sin sub-layout): "<folder>/index"
+//  - Para un Stack con su propio _layout.tsx: solo "<folder>"
+//
+// `routines/` tiene `_layout.tsx` (Stack para la navegación list↔detail), por
+// eso usa `'routines'`. El resto siguen como single screens.
 const TABS: Record<string, { Icon: LucideIcon; label: string }> = {
   'home/index': { Icon: Home, label: 'Home' },
-  'routines/index': { Icon: BookMarked, label: 'Rutinas' },
+  routines: { Icon: BookMarked, label: 'Rutinas' },
   'body/index': { Icon: PersonStanding, label: 'Body' },
   'settings/index': { Icon: Settings, label: 'Ajustes' },
 };

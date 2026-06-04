@@ -1,5 +1,6 @@
 import '@/global.css';
 
+import { SplashScreen } from '@/components/ui/splash-screen';
 import { DbProvider } from '@/db/db-provider';
 import { WorkoutSheet } from '@/features/workouts/ui/components/workout-sheet';
 import { WorkoutSessionProvider } from '@/features/workouts/ui/contexts/workout-session-context';
@@ -28,19 +29,12 @@ export default function RootLayout() {
     ZenDots_400Regular,
   });
 
-  if (!loaded) return null;
+  // Mientras las fuentes carguen mostramos splash (cae al fallback del sistema).
+  if (!loaded) {
+    return <SplashScreen />;
+  }
 
-  // GestureHandlerRootView envuelve TODO: cualquier gesto (drag del sheet,
-  // swipe, pan) necesita estar dentro de este root o no funciona.
-  //
-  // DbProvider abre SQLite (async-safe en web), aplica migrations y corre
-  // el seed. Bloquea el render del resto del árbol hasta que la DB está lista.
-  //
-  // WorkoutSessionProvider envuelve auth + workspace para que el WorkoutSheet
-  // viva como sibling del Stack y se posicione absolute por encima de todo.
-  //
-  // Marco mobile-first: en web el contenido se limita a ~440px y se centra
-  // (el fondo oscuro rellena los lados). En móvil real, max-w no aplica → ancho completo.
+  // Sin piso de tiempo — el gate abre EN CUANTO la DB esté lista.
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DbProvider>
@@ -55,8 +49,6 @@ export default function RootLayout() {
                 }}
               />
             </View>
-            {/* WorkoutSheet usa plain RN Modal (portal nativo) → no afecta
-                al layout del Stack vecino. */}
             <WorkoutSheet />
           </View>
         </WorkoutSessionProvider>

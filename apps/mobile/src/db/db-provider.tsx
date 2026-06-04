@@ -1,79 +1,134 @@
-import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
-import { seedCuratedExercises } from '@/features/exercises/use-cases/seed-curated-exercises';
+import { SplashScreen } from '@/components/ui/splash-screen';
+import { seedCuratedExercisesRaw } from '@/features/exercises/use-cases/seed-curated-exercises-raw';
+import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-profile';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
-import { type ReactNode, createContext, useContext, useEffect, useMemo } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { type SQLiteDatabase, SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
+import { type ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { Text, View } from 'react-native';
 
+import { applyMigrationsAsync } from './apply-migrations-async';
 import { type Db, migrations, schema } from './connection';
 
-// Patrón oficial recomendado por Expo + Drizzle:
+// Patrón oficial Expo + Drizzle:
 //
-//   <SQLiteProvider>      ← abre la DB de forma async-safe (clave para web,
-//                           donde el sync wrapper de wa-sqlite hace timeout)
+//   <SQLiteProvider>      ← abre la DB de forma async-safe (clave para web)
 //     <DbReadyGate>       ← envuelve con Drizzle, corre migrations + seed,
 //                           bloquea el render hasta que todo está listo
-//       <DbContext>       ← expone el `db` tipado a cualquier descendiente
+//       <DbContext>       ← expone {db, sqlite} a cualquier descendiente
 //         {children}
 //
-// Cualquier componente del árbol puede pedir el `db` con `const db = useDb()`.
-// Si llaman `useDb` fuera del provider lanza error explícito en lugar de devolver
-// `null` y enmascarar bugs.
+// Por qué dos handles (`db` + `sqlite`):
+//
+//   `db` (Drizzle) → reads tipadas (.select(), .findById(), joins). Va por la
+//     API SYNC de expo-sqlite, que en web envuelve wa-sqlite con busy-loop
+//     sobre SharedArrayBuffer. Funciona BIEN para SELECTs sueltos.
+//
+//   `sqlite` (raw) → writes (INSERT/UPDATE/DELETE) vía `runAsync()`. En web,
+//     escribir muchas filas a través del sync wrapper trunca el buffer de
+//     respuesta del worker y peta con "Unterminated string in JSON". `runAsync`
+//     usa otro canal (no busy-loop) y va siempre fino. En móvil tampoco daña.
+//
+// Regla práctica: en los adapters, reads con `db`, writes con `sqlite`.
 
-const DbContext = createContext<Db | null>(null);
+export type DbBundle = { db: Db; sqlite: SQLiteDatabase };
 
-export function useDb(): Db {
-  const db = useContext(DbContext);
-  if (!db) {
+const DbContext = createContext<DbBundle | null>(null);
+
+export function useDb(): DbBundle {
+  const bundle = useContext(DbContext);
+  if (!bundle) {
     throw new Error(
       'useDb() debe usarse dentro de <DbProvider>. Asegúrate de que el árbol está envuelto en el provider raíz (típicamente en _layout.tsx).',
     );
   }
-  return db;
+  return bundle;
 }
 
-export function DbProvider({ children }: { children: ReactNode }) {
+export type DbProviderProps = {
+  children: ReactNode;
+  // Duración mínima del splash en ms (UX: branding visible al arrancar).
+  // 0 = sin piso de tiempo, abre en cuanto la DB está lista.
+  minimumSplashMs?: number;
+};
+
+export function DbProvider({ children, minimumSplashMs = 0 }: DbProviderProps) {
   return (
     <SQLiteProvider databaseName="rawsets.db">
-      <DbReadyGate>{children}</DbReadyGate>
+      <DbReadyGate minimumSplashMs={minimumSplashMs}>{children}</DbReadyGate>
     </SQLiteProvider>
   );
 }
 
-function DbReadyGate({ children }: { children: ReactNode }) {
-  // SQLite handle crudo, ya abierto cuando llegamos aquí (SQLiteProvider lo
-  // garantiza). En web es el wrapper de wa-sqlite; en móvil, SQLite nativo.
+function DbReadyGate({
+  children,
+  minimumSplashMs,
+}: {
+  children: ReactNode;
+  minimumSplashMs: number;
+}) {
   const sqlite = useSQLiteContext();
-
-  // Envolvemos con Drizzle UNA vez por sqlite handle. Sin useMemo crearíamos
-  // un Drizzle nuevo en cada render → cache de queries perdido y posibles bugs.
   const db = useMemo(() => drizzle(sqlite, { schema }), [sqlite]);
+  const bundle = useMemo<DbBundle>(() => ({ db, sqlite }), [db, sqlite]);
 
-  // Aplica migrations pendientes. En el primer arranque crea las 8 tablas.
-  // En arranques posteriores no hace nada (el journal en `meta/` registra
-  // qué migrations ya corrieron).
-  const { success: migrationsReady, error: migrationsError } = useMigrations(db, migrations);
+  // Migrator manual ASYNC — esquiva el sync wrapper colgante de wa-sqlite.
+  const [migrationsReady, setMigrationsReady] = useState(false);
+  const [migrationsError, setMigrationsError] = useState<Error | null>(null);
 
-  // Seed de ejercicios curados — corre tras migrations OK. Idempotente.
-  //
-  // Web está saltado a propósito: el worker de wa-sqlite tiene buffers
-  // internos que truncan respuestas en ciertos patrones de query/insert.
-  // Migrations (un único `exec` con DDL) sí funcionan, pero el SELECT+INSERT
-  // del seed dispara la lógica que falla con "Unterminated string in JSON".
-  // Mobile (SQLite nativo) no tiene este límite y siembra normal.
-  // Cuando queramos web con datos reales, hay que migrar las queries a
-  // las APIs async puras de expo-sqlite. Deuda explícita.
+  // Timer LOCAL del gate. Sin props que viajen por el árbol — así nada lo
+  // puede memoizar mal. Si minimumSplashMs es 0, arranca ya en true.
+  const [minimumElapsed, setMinimumElapsed] = useState(minimumSplashMs <= 0);
+
+  useEffect(() => {
+    if (minimumSplashMs <= 0) return;
+    console.log('[db-gate] splash timer armed for', minimumSplashMs, 'ms');
+    const t = setTimeout(() => {
+      console.log('[db-gate] splash timer FIRED');
+      setMinimumElapsed(true);
+    }, minimumSplashMs);
+    return () => clearTimeout(t);
+  }, [minimumSplashMs]);
+
+  useEffect(() => {
+    let cancelled = false;
+    console.log('[db-gate] applying migrations...');
+    applyMigrationsAsync(sqlite, migrations)
+      .then(() => {
+        if (cancelled) return;
+        console.log('[db-gate] migrations DONE');
+        setMigrationsReady(true);
+      })
+      .catch((err: Error) => {
+        if (cancelled) return;
+        console.error('[db-gate] migrations FAILED:', err);
+        setMigrationsError(err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sqlite]);
+
   useEffect(() => {
     if (!migrationsReady) return;
-    if (Platform.OS === 'web') return;
-    const repo = new DrizzleSqliteExerciseRepo(db);
-    seedCuratedExercises(repo)
+
+    const profileRepo = new DrizzleSqliteUserProfileRepo(db, sqlite);
+    getOrCreateProfile(profileRepo).catch((err) =>
+      console.error('[bootstrap] user profile error:', err),
+    );
+
+    seedCuratedExercisesRaw(sqlite)
       .then(({ inserted, skipped }) => {
         if (inserted > 0) console.log(`[seed] +${inserted} ejercicios (${skipped} ya existían)`);
       })
       .catch((err) => console.error('[seed] error:', err));
-  }, [migrationsReady, db]);
+  }, [migrationsReady, db, sqlite]);
+
+  console.log(
+    '[db-gate] render — migrationsReady:',
+    migrationsReady,
+    'minimumElapsed:',
+    minimumElapsed,
+  );
 
   if (migrationsError) {
     return (
@@ -83,7 +138,14 @@ function DbReadyGate({ children }: { children: ReactNode }) {
       </View>
     );
   }
-  if (!migrationsReady) return null;
+  if (!migrationsReady || !minimumElapsed) {
+    console.log(
+      '[db-gate] BLOCKED → rendering splash. reason:',
+      !migrationsReady ? 'migrations' : 'minimumElapsed',
+    );
+    return <SplashScreen />;
+  }
+  console.log('[db-gate] OPEN → rendering children');
 
-  return <DbContext.Provider value={db}>{children}</DbContext.Provider>;
+  return <DbContext.Provider value={bundle}>{children}</DbContext.Provider>;
 }

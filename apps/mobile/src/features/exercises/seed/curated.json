@@ -1,0 +1,690 @@
+[
+  {
+    "id": "press-banca",
+    "name": "Press banca",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 1.0 },
+      { "group": "hombro", "weight": 0.3 },
+      { "group": "triceps", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "press-banca-mancuernas",
+    "name": "Press banca con mancuernas",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 1.0 },
+      { "group": "hombro", "weight": 0.4 },
+      { "group": "triceps", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "press-inclinado",
+    "name": "Press inclinado",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 0.8 },
+      { "group": "hombro", "weight": 0.6 },
+      { "group": "triceps", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "press-inclinado-mancuernas",
+    "name": "Press inclinado con mancuernas",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 0.9 },
+      { "group": "hombro", "weight": 0.6 },
+      { "group": "triceps", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "press-declinado",
+    "name": "Press declinado",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+  },
+  {
+    "id": "aperturas-mancuernas",
+    "name": "Aperturas con mancuernas",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }, { "group": "hombro", "weight": 0.2 }]
+  },
+  {
+    "id": "cruces-polea",
+    "name": "Cruces en polea",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }]
+  },
+  {
+    "id": "pec-deck",
+    "name": "Pec deck (contractor)",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }]
+  },
+  {
+    "id": "press-pecho-maquina",
+    "name": "Press de pecho en máquina",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 1.0 },
+      { "group": "hombro", "weight": 0.3 },
+      { "group": "triceps", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "fondos",
+    "name": "Fondos en paralelas",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 0.8 },
+      { "group": "hombro", "weight": 0.4 },
+      { "group": "triceps", "weight": 0.6 }
+    ]
+  },
+  {
+    "id": "flexiones",
+    "name": "Flexiones",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 0.8 },
+      { "group": "hombro", "weight": 0.4 },
+      { "group": "triceps", "weight": 0.5 },
+      { "group": "core", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "pull-over",
+    "name": "Pull-over con mancuerna",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "pecho", "weight": 0.6 },
+      { "group": "espalda", "weight": 0.6 },
+      { "group": "triceps", "weight": 0.2 }
+    ]
+  },
+
+  {
+    "id": "dominadas",
+    "name": "Dominadas",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 1.0 },
+      { "group": "biceps", "weight": 0.5 },
+      { "group": "antebrazo", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "dominadas-supinas",
+    "name": "Dominadas supinas (chin-ups)",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 0.9 },
+      { "group": "biceps", "weight": 0.8 },
+      { "group": "antebrazo", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "jalon-pecho",
+    "name": "Jalón al pecho",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+  },
+  {
+    "id": "jalon-agarre-cerrado",
+    "name": "Jalón agarre cerrado",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.5 }]
+  },
+  {
+    "id": "remo-barra",
+    "name": "Remo con barra",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 1.0 },
+      { "group": "biceps", "weight": 0.4 },
+      { "group": "antebrazo", "weight": 0.2 }
+    ]
+  },
+  {
+    "id": "remo-mancuerna",
+    "name": "Remo con mancuerna",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+  },
+  {
+    "id": "remo-en-t",
+    "name": "Remo en T",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 1.0 },
+      { "group": "biceps", "weight": 0.4 },
+      { "group": "antebrazo", "weight": 0.2 }
+    ]
+  },
+  {
+    "id": "remo-polea-sentado",
+    "name": "Remo en polea sentado",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+  },
+  {
+    "id": "remo-maquina",
+    "name": "Remo en máquina",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+  },
+  {
+    "id": "peso-muerto",
+    "name": "Peso muerto",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 0.8 },
+      { "group": "gluteo", "weight": 0.7 },
+      { "group": "isquios", "weight": 0.7 },
+      { "group": "core", "weight": 0.4 },
+      { "group": "antebrazo", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "peso-muerto-sumo",
+    "name": "Peso muerto sumo",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 0.7 },
+      { "group": "gluteo", "weight": 0.9 },
+      { "group": "cuadriceps", "weight": 0.6 },
+      { "group": "isquios", "weight": 0.5 },
+      { "group": "core", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "peso-muerto-rumano",
+    "name": "Peso muerto rumano",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "isquios", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.7 },
+      { "group": "espalda", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "hiperextension",
+    "name": "Hiperextensiones lumbares",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      { "group": "espalda", "weight": 0.8 },
+      { "group": "gluteo", "weight": 0.4 },
+      { "group": "isquios", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "encogimientos",
+    "name": "Encogimientos (shrugs)",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "espalda", "weight": 0.8 }, { "group": "hombro", "weight": 0.3 }]
+  },
+
+  {
+    "id": "press-militar",
+    "name": "Press militar",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "hombro", "weight": 1.0 },
+      { "group": "triceps", "weight": 0.4 },
+      { "group": "core", "weight": 0.2 }
+    ]
+  },
+  {
+    "id": "press-mancuernas-hombros",
+    "name": "Press de hombros con mancuernas",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+  },
+  {
+    "id": "press-arnold",
+    "name": "Press Arnold",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+  },
+  {
+    "id": "press-hombro-maquina",
+    "name": "Press de hombros en máquina",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+  },
+  {
+    "id": "elevaciones-laterales",
+    "name": "Elevaciones laterales",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }]
+  },
+  {
+    "id": "elevaciones-frontales",
+    "name": "Elevaciones frontales",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }]
+  },
+  {
+    "id": "pajaros",
+    "name": "Elevaciones posteriores (pájaros)",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "espalda", "weight": 0.3 }]
+  },
+  {
+    "id": "face-pull",
+    "name": "Face pull",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "hombro", "weight": 0.9 }, { "group": "espalda", "weight": 0.4 }]
+  },
+  {
+    "id": "remo-menton",
+    "name": "Remo al mentón",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "hombro", "weight": 0.9 },
+      { "group": "espalda", "weight": 0.3 },
+      { "group": "biceps", "weight": 0.2 }
+    ]
+  },
+
+  {
+    "id": "curl-barra",
+    "name": "Curl con barra",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+  },
+  {
+    "id": "curl-mancuernas",
+    "name": "Curl con mancuernas",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+  },
+  {
+    "id": "curl-martillo",
+    "name": "Curl martillo",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 0.8 }, { "group": "antebrazo", "weight": 0.6 }]
+  },
+  {
+    "id": "curl-predicador",
+    "name": "Curl predicador",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }]
+  },
+  {
+    "id": "curl-concentrado",
+    "name": "Curl concentrado",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }]
+  },
+  {
+    "id": "curl-polea",
+    "name": "Curl en polea",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.2 }]
+  },
+
+  {
+    "id": "extension-triceps-polea",
+    "name": "Extensión de tríceps en polea",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+  },
+  {
+    "id": "triceps-cuerda",
+    "name": "Tríceps polea con cuerda",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+  },
+  {
+    "id": "press-frances",
+    "name": "Press francés",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+  },
+  {
+    "id": "patada-triceps",
+    "name": "Patada de tríceps (kickback)",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+  },
+  {
+    "id": "press-cerrado",
+    "name": "Press cerrado con barra",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "triceps", "weight": 1.0 },
+      { "group": "pecho", "weight": 0.5 },
+      { "group": "hombro", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "fondos-banco",
+    "name": "Fondos en banco",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "triceps", "weight": 0.9 }, { "group": "hombro", "weight": 0.3 }]
+  },
+
+  {
+    "id": "curl-muneca",
+    "name": "Curl de muñeca",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "antebrazo", "weight": 1.0 }]
+  },
+  {
+    "id": "curl-muneca-inverso",
+    "name": "Curl de muñeca inverso",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "antebrazo", "weight": 1.0 }]
+  },
+  {
+    "id": "farmer-walk",
+    "name": "Paseo del granjero",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "antebrazo", "weight": 1.0 },
+      { "group": "espalda", "weight": 0.4 },
+      { "group": "core", "weight": 0.4 }
+    ]
+  },
+
+  {
+    "id": "sentadilla",
+    "name": "Sentadilla",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "cuadriceps", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.5 },
+      { "group": "isquios", "weight": 0.3 },
+      { "group": "core", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "sentadilla-frontal",
+    "name": "Sentadilla frontal",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "cuadriceps", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.4 },
+      { "group": "core", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "sentadilla-bulgara",
+    "name": "Sentadilla búlgara",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "cuadriceps", "weight": 0.9 },
+      { "group": "gluteo", "weight": 0.7 },
+      { "group": "isquios", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "sentadilla-goblet",
+    "name": "Sentadilla goblet",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "cuadriceps", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.5 },
+      { "group": "core", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "hack-squat",
+    "name": "Hack squat",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }, { "group": "gluteo", "weight": 0.4 }]
+  },
+  {
+    "id": "prensa-45",
+    "name": "Prensa 45°",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }, { "group": "gluteo", "weight": 0.4 }]
+  },
+  {
+    "id": "extension-cuadriceps",
+    "name": "Extensión de cuádriceps",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }]
+  },
+  {
+    "id": "zancadas",
+    "name": "Zancadas (lunges)",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "cuadriceps", "weight": 0.9 },
+      { "group": "gluteo", "weight": 0.6 },
+      { "group": "isquios", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "step-ups",
+    "name": "Step-ups",
+    "equipment": "mancuerna",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "cuadriceps", "weight": 0.9 }, { "group": "gluteo", "weight": 0.6 }]
+  },
+
+  {
+    "id": "curl-femoral",
+    "name": "Curl femoral",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }]
+  },
+  {
+    "id": "curl-femoral-sentado",
+    "name": "Curl femoral sentado",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }]
+  },
+  {
+    "id": "peso-muerto-piernas-rigidas",
+    "name": "Peso muerto piernas rígidas",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "isquios", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.6 },
+      { "group": "espalda", "weight": 0.3 }
+    ]
+  },
+  {
+    "id": "good-mornings",
+    "name": "Good mornings",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "isquios", "weight": 1.0 },
+      { "group": "gluteo", "weight": 0.5 },
+      { "group": "espalda", "weight": 0.4 }
+    ]
+  },
+  {
+    "id": "nordic-curl",
+    "name": "Curl nórdico",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }, { "group": "gluteo", "weight": 0.2 }]
+  },
+
+  {
+    "id": "hip-thrust",
+    "name": "Hip thrust",
+    "equipment": "barra",
+    "isBodyweight": false,
+    "muscleGroups": [
+      { "group": "gluteo", "weight": 1.0 },
+      { "group": "isquios", "weight": 0.4 },
+      { "group": "cuadriceps", "weight": 0.2 }
+    ]
+  },
+  {
+    "id": "hip-thrust-maquina",
+    "name": "Hip thrust en máquina",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }, { "group": "isquios", "weight": 0.4 }]
+  },
+  {
+    "id": "patada-gluteo",
+    "name": "Patada de glúteo en polea",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }]
+  },
+  {
+    "id": "abductor-maquina",
+    "name": "Abductores en máquina",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }]
+  },
+  {
+    "id": "puente-gluteo",
+    "name": "Puente de glúteo",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "gluteo", "weight": 0.9 }, { "group": "isquios", "weight": 0.3 }]
+  },
+
+  {
+    "id": "gemelos-de-pie",
+    "name": "Gemelos de pie",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+  },
+  {
+    "id": "gemelos-sentado",
+    "name": "Gemelos sentado",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+  },
+  {
+    "id": "gemelos-prensa",
+    "name": "Gemelos en prensa",
+    "equipment": "maquina",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+  },
+
+  {
+    "id": "plancha",
+    "name": "Plancha",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+  },
+  {
+    "id": "plancha-lateral",
+    "name": "Plancha lateral",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "hombro", "weight": 0.3 }]
+  },
+  {
+    "id": "crunch",
+    "name": "Crunch abdominal",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+  },
+  {
+    "id": "crunch-polea",
+    "name": "Crunch en polea",
+    "equipment": "polea",
+    "isBodyweight": false,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian twist",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+  },
+  {
+    "id": "elevacion-piernas",
+    "name": "Elevación de piernas",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+  },
+  {
+    "id": "hanging-leg-raise",
+    "name": "Elevación de piernas colgado",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+  },
+  {
+    "id": "rueda-abdominal",
+    "name": "Rueda abdominal",
+    "equipment": "otro",
+    "isBodyweight": true,
+    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "espalda", "weight": 0.3 }]
+  }
+]

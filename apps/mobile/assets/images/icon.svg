@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  RAWSETS — App icon "Balance Polygon" (v2.0 simétrico)
+  ────────────────────────────────────────────────────
+  Hexágono regular pointy-top centrado en (512, 512), radio 380.
+
+  Vértices (regulares, simétricos):
+    v1 (top):          (512, 132)
+    v2 (upper-right):  (841, 322)
+    v3 (lower-right):  (841, 702)
+    v4 (bottom):       (512, 892)
+    v5 (lower-left):   (183, 702)
+    v6 (upper-left):   (183, 322)
+
+  Composición por capas (bottom → top):
+    1. Squircle lima — fondo de marca
+    2. Hexágono dark — silueta de los datos
+    3. Ejes lima desde el centro a cada vértice
+    4. Nodos lima en cada vértice + nodo central
+-->
+<svg width={size} height={size} viewBox="0 0 1024 1024">
+      {/* Squircle lima */}
+      <Rect width="1024" height="1024" rx="232" ry="232" fill="#B8FA82" />
+
+      {/* Hexágono regular (datos) */}
+      <Polygon points="512,132 841,322 841,702 512,892 183,702 183,322" fill="#0A0A0A" />
+
+      {/* Ejes radiales desde centro hacia cada vértice */}
+      <G stroke="#B8FA82" strokeWidth="12" strokeLinecap="round">
+        <Line x1="512" y1="512" x2="512" y2="132" />
+        <Line x1="512" y1="512" x2="841" y2="322" />
+        <Line x1="512" y1="512" x2="841" y2="702" />
+        <Line x1="512" y1="512" x2="512" y2="892" />
+        <Line x1="512" y1="512" x2="183" y2="702" />
+        <Line x1="512" y1="512" x2="183" y2="322" />
+      </G>
+
+      {/* Nodos en los vértices */}
+      <G fill="#B8FA82">
+        <Circle cx="512" cy="132" r="30" />
+        <Circle cx="841" cy="322" r="30" />
+        <Circle cx="841" cy="702" r="30" />
+        <Circle cx="512" cy="892" r="30" />
+        <Circle cx="183" cy="702" r="30" />
+        <Circle cx="183" cy="322" r="30" />
+      </G>
+
+      {/* Nodo central (origen del radar) */}
+      <Circle cx="512" cy="512" r="22" fill="#B8FA82" />
+    </svg>

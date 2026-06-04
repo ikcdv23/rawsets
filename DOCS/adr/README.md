@@ -21,3 +21,4 @@ Decisiones técnicas importantes de RAWSETS. Cada ADR documenta el contexto, las
 - [0005 — Modelo de UserProfile](0005-modelo-user-profile.md) — Accepted · 2026-05-28
 - [0006 — Modelo de PR y Streak (derivados)](0006-modelo-pr-y-streak.md) — Accepted · 2026-05-28
 - [0007 — Auth: Supabase + Google OAuth](0007-auth-supabase-google.md) — Accepted · 2026-05-28
+- [0008 — Inicialización de DB con SQLiteProvider (async-safe en web)](0008-db-init-sqlite-provider.md) — Accepted · 2026-05-29

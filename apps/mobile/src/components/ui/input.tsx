@@ -18,7 +18,11 @@ import { Pressable, Text, TextInput, type TextInputProps, View } from 'react-nat
  */
 type InputType = 'text' | 'email' | 'password';
 
-type InputProps = Omit<TextInputProps, 'secureTextEntry' | 'keyboardType' | 'autoCapitalize'> & {
+// `keyboardType` y `autoCapitalize` los infiere el componente desde `type`,
+// pero el caller puede sobreescribirlos (ej. `keyboardType="decimal-pad"`
+// para un campo numérico). `secureTextEntry` lo controla el componente
+// porque depende del estado interno `showPassword`.
+type InputProps = Omit<TextInputProps, 'secureTextEntry'> & {
   label?: string;
   error?: string;
   type?: InputType;
