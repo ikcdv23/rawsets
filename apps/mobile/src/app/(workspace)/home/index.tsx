@@ -2,12 +2,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InfoModal } from '@/components/ui/info-modal';
 import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
-import { type RadarAxis, RadarChart } from '@/components/ui/radar-chart';
+import type { RadarAxis } from '@/components/ui/radar-chart';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Stat } from '@/components/ui/stat';
 import { useDb } from '@/db/db-provider';
 import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
 import type { Exercise } from '@/features/exercises/domain/exercise';
+import type { MuscleGroup } from '@/features/exercises/domain/muscle-groups';
 import { listExercises } from '@/features/exercises/use-cases/list-exercises';
 import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
 import type { Routine } from '@/features/routines/domain/routine';
@@ -15,31 +16,68 @@ import { DrizzleSqliteScheduledSessionRepo } from '@/features/scheduling/adapter
 import { addDays, startOfDay } from '@/features/scheduling/domain/dates';
 import type { ScheduledSession } from '@/features/scheduling/domain/scheduled-session';
 import { listScheduledInRange } from '@/features/scheduling/use-cases/list-scheduled-in-range';
+import { DrizzleSqliteWorkoutRepo } from '@/features/workouts/adapters/drizzle-sqlite-workout-repo';
+import { BalanceRadar } from '@/features/workouts/ui/components/radar';
 import {
-  type WorkoutExercise,
+  type StartWorkoutExercise,
   useWorkoutSession,
 } from '@/features/workouts/ui/contexts/workout-session-context';
+import {
+  type MuscleBalanceItem,
+  computeMuscleVolumeByRange,
+} from '@/features/workouts/use-cases/compute-muscle-volume-by-range';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { Info } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
-// Toggle temporal del histórico. Cuando exista el slice workouts/, se sustituye
-// por una query real (`countWorkoutsInRange` o similar). Mientras tanto, el
-// radar y los KPIs siguen en modo "esperando primer entreno".
-const MOCK_HAS_HISTORY: boolean = false;
-
-// Ejes del radar — placeholder hasta que existan datos de workouts.
-const RADAR_DATA: RadarAxis[] = [
-  { label: 'Pecho', value: 92 },
-  { label: 'Brazos', value: 68 },
-  { label: 'Piernas', value: 76 },
-  { label: 'Core', value: 55 },
-  { label: 'Espalda', value: 38, flagged: true },
-  { label: 'Hombros', value: 71 },
+// Mapping de grupos planos (11) → ejes del radar (6). Los 11 grupos del dominio
+// son granulares para que la lógica de balance sea precisa; el radar agrupa por
+// región para que sea LEGIBLE de un vistazo. Si Fase 2 añade stats screen con
+// los 11, esa pantalla usa otro mapeo (o ninguno).
+const RADAR_AXES: Array<{ label: string; groups: MuscleGroup[] }> = [
+  { label: 'Pecho', groups: ['pecho'] },
+  { label: 'Brazos', groups: ['biceps', 'triceps', 'antebrazo'] },
+  { label: 'Piernas', groups: ['cuadriceps', 'isquios', 'gluteo', 'pantorrilla'] },
+  { label: 'Core', groups: ['core'] },
+  { label: 'Espalda', groups: ['espalda'] },
+  { label: 'Hombros', groups: ['hombro'] },
 ];
 
-const RADAR_EMPTY: RadarAxis[] = RADAR_DATA.map((a) => ({ label: a.label, value: 0 }));
+const RADAR_EMPTY: RadarAxis[] = RADAR_AXES.map((a) => ({ label: a.label, value: 0 }));
+
+// Construye los 6 ejes del radar agregando volumen por región.
+// El flag de eje "más bajo" se activa SÓLO si:
+//   1. Hay histórico (algún eje con volumen > 0)
+//   2. El eje más bajo está por debajo de 60% del máximo
+// Sin esos dos criterios juntos no hay nada "que alarmar" todavía.
+function buildRadarAxes(balance: MuscleBalanceItem[]): {
+  axes: RadarAxis[];
+  flaggedLabel: string | null;
+} {
+  const byGroup = new Map(balance.map((b) => [b.muscleGroup, b]));
+  const aggregated = RADAR_AXES.map(({ label, groups }) => {
+    let volumeKg = 0;
+    for (const g of groups) volumeKg += byGroup.get(g)?.volumeKg ?? 0;
+    return { label, volumeKg };
+  });
+  const maxVolume = Math.max(0, ...aggregated.map((a) => a.volumeKg));
+  if (maxVolume === 0) {
+    return { axes: RADAR_EMPTY, flaggedLabel: null };
+  }
+  const axes = aggregated.map(({ label, volumeKg }) => ({
+    label,
+    value: Math.round((volumeKg / maxVolume) * 100),
+  }));
+  // axes nunca está vacío — RADAR_AXES tiene 6 elementos hardcoded — pero
+  // TS no lo sabe. reduce sin initial value sobre array no vacío es seguro.
+  const lowestValue = Math.min(...axes.map((a) => a.value));
+  const lowestAxis = axes.find((a) => a.value === lowestValue);
+  const flaggedLabel = lowestAxis && lowestAxis.value < 60 ? lowestAxis.label : null;
+  const axesWithFlag = axes.map(
+    (a): RadarAxis => (a.label === flaggedLabel ? { ...a, flagged: true } : a),
+  );
+  return { axes: axesWithFlag, flaggedLabel };
+}
 
 // Tres estados de "Sesión de hoy", derivados de los datos reales:
 //   workout → hay scheduled_session con routineId apuntando a una rutina viva
@@ -57,33 +95,43 @@ export default function HomeScreen() {
     [db, sqlite],
   );
 
+  const workoutRepo = useMemo(() => new DrizzleSqliteWorkoutRepo(db, sqlite), [db, sqlite]);
+
   const [radarInfoOpen, setRadarInfoOpen] = useState(false);
   const { activeWorkout, startWorkout, finishWorkout } = useWorkoutSession();
 
   const [todaySession, setTodaySession] = useState<ScheduledSession | null>(null);
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [catalog, setCatalog] = useState<Exercise[]>([]);
+  const [muscleBalance, setMuscleBalance] = useState<MuscleBalanceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
     try {
-      const today = startOfDay(new Date());
+      const now = new Date();
+      const today = startOfDay(now);
       const tomorrow = addDays(today, 1);
-      // Las tres queries van en paralelo — son independientes.
-      const [sch, rs, cat] = await Promise.all([
+      // Ventana del radar: últimos 14 días. El +1ms en `to` evita borderline
+      // del momento actual sin pelearse con timestamps.
+      const radarFrom = addDays(today, -13);
+      const radarTo = new Date(now.getTime() + 1);
+      // Cuatro queries en paralelo — independientes entre sí.
+      const [sch, rs, cat, balance] = await Promise.all([
         listScheduledInRange(scheduleRepo, today, tomorrow),
         routineRepo.list(),
         listExercises(exerciseRepo),
+        computeMuscleVolumeByRange(workoutRepo, radarFrom, radarTo),
       ]);
       setTodaySession(sch[0] ?? null);
       setRoutines(rs);
       setCatalog(cat);
+      setMuscleBalance(balance);
     } catch (err) {
       console.error('[home] load error:', err);
     } finally {
       setLoading(false);
     }
-  }, [scheduleRepo, routineRepo, exerciseRepo]);
+  }, [scheduleRepo, routineRepo, exerciseRepo, workoutRepo]);
 
   useFocusEffect(
     useCallback(() => {
@@ -94,6 +142,15 @@ export default function HomeScreen() {
   // Lookup rápido de ejercicios para enriquecer la rutina del día.
   const catalogById = useMemo(() => new Map(catalog.map((e) => [e.id, e])), [catalog]);
   const routinesById = useMemo(() => new Map(routines.map((r) => [r.id, r])), [routines]);
+
+  // Radar: agrego los 11 grupos planos en los 6 ejes visuales del mockup.
+  // `hasHistory` es true sólo si CUALQUIER eje tiene volumen > 0 — sin
+  // entrenos completos no hay nada que pintar.
+  const { axes: radarAxes, flaggedLabel } = useMemo(
+    () => buildRadarAxes(muscleBalance),
+    [muscleBalance],
+  );
+  const hasHistory = muscleBalance.some((b) => b.volumeKg > 0);
 
   // Derivación del estado de hoy. Esta lógica vive aquí porque es de UI;
   // si la necesitara más de una pantalla, subiría a un use case puro
@@ -120,35 +177,12 @@ export default function HomeScreen() {
 
           {/* Hero: balance muscular (radar). */}
           <SectionHeader>Balance muscular</SectionHeader>
-          <Card glow glowPosition="center" glowOpacity={0.16}>
-            <View className="mb-2 flex-row items-center justify-between">
-              <Text className="font-sans-bold text-foreground">Últimos 14 días</Text>
-              {MOCK_HAS_HISTORY ? (
-                <Text className="font-sans-bold text-[10px] uppercase tracking-[1.5px] text-destructive">
-                  Espalda baja
-                </Text>
-              ) : (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="¿Qué es el balance muscular?"
-                  onPress={() => setRadarInfoOpen(true)}
-                  className="active:opacity-60"
-                  hitSlop={8}
-                >
-                  <Info color="#8A8A8A" size={18} strokeWidth={2.2} />
-                </Pressable>
-              )}
-            </View>
-            <RadarChart
-              data={MOCK_HAS_HISTORY ? RADAR_DATA : RADAR_EMPTY}
-              empty={!MOCK_HAS_HISTORY}
-            />
-            {!MOCK_HAS_HISTORY && (
-              <Text className="mt-2 text-center font-sans text-[12px] text-muted">
-                Tu radar despertará con tu primera sesión.
-              </Text>
-            )}
-          </Card>
+          <BalanceRadar
+            data={hasHistory ? radarAxes : RADAR_EMPTY}
+            empty={!hasHistory}
+            onPressInfo={() => setRadarInfoOpen(true)}
+            alertLabel={flaggedLabel ? `${flaggedLabel} bajo` : null}
+          />
 
           {/* Resumen: 4 KPIs en grid 2x2. "—" cuando no hay histórico. */}
           <SectionHeader>Resumen</SectionHeader>
@@ -156,15 +190,15 @@ export default function HomeScreen() {
             <View className="flex-1">
               <Stat
                 label="Volumen sem"
-                value={MOCK_HAS_HISTORY ? '12.4' : '—'}
-                unit={MOCK_HAS_HISTORY ? 't' : undefined}
+                value={hasHistory ? '12.4' : '—'}
+                unit={hasHistory ? 't' : undefined}
               />
             </View>
             <View className="flex-1">
               <Stat
                 label="Sesiones"
-                value={MOCK_HAS_HISTORY ? '4' : '—'}
-                unit={MOCK_HAS_HISTORY ? '/5' : undefined}
+                value={hasHistory ? '4' : '—'}
+                unit={hasHistory ? '/5' : undefined}
               />
             </View>
           </View>
@@ -172,16 +206,16 @@ export default function HomeScreen() {
             <View className="flex-1">
               <Stat
                 label="PRs · mes"
-                value={MOCK_HAS_HISTORY ? '3' : '—'}
-                tone={MOCK_HAS_HISTORY ? 'primary' : 'default'}
+                value={hasHistory ? '3' : '—'}
+                tone={hasHistory ? 'primary' : 'default'}
               />
             </View>
             <View className="flex-1">
               <Stat
                 label="Grupos OK"
-                value={MOCK_HAS_HISTORY ? '8' : '—'}
-                unit={MOCK_HAS_HISTORY ? '/11' : undefined}
-                tone={MOCK_HAS_HISTORY ? 'destructive' : 'default'}
+                value={hasHistory ? '8' : '—'}
+                unit={hasHistory ? '/11' : undefined}
+                tone={hasHistory ? 'destructive' : 'default'}
               />
             </View>
           </View>
@@ -199,14 +233,17 @@ export default function HomeScreen() {
               onStart={() => {
                 const exercises = buildWorkoutExercises(today.routine, catalogById);
                 startWorkout({
+                  routineId: today.routine.id,
                   routineName: today.routine.name,
                   // Si tuviéramos "Día 2/5" de un programa lo metemos aquí.
                   // De momento usamos un subtítulo neutro.
                   routineSubtitle: null,
                   exercises,
-                });
+                }).catch((err) => console.error('[home] startWorkout error:', err));
               }}
-              onFinishDev={finishWorkout}
+              onFinishDev={() => {
+                finishWorkout().catch((err) => console.error('[home] finishWorkout error:', err));
+              }}
             />
           ) : today.kind === 'rest' ? (
             <RestDayCard />
@@ -228,17 +265,16 @@ export default function HomeScreen() {
 
 /* ──────────────────────────────────────────────────────────────────────── */
 
-// Adapter de Routine + catálogo → la forma `WorkoutExercise[]` que espera el
-// WorkoutSessionContext. Local porque es traducción específica del Home; si
-// más adelante hay otros consumidores que arrancan workouts (e.g. "empezar
-// libre desde una rutina"), se sube a un helper.
+// Adapter de Routine + catálogo → la forma que espera el WorkoutSessionContext.
+// Usa `StartWorkoutExercise` (sin status/currentSet/sets) — el contexto inicializa
+// sets[] vacíos y recomputa status/currentSet automáticamente.
 function buildWorkoutExercises(
   routine: Routine,
   catalogById: Map<string, Exercise>,
-): WorkoutExercise[] {
+): StartWorkoutExercise[] {
   return routine.exercises
     .sort((a, b) => a.position - b.position)
-    .map((re, idx): WorkoutExercise => {
+    .map((re): StartWorkoutExercise => {
       const ex = catalogById.get(re.exerciseId);
       const repsLabel =
         re.targetRepsMin === re.targetRepsMax
@@ -251,9 +287,6 @@ function buildWorkoutExercises(
         muscleGroup: primaryMuscle.charAt(0).toUpperCase() + primaryMuscle.slice(1),
         targetSets: re.targetSets,
         targetReps: repsLabel,
-        // El primero arranca como "current" (toca este); el resto pending.
-        status: idx === 0 ? 'current' : 'pending',
-        currentSet: idx === 0 ? 1 : null,
       };
     });
 }
