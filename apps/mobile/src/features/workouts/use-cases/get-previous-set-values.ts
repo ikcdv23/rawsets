@@ -1,3 +1,4 @@
+import { type Result, ok } from '@/shared/result';
 import type { WorkoutRepo } from '../ports/workout-repo';
 
 /**
@@ -19,8 +20,13 @@ export async function getPreviousSetValues(
   repo: WorkoutRepo,
   exerciseId: string,
   targetSets: number,
-): Promise<PreviousSetLabel[]> {
-  const rows = await repo.getPreviousSetValues(exerciseId);
+): Promise<Result<PreviousSetLabel[]>> {
+  const result = await repo.getPreviousSetValues(exerciseId);
+  if (!result.ok) return result;
+
+  const rows = result.value;
   const byNumber = new Map(rows.map((r) => [r.setNumber, { weight: r.weight, reps: r.reps }]));
-  return Array.from({ length: targetSets }, (_, i) => byNumber.get(i + 1) ?? null);
+  const values = Array.from({ length: targetSets }, (_, i) => byNumber.get(i + 1) ?? null);
+
+  return ok(values);
 }

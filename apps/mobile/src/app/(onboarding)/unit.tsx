@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { UNITS, type Unit } from '@/features/user/domain/user-profile';
 import { OnboardingShell } from '@/features/user/ui/onboarding/onboarding-shell';
 import { SelectCard } from '@/features/user/ui/onboarding/select-card';
@@ -8,7 +7,7 @@ import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-prof
 import { updateProfile } from '@/features/user/use-cases/update-profile';
 import { router } from 'expo-router';
 import { ArrowRight } from 'lucide-react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 // Step 3 — Unidad. kg / lb. Internamente siempre kg (ver ADR-0005), esto
@@ -26,16 +25,18 @@ const OPTIONS: UnitOption[] = [
 ];
 
 export default function OnboardingUnitScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [selected, setSelected] = useState<Unit>('kg');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo).then((p) => {
-      if (!cancelled && UNITS.includes(p.unit)) setSelected(p.unit);
+    getOrCreateProfile(repo).then((result) => {
+      if (!cancelled && result.ok) {
+        const p = result.value;
+        if (UNITS.includes(p.unit)) setSelected(p.unit);
+      }
     });
     return () => {
       cancelled = true;
@@ -46,7 +47,8 @@ export default function OnboardingUnitScreen() {
     if (saving) return;
     setSaving(true);
     try {
-      await updateProfile(repo, { unit: selected });
+      const result = await updateProfile(repo, { unit: selected });
+      if (!result.ok) throw result.error;
       router.push('/body');
     } catch (err) {
       console.error('[onboarding/unit] save error:', err);

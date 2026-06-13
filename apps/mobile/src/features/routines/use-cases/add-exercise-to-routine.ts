@@ -1,3 +1,4 @@
+import { Result, ok, err } from '@/shared/result';
 import type { RoutineExercise } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -18,14 +19,17 @@ export async function addExerciseToRoutine(
   repo: RoutineRepo,
   routineId: string,
   input: AddExerciseToRoutineInput,
-): Promise<void> {
-  const routine = await repo.findById(routineId);
-  if (!routine) throw new Error(`Rutina ${routineId} no encontrada.`);
+): Promise<Result<void, Error>> {
+  const result = await repo.findById(routineId);
+  if (!result.ok) return result;
+  const routine = result.value;
+
+  if (!routine) return err(new Error(`Rutina ${routineId} no encontrada.`));
 
   if (routine.exercises.some((e) => e.exerciseId === input.exerciseId)) {
     // Ya estaba — no-op idempotente. La UI puede mostrarlo con un toast tipo
     // "ya está en la rutina" si quiere.
-    return;
+    return ok(undefined);
   }
 
   const nextPosition = routine.exercises.length + 1;
@@ -39,5 +43,6 @@ export async function addExerciseToRoutine(
     notes: null,
   };
 
-  await repo.setExercises(routineId, [...routine.exercises, newExercise]);
+  return repo.setExercises(routineId, [...routine.exercises, newExercise]);
 }
+

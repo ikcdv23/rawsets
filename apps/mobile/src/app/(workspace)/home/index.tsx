@@ -5,18 +5,14 @@ import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
 import type { RadarAxis } from '@/components/ui/radar-chart';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Stat } from '@/components/ui/stat';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
+import { useRepos } from '@/db/repo-provider';
 import type { Exercise } from '@/features/exercises/domain/exercise';
 import type { MuscleGroup } from '@/features/exercises/domain/muscle-groups';
 import { listExercises } from '@/features/exercises/use-cases/list-exercises';
-import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
 import type { Routine } from '@/features/routines/domain/routine';
-import { DrizzleSqliteScheduledSessionRepo } from '@/features/scheduling/adapters/drizzle-sqlite-scheduled-session-repo';
 import { addDays, startOfDay } from '@/features/scheduling/domain/dates';
 import type { ScheduledSession } from '@/features/scheduling/domain/scheduled-session';
 import { listScheduledInRange } from '@/features/scheduling/use-cases/list-scheduled-in-range';
-import { DrizzleSqliteWorkoutRepo } from '@/features/workouts/adapters/drizzle-sqlite-workout-repo';
 import { BalanceRadar } from '@/features/workouts/ui/components/radar';
 import {
   type StartWorkoutExercise,
@@ -87,15 +83,12 @@ type TodayState = { kind: 'workout'; routine: Routine } | { kind: 'rest' } | { k
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { db, sqlite } = useDb();
-  const routineRepo = useMemo(() => new DrizzleSqliteRoutineRepo(db, sqlite), [db, sqlite]);
-  const exerciseRepo = useMemo(() => new DrizzleSqliteExerciseRepo(db, sqlite), [db, sqlite]);
-  const scheduleRepo = useMemo(
-    () => new DrizzleSqliteScheduledSessionRepo(db, sqlite),
-    [db, sqlite],
-  );
-
-  const workoutRepo = useMemo(() => new DrizzleSqliteWorkoutRepo(db, sqlite), [db, sqlite]);
+  const {
+    routine: routineRepo,
+    exercise: exerciseRepo,
+    schedule: scheduleRepo,
+    workout: workoutRepo,
+  } = useRepos();
 
   const [radarInfoOpen, setRadarInfoOpen] = useState(false);
   const { activeWorkout, startWorkout, finishWorkout } = useWorkoutSession();
@@ -116,18 +109,24 @@ export default function HomeScreen() {
       const radarFrom = addDays(today, -13);
       const radarTo = new Date(now.getTime() + 1);
       // Cuatro queries en paralelo — independientes entre sí.
-      const [sch, rs, cat, balance] = await Promise.all([
+      const [schRes, rsRes, catRes, balanceRes] = await Promise.all([
         listScheduledInRange(scheduleRepo, today, tomorrow),
         routineRepo.list(),
         listExercises(exerciseRepo),
         computeMuscleVolumeByRange(workoutRepo, radarFrom, radarTo),
       ]);
-      setTodaySession(sch[0] ?? null);
-      setRoutines(rs);
-      setCatalog(cat);
-      setMuscleBalance(balance);
+
+      if (schRes.ok) setTodaySession(schRes.value[0] ?? null);
+      if (rsRes.ok) setRoutines(rsRes.value);
+      if (catRes.ok) setCatalog(catRes.value);
+      if (balanceRes.ok) setMuscleBalance(balanceRes.value);
+
+      // Opcional: loggear errores si alguno falló
+      [schRes, rsRes, catRes, balanceRes].forEach((r) => {
+        if (!r.ok) console.error('[home] load error:', r.error);
+      });
     } catch (err) {
-      console.error('[home] load error:', err);
+      console.error('[home] unexpected error:', err);
     } finally {
       setLoading(false);
     }

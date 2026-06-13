@@ -1,3 +1,4 @@
+import { type Result, err, ok } from '@/shared/result';
 import type { UserProfile } from '../domain/user-profile';
 import type { UserProfileRepo } from '../ports/user-profile-repo';
 
@@ -13,16 +14,23 @@ import type { UserProfileRepo } from '../ports/user-profile-repo';
 // para lanzar el bootstrap remoto ("perfil onboarded localmente, intenta
 // enlazar con cuenta sincronizada"). Sin un use case dedicado tendría que
 // detectarse desde un parche genérico — frágil.
-export async function completeOnboarding(repo: UserProfileRepo): Promise<UserProfile> {
-  const current = await repo.get();
+export async function completeOnboarding(repo: UserProfileRepo): Promise<Result<UserProfile>> {
+  const currentResult = await repo.get();
+  if (!currentResult.ok) return currentResult;
+
+  const current = currentResult.value;
   if (!current) {
-    throw new Error('completeOnboarding: el perfil no existe. Llama a getOrCreateProfile primero.');
+    return err(
+      new Error('completeOnboarding: el perfil no existe. Llama a getOrCreateProfile primero.'),
+    );
   }
   if (current.onboardedAt !== null) {
     // Idempotente — si ya estaba sellado, devuelvo el perfil actual sin tocar.
-    return current;
+    return ok(current);
   }
   const next: UserProfile = { ...current, onboardedAt: new Date() };
-  await repo.upsert(next);
-  return next;
+  const upsertResult = await repo.upsert(next);
+  if (!upsertResult.ok) return upsertResult;
+
+  return ok(next);
 }

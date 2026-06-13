@@ -1,3 +1,4 @@
+import { Result, ok, err } from '@/shared/result';
 import type { RoutineExercise } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -25,11 +26,14 @@ export async function addExercisesToRoutine(
   repo: RoutineRepo,
   routineId: string,
   inputs: AddExerciseInput[],
-): Promise<{ added: number; skipped: number }> {
-  if (inputs.length === 0) return { added: 0, skipped: 0 };
+): Promise<Result<{ added: number; skipped: number }, Error>> {
+  if (inputs.length === 0) return ok({ added: 0, skipped: 0 });
 
-  const routine = await repo.findById(routineId);
-  if (!routine) throw new Error(`Rutina ${routineId} no encontrada.`);
+  const result = await repo.findById(routineId);
+  if (!result.ok) return result;
+  const routine = result.value;
+
+  if (!routine) return err(new Error(`Rutina ${routineId} no encontrada.`));
 
   // Skip los que ya están — la PK (routineId, exerciseId) no permite duplicados.
   const existing = new Set(routine.exercises.map((e) => e.exerciseId));
@@ -52,9 +56,12 @@ export async function addExercisesToRoutine(
   });
 
   if (additions.length === 0) {
-    return { added: 0, skipped: inputs.length };
+    return ok({ added: 0, skipped: inputs.length });
   }
 
-  await repo.setExercises(routineId, [...routine.exercises, ...additions]);
-  return { added: additions.length, skipped: inputs.length - additions.length };
+  const setRes = await repo.setExercises(routineId, [...routine.exercises, ...additions]);
+  if (!setRes.ok) return setRes;
+
+  return ok({ added: additions.length, skipped: inputs.length - additions.length });
 }
+

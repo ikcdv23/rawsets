@@ -1,3 +1,4 @@
+import { Result, err } from '@/shared/result';
 import type { RoutineRepo } from '../ports/routine-repo';
 
 // Elimina un ejercicio de una rutina y reorganiza las posiciones restantes
@@ -7,14 +8,18 @@ export async function removeExerciseFromRoutine(
   repo: RoutineRepo,
   routineId: string,
   exerciseId: string,
-): Promise<void> {
-  const routine = await repo.findById(routineId);
-  if (!routine) throw new Error(`Rutina ${routineId} no encontrada.`);
+): Promise<Result<void, Error>> {
+  const result = await repo.findById(routineId);
+  if (!result.ok) return result;
+  const routine = result.value;
+
+  if (!routine) return err(new Error(`Rutina ${routineId} no encontrada.`));
 
   const remaining = routine.exercises
     .filter((e) => e.exerciseId !== exerciseId)
     .sort((a, b) => a.position - b.position)
     .map((e, idx) => ({ ...e, position: idx + 1 }));
 
-  await repo.setExercises(routineId, remaining);
+  return repo.setExercises(routineId, remaining);
 }
+

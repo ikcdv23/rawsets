@@ -1,4 +1,5 @@
 import { MUSCLE_GROUPS, type MuscleGroup } from '@/features/exercises/domain/muscle-groups';
+import { type Result, ok } from '@/shared/result';
 import type { WorkoutRepo } from '../ports/workout-repo';
 
 /**
@@ -28,15 +29,20 @@ export async function computeMuscleVolumeByRange(
   repo: WorkoutRepo,
   from: Date,
   to: Date,
-): Promise<MuscleBalanceItem[]> {
-  const rows = await repo.aggregateMuscleVolumeInRange(from, to);
+): Promise<Result<MuscleBalanceItem[]>> {
+  const result = await repo.aggregateMuscleVolumeInRange(from, to);
+  if (!result.ok) return result;
+
+  const rows = result.value;
   const volumesByGroup = new Map<MuscleGroup, number>(rows.map((r) => [r.muscleGroup, r.volumeKg]));
 
   const maxVolume = Math.max(0, ...rows.map((r) => r.volumeKg));
 
-  return MUSCLE_GROUPS.map((mg): MuscleBalanceItem => {
+  const balance = MUSCLE_GROUPS.map((mg): MuscleBalanceItem => {
     const volume = volumesByGroup.get(mg) ?? 0;
     const percent = maxVolume > 0 ? Math.round((volume / maxVolume) * 100) : 0;
     return { muscleGroup: mg, volumeKg: volume, percent };
   });
+
+  return ok(balance);
 }

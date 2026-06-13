@@ -1,3 +1,4 @@
+import { Result } from '@/shared/result';
 import type { ScheduledSession } from '../domain/scheduled-session';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
 
@@ -7,6 +8,7 @@ export async function listScheduledInRange(
   repo: ScheduledSessionRepo,
   from: Date,
   to: Date,
-): Promise<ScheduledSession[]> {
+): Promise<Result<ScheduledSession[], Error>> {
   return repo.listInRange(from, to);
 }
+

@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { SEXES, type Sex, type Unit } from '@/features/user/domain/user-profile';
 import { OnboardingShell } from '@/features/user/ui/onboarding/onboarding-shell';
 import { SelectCard } from '@/features/user/ui/onboarding/select-card';
@@ -9,7 +8,7 @@ import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-prof
 import { updateProfile } from '@/features/user/use-cases/update-profile';
 import { router } from 'expo-router';
 import { ArrowRight, Asterisk, type LucideIcon, Mars, Venus } from 'lucide-react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 // Step 4 — Sobre ti (peso corporal + sexo). AMBOS opcionales pero recomendados.
@@ -31,8 +30,7 @@ const SEX_OPTIONS: SexOption[] = [
 ];
 
 export default function OnboardingBodyScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [weight, setWeight] = useState('');
   const [sex, setSex] = useState<Sex | null>(null);
@@ -41,11 +39,14 @@ export default function OnboardingBodyScreen() {
 
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo).then((p) => {
+    getOrCreateProfile(repo).then((result) => {
       if (cancelled) return;
-      setUnit(p.unit);
-      if (p.bodyWeight !== null) setWeight(String(p.bodyWeight));
-      if (p.sex && SEXES.includes(p.sex)) setSex(p.sex);
+      if (result.ok) {
+        const p = result.value;
+        setUnit(p.unit);
+        if (p.bodyWeight !== null) setWeight(String(p.bodyWeight));
+        if (p.sex && SEXES.includes(p.sex)) setSex(p.sex);
+      }
     });
     return () => {
       cancelled = true;
@@ -68,7 +69,8 @@ export default function OnboardingBodyScreen() {
         }
         if (sex) patch.sex = sex;
         if (Object.keys(patch).length > 0) {
-          await updateProfile(repo, patch);
+          const result = await updateProfile(repo, patch);
+          if (!result.ok) throw result.error;
         }
       }
       router.push('/done');

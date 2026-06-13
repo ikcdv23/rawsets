@@ -1,3 +1,4 @@
+import { Result } from '@/shared/result';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
 
 // Marca un día como descanso PLANIFICADO (distinto de "no asignado").
@@ -11,11 +12,12 @@ export async function markRestDay(
   repo: ScheduledSessionRepo,
   date: Date,
   idGenerator: () => string,
-): Promise<void> {
-  await repo.upsertOnDate({
+): Promise<Result<void, Error>> {
+  return repo.upsertOnDate({
     id: idGenerator(),
     date,
     routineId: null,
     createdAt: new Date(),
   });
 }
+

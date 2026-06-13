@@ -2,11 +2,9 @@ import { Button } from '@/components/ui/button';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
 import { SectionHeader } from '@/components/ui/section-header';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
+import { useRepos } from '@/db/repo-provider';
 import type { Exercise } from '@/features/exercises/domain/exercise';
 import { listExercises } from '@/features/exercises/use-cases/list-exercises';
-import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
 import type { Routine } from '@/features/routines/domain/routine';
 import { CreateRoutineDashedButton } from '@/features/routines/ui/components/create-routine-dashed-button';
 import { CreateRoutineModal } from '@/features/routines/ui/components/create-routine-modal';
@@ -15,7 +13,6 @@ import { RoutinesSelectionBar } from '@/features/routines/ui/components/routines
 import { createRoutine } from '@/features/routines/use-cases/create-routine';
 import { deleteRoutine } from '@/features/routines/use-cases/delete-routine';
 import { listRoutines } from '@/features/routines/use-cases/list-routines';
-import { DrizzleSqliteScheduledSessionRepo } from '@/features/scheduling/adapters/drizzle-sqlite-scheduled-session-repo';
 import { addMonths, startOfMonth } from '@/features/scheduling/domain/dates';
 import type { ScheduledSession } from '@/features/scheduling/domain/scheduled-session';
 import { AssignDaySheet } from '@/features/scheduling/ui/components/assign-day-sheet';
@@ -39,14 +36,12 @@ import { ScrollView, Text, View } from 'react-native';
 // 6 semanas — basta para pintar la grid. Si el usuario navega mes, hacemos
 // re-fetch.
 export default function RoutinesScreen() {
-  const { db, sqlite } = useDb();
   const router = useRouter();
-  const routineRepo = useMemo(() => new DrizzleSqliteRoutineRepo(db, sqlite), [db, sqlite]);
-  const exerciseRepo = useMemo(() => new DrizzleSqliteExerciseRepo(db, sqlite), [db, sqlite]);
-  const scheduleRepo = useMemo(
-    () => new DrizzleSqliteScheduledSessionRepo(db, sqlite),
-    [db, sqlite],
-  );
+  const {
+    routine: routineRepo,
+    exercise: exerciseRepo,
+    schedule: scheduleRepo,
+  } = useRepos();
 
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [_catalog, setCatalog] = useState<Exercise[]>([]);
@@ -68,16 +63,21 @@ export default function RoutinesScreen() {
     try {
       const from = addMonths(monthAnchor, -1);
       const to = addMonths(monthAnchor, 2);
-      const [rs, cat, sch] = await Promise.all([
+      const [rsRes, catRes, schRes] = await Promise.all([
         listRoutines(routineRepo),
         listExercises(exerciseRepo),
         listScheduledInRange(scheduleRepo, from, to),
       ]);
-      setRoutines(rs);
-      setCatalog(cat);
-      setScheduled(sch);
+
+      if (rsRes.ok) setRoutines(rsRes.value);
+      if (catRes.ok) setCatalog(catRes.value);
+      if (schRes.ok) setScheduled(schRes.value);
+
+      if (!rsRes.ok) console.error('[routines] listRoutines error:', rsRes.error);
+      if (!catRes.ok) console.error('[routines] listExercises error:', catRes.error);
+      if (!schRes.ok) console.error('[routines] listScheduled error:', schRes.error);
     } catch (err) {
-      console.error('[routines] list error:', err);
+      console.error('[routines] reload error:', err);
     } finally {
       setLoading(false);
     }
@@ -123,6 +123,8 @@ export default function RoutinesScreen() {
   const performBulkDelete = async () => {
     setConfirmDelete(false);
     const ids = Array.from(selectedIds);
+    // Para simplificar tratamos cada delete individualmente.
+    // listRoutines nos refrescará el estado real después.
     await Promise.allSettled(ids.map((id) => deleteRoutine(routineRepo, id)));
     exitSelection();
     await reload();
@@ -205,9 +207,13 @@ export default function RoutinesScreen() {
         visible={showCreate}
         onClose={() => setShowCreate(false)}
         onCreate={async (name) => {
-          await createRoutine(routineRepo, { name }, () => crypto.randomUUID());
-          setShowCreate(false);
-          reload();
+          const res = await createRoutine(routineRepo, { name }, () => crypto.randomUUID());
+          if (res.ok) {
+            setShowCreate(false);
+            reload();
+          } else {
+            console.error('[routines] create error:', res.error);
+          }
         }}
       />
 
@@ -234,21 +240,38 @@ export default function RoutinesScreen() {
         onClose={() => setSelectedDay(null)}
         onAssignRoutine={async (routineId) => {
           if (!selectedDay) return;
-          await assignRoutineToDay(scheduleRepo, selectedDay, routineId, () => crypto.randomUUID());
-          setSelectedDay(null);
-          await reload();
+          const res = await assignRoutineToDay(
+            scheduleRepo,
+            selectedDay,
+            routineId,
+            () => crypto.randomUUID(),
+          );
+          if (res.ok) {
+            setSelectedDay(null);
+            await reload();
+          } else {
+            console.error('[routines] assignRoutine error:', res.error);
+          }
         }}
         onMarkRest={async () => {
           if (!selectedDay) return;
-          await markRestDay(scheduleRepo, selectedDay, () => crypto.randomUUID());
-          setSelectedDay(null);
-          await reload();
+          const res = await markRestDay(scheduleRepo, selectedDay, () => crypto.randomUUID());
+          if (res.ok) {
+            setSelectedDay(null);
+            await reload();
+          } else {
+            console.error('[routines] markRest error:', res.error);
+          }
         }}
         onUnschedule={async () => {
           if (!selectedDay) return;
-          await unscheduleDay(scheduleRepo, selectedDay);
-          setSelectedDay(null);
-          await reload();
+          const res = await unscheduleDay(scheduleRepo, selectedDay);
+          if (res.ok) {
+            setSelectedDay(null);
+            await reload();
+          } else {
+            console.error('[routines] unscheduleDay error:', res.error);
+          }
         }}
         onCreateRoutine={() => {
           setSelectedDay(null);

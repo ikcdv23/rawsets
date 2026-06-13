@@ -1,3 +1,4 @@
+import { type Result, err, ok } from '@/shared/result';
 import type { UserProfile } from '../domain/user-profile';
 import type { UserProfileRepo } from '../ports/user-profile-repo';
 
@@ -10,17 +11,22 @@ export type UpdateProfileInput = Partial<
 export async function updateProfile(
   repo: UserProfileRepo,
   patch: UpdateProfileInput,
-): Promise<UserProfile> {
-  const current = await repo.get();
+): Promise<Result<UserProfile>> {
+  const currentResult = await repo.get();
+  if (!currentResult.ok) return currentResult;
+
+  const current = currentResult.value;
   if (!current) {
-    throw new Error(
-      'updateProfile: el perfil no existe. Llama a getOrCreateProfile primero (típicamente en el bootstrap de la app).',
+    return err(
+      new Error(
+        'updateProfile: el perfil no existe. Llama a getOrCreateProfile primero (típicamente en el bootstrap de la app).',
+      ),
     );
   }
 
   // Validaciones del dominio.
   if (patch.bodyWeight !== undefined && patch.bodyWeight !== null && patch.bodyWeight <= 0) {
-    throw new Error('bodyWeight debe ser > 0 kg.');
+    return err(new Error('bodyWeight debe ser > 0 kg.'));
   }
   if (patch.displayName !== undefined && patch.displayName !== null) {
     const trimmed = patch.displayName.trim();
@@ -33,6 +39,8 @@ export async function updateProfile(
   }
 
   const next: UserProfile = { ...current, ...patch };
-  await repo.upsert(next);
-  return next;
+  const upsertResult = await repo.upsert(next);
+  if (!upsertResult.ok) return upsertResult;
+
+  return ok(next);
 }

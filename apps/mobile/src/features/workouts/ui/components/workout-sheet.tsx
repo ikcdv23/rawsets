@@ -1,5 +1,4 @@
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteWorkoutRepo } from '@/features/workouts/adapters/drizzle-sqlite-workout-repo';
+import { useRepos } from '@/db/repo-provider';
 import {
   WorkoutSetRow,
   type WorkoutSetRowHandle,
@@ -15,7 +14,7 @@ import {
 } from '@/features/workouts/use-cases/get-previous-set-values';
 import * as Haptics from 'expo-haptics';
 import { Check, ChevronDown, ChevronRight, Circle } from 'lucide-react-native';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -62,8 +61,7 @@ export function WorkoutSheet() {
     toggleSetDone,
   } = useWorkoutSession();
 
-  const { db, sqlite } = useDb();
-  const workoutRepo = useMemo(() => new DrizzleSqliteWorkoutRepo(db, sqlite), [db, sqlite]);
+  const { workout: workoutRepo } = useRepos();
 
   // ID del ejercicio actualmente expandido en el acordeón.
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -85,10 +83,10 @@ export function WorkoutSheet() {
     let cancelled = false;
     (async () => {
       const entries = await Promise.all(
-        activeWorkout.exercises.map(
-          async (ex) =>
-            [ex.id, await getPreviousSetValues(workoutRepo, ex.id, ex.targetSets)] as const,
-        ),
+        activeWorkout.exercises.map(async (ex) => {
+          const res = await getPreviousSetValues(workoutRepo, ex.id, ex.targetSets);
+          return [ex.id, res.ok ? res.value : []] as const;
+        }),
       );
       if (cancelled) return;
       setPreviousByExercise(Object.fromEntries(entries));

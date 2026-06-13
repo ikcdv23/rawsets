@@ -1,11 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
+import { useRepos } from '@/db/repo-provider';
 import type { Exercise } from '@/features/exercises/domain/exercise';
 import { ExercisePickerModal } from '@/features/exercises/ui/components/exercise-picker-modal';
 import { listExercises } from '@/features/exercises/use-cases/list-exercises';
-import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
 import type { Routine, RoutineExercise } from '@/features/routines/domain/routine';
 import { RoutineActionsSheet } from '@/features/routines/ui/components/routine-actions-sheet';
 import { RoutineExerciseEditModal } from '@/features/routines/ui/components/routine-exercise-edit-modal';
@@ -36,10 +34,7 @@ const SECONDS_PER_SET_HEURISTIC = 180;
 export default function RoutineDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { db, sqlite } = useDb();
-
-  const routineRepo = useMemo(() => new DrizzleSqliteRoutineRepo(db, sqlite), [db, sqlite]);
-  const exerciseRepo = useMemo(() => new DrizzleSqliteExerciseRepo(db, sqlite), [db, sqlite]);
+  const { routine: routineRepo, exercise: exerciseRepo } = useRepos();
 
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [catalog, setCatalog] = useState<Exercise[]>([]);
@@ -54,9 +49,15 @@ export default function RoutineDetailScreen() {
   const reload = useCallback(async () => {
     if (!id) return;
     try {
-      const [r, cat] = await Promise.all([routineRepo.findById(id), listExercises(exerciseRepo)]);
-      setRoutine(r);
-      setCatalog(cat);
+      const [rRes, catRes] = await Promise.all([
+        routineRepo.findById(id),
+        listExercises(exerciseRepo),
+      ]);
+      if (rRes.ok) setRoutine(rRes.value);
+      if (catRes.ok) setCatalog(catRes.value);
+
+      if (!rRes.ok) console.error('[routine-detail] findById error:', rRes.error);
+      if (!catRes.ok) console.error('[routine-detail] listExercises error:', catRes.error);
     } catch (err) {
       console.error('[routine-detail] load error:', err);
     } finally {
@@ -214,12 +215,24 @@ export default function RoutineDetailScreen() {
                   canMoveDown={!isLast}
                   onPress={() => setEditing(re)}
                   onMoveUp={async () => {
-                    await moveExerciseInRoutine(routineRepo, routine.id, re.exerciseId, 'up');
-                    await reload();
+                    const res = await moveExerciseInRoutine(
+                      routineRepo,
+                      routine.id,
+                      re.exerciseId,
+                      'up',
+                    );
+                    if (res.ok) await reload();
+                    else console.error('[routine-detail] moveUp error:', res.error);
                   }}
                   onMoveDown={async () => {
-                    await moveExerciseInRoutine(routineRepo, routine.id, re.exerciseId, 'down');
-                    await reload();
+                    const res = await moveExerciseInRoutine(
+                      routineRepo,
+                      routine.id,
+                      re.exerciseId,
+                      'down',
+                    );
+                    if (res.ok) await reload();
+                    else console.error('[routine-detail] moveDown error:', res.error);
                   }}
                 />
               );
@@ -268,13 +281,17 @@ export default function RoutineDetailScreen() {
         alreadyAddedIds={new Set(routine.exercises.map((e) => e.exerciseId))}
         onClose={() => setShowPicker(false)}
         onConfirm={async (ids) => {
-          await addExercisesToRoutine(
+          const res = await addExercisesToRoutine(
             routineRepo,
             routine.id,
             ids.map((exerciseId) => ({ exerciseId })),
           );
-          await reload();
-          setShowPicker(false);
+          if (res.ok) {
+            await reload();
+            setShowPicker(false);
+          } else {
+            console.error('[routine-detail] addExercises error:', res.error);
+          }
         }}
       />
 
@@ -285,14 +302,27 @@ export default function RoutineDetailScreen() {
           initial={editing}
           onClose={() => setEditing(null)}
           onSave={async (patch) => {
-            await updateRoutineExercise(routineRepo, routine.id, editing.exerciseId, patch);
-            await reload();
-            setEditing(null);
+            const res = await updateRoutineExercise(
+              routineRepo,
+              routine.id,
+              editing.exerciseId,
+              patch,
+            );
+            if (res.ok) {
+              await reload();
+              setEditing(null);
+            } else {
+              console.error('[routine-detail] updateExercise error:', res.error);
+            }
           }}
           onRemove={async () => {
-            await removeExerciseFromRoutine(routineRepo, routine.id, editing.exerciseId);
-            await reload();
-            setEditing(null);
+            const res = await removeExerciseFromRoutine(routineRepo, routine.id, editing.exerciseId);
+            if (res.ok) {
+              await reload();
+              setEditing(null);
+            } else {
+              console.error('[routine-detail] removeExercise error:', res.error);
+            }
           }}
         />
       ) : null}
@@ -318,9 +348,13 @@ export default function RoutineDetailScreen() {
         initialName={routine.name}
         onClose={() => setShowRename(false)}
         onConfirm={async (newName) => {
-          await renameRoutine(routineRepo, routine.id, newName);
-          setShowRename(false);
-          await reload();
+          const res = await renameRoutine(routineRepo, routine.id, newName);
+          if (res.ok) {
+            setShowRename(false);
+            await reload();
+          } else {
+            console.error('[routine-detail] renameRoutine error:', res.error);
+          }
         }}
       />
 
@@ -334,8 +368,12 @@ export default function RoutineDetailScreen() {
         onCancel={() => setConfirmDelete(false)}
         onConfirm={async () => {
           setConfirmDelete(false);
-          await deleteRoutine(routineRepo, routine.id);
-          router.back();
+          const res = await deleteRoutine(routineRepo, routine.id);
+          if (res.ok) {
+            router.back();
+          } else {
+            console.error('[routine-detail] deleteRoutine error:', res.error);
+          }
         }}
       />
     </View>

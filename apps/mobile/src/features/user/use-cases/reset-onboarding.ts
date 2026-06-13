@@ -1,3 +1,4 @@
+import { type Result, err, ok } from '@/shared/result';
 import type { UserProfile } from '../domain/user-profile';
 import type { UserProfileRepo } from '../ports/user-profile-repo';
 
@@ -10,16 +11,21 @@ import type { UserProfileRepo } from '../ports/user-profile-repo';
 //   - Profile → "Reiniciar onboarding" (dev / curiosity).
 //   - Tests E2E.
 //   - Bug recovery (rara vez).
-export async function resetOnboarding(repo: UserProfileRepo): Promise<UserProfile> {
-  const current = await repo.get();
+export async function resetOnboarding(repo: UserProfileRepo): Promise<Result<UserProfile>> {
+  const currentResult = await repo.get();
+  if (!currentResult.ok) return currentResult;
+
+  const current = currentResult.value;
   if (!current) {
-    throw new Error('resetOnboarding: no hay perfil. Estado inconsistente.');
+    return err(new Error('resetOnboarding: no hay perfil. Estado inconsistente.'));
   }
   if (current.onboardedAt === null) {
     // Ya estaba sin sellar — idempotente.
-    return current;
+    return ok(current);
   }
   const next: UserProfile = { ...current, onboardedAt: null };
-  await repo.upsert(next);
-  return next;
+  const upsertResult = await repo.upsert(next);
+  if (!upsertResult.ok) return upsertResult;
+
+  return ok(next);
 }

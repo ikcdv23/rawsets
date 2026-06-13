@@ -10,27 +10,6 @@ import { Text, View } from 'react-native';
 import { applyMigrationsAsync } from './apply-migrations-async';
 import { type Db, migrations, schema } from './connection';
 
-// Patrón oficial Expo + Drizzle:
-//
-//   <SQLiteProvider>      ← abre la DB de forma async-safe (clave para web)
-//     <DbReadyGate>       ← envuelve con Drizzle, corre migrations + seed,
-//                           bloquea el render hasta que todo está listo
-//       <DbContext>       ← expone {db, sqlite} a cualquier descendiente
-//         {children}
-//
-// Por qué dos handles (`db` + `sqlite`):
-//
-//   `db` (Drizzle) → reads tipadas (.select(), .findById(), joins). Va por la
-//     API SYNC de expo-sqlite, que en web envuelve wa-sqlite con busy-loop
-//     sobre SharedArrayBuffer. Funciona BIEN para SELECTs sueltos.
-//
-//   `sqlite` (raw) → writes (INSERT/UPDATE/DELETE) vía `runAsync()`. En web,
-//     escribir muchas filas a través del sync wrapper trunca el buffer de
-//     respuesta del worker y peta con "Unterminated string in JSON". `runAsync`
-//     usa otro canal (no busy-loop) y va siempre fino. En móvil tampoco daña.
-//
-// Regla práctica: en los adapters, reads con `db`, writes con `sqlite`.
-
 export type DbBundle = { db: Db; sqlite: SQLiteDatabase };
 
 const DbContext = createContext<DbBundle | null>(null);
@@ -47,8 +26,6 @@ export function useDb(): DbBundle {
 
 export type DbProviderProps = {
   children: ReactNode;
-  // Duración mínima del splash en ms (UX: branding visible al arrancar).
-  // 0 = sin piso de tiempo, abre en cuanto la DB está lista.
   minimumSplashMs?: number;
 };
 
@@ -71,81 +48,65 @@ function DbReadyGate({
   const db = useMemo(() => drizzle(sqlite, { schema }), [sqlite]);
   const bundle = useMemo<DbBundle>(() => ({ db, sqlite }), [db, sqlite]);
 
-  // Migrator manual ASYNC — esquiva el sync wrapper colgante de wa-sqlite.
-  const [migrationsReady, setMigrationsReady] = useState(false);
-  const [migrationsError, setMigrationsError] = useState<Error | null>(null);
-
-  // Timer LOCAL del gate. Sin props que viajen por el árbol — así nada lo
-  // puede memoizar mal. Si minimumSplashMs es 0, arranca ya en true.
+  const [isReady, setIsReady] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [minimumElapsed, setMinimumElapsed] = useState(minimumSplashMs <= 0);
 
   useEffect(() => {
     if (minimumSplashMs <= 0) return;
-    console.log('[db-gate] splash timer armed for', minimumSplashMs, 'ms');
-    const t = setTimeout(() => {
-      console.log('[db-gate] splash timer FIRED');
-      setMinimumElapsed(true);
-    }, minimumSplashMs);
+    const t = setTimeout(() => setMinimumElapsed(true), minimumSplashMs);
     return () => clearTimeout(t);
   }, [minimumSplashMs]);
 
   useEffect(() => {
     let cancelled = false;
-    console.log('[db-gate] applying migrations...');
-    applyMigrationsAsync(sqlite, migrations)
-      .then(() => {
+
+    async function bootstrap() {
+      try {
+        console.log('[db-gate] 1/3 applying migrations...');
+        await applyMigrationsAsync(sqlite, migrations);
         if (cancelled) return;
-        console.log('[db-gate] migrations DONE');
-        setMigrationsReady(true);
-      })
-      .catch((err: Error) => {
+
+        console.log('[db-gate] 2/3 initializing profile...');
+        const profileRepo = new DrizzleSqliteUserProfileRepo(db, sqlite);
+        const profileRes = await getOrCreateProfile(profileRepo);
         if (cancelled) return;
-        console.error('[db-gate] migrations FAILED:', err);
-        setMigrationsError(err);
-      });
+        if (!profileRes.ok) throw profileRes.error;
+
+        console.log('[db-gate] 3/3 seeding exercises...');
+        const seedRes = await seedCuratedExercisesRaw(sqlite);
+        if (cancelled) return;
+        if (seedRes.inserted > 0) {
+          console.log(`[db-gate] seed OK: +${seedRes.inserted} exercises`);
+        }
+
+        console.log('[db-gate] bootstrap complete.');
+        setIsReady(true);
+      } catch (e) {
+        if (cancelled) return;
+        console.error('[db-gate] bootstrap FAILED:', e);
+        setError(e instanceof Error ? e : new Error(String(e)));
+      }
+    }
+
+    bootstrap();
     return () => {
       cancelled = true;
     };
-  }, [sqlite]);
+  }, [sqlite, db]);
 
-  useEffect(() => {
-    if (!migrationsReady) return;
-
-    const profileRepo = new DrizzleSqliteUserProfileRepo(db, sqlite);
-    getOrCreateProfile(profileRepo).catch((err) =>
-      console.error('[bootstrap] user profile error:', err),
-    );
-
-    seedCuratedExercisesRaw(sqlite)
-      .then(({ inserted, skipped }) => {
-        if (inserted > 0) console.log(`[seed] +${inserted} ejercicios (${skipped} ya existían)`);
-      })
-      .catch((err) => console.error('[seed] error:', err));
-  }, [migrationsReady, db, sqlite]);
-
-  console.log(
-    '[db-gate] render — migrationsReady:',
-    migrationsReady,
-    'minimumElapsed:',
-    minimumElapsed,
-  );
-
-  if (migrationsError) {
+  if (error) {
     return (
       <View className="flex-1 items-center justify-center bg-background px-6">
-        <Text className="font-sans-bold text-destructive">Error en migraciones de DB</Text>
-        <Text className="mt-2 font-sans text-sm text-muted">{migrationsError.message}</Text>
+        <Text className="font-sans-bold text-destructive text-lg">Error crítico de inicio</Text>
+        <Text className="mt-2 text-center font-sans text-sm text-muted">{error.message}</Text>
       </View>
     );
   }
-  if (!migrationsReady || !minimumElapsed) {
-    console.log(
-      '[db-gate] BLOCKED → rendering splash. reason:',
-      !migrationsReady ? 'migrations' : 'minimumElapsed',
-    );
+
+  if (!isReady || !minimumElapsed) {
     return <SplashScreen />;
   }
-  console.log('[db-gate] OPEN → rendering children');
 
   return <DbContext.Provider value={bundle}>{children}</DbContext.Provider>;
 }

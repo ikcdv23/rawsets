@@ -1,3 +1,4 @@
+import { Result, ok } from '@/shared/result';
 import { addDays } from '../domain/dates';
 import type { ScheduledSession } from '../domain/scheduled-session';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
@@ -16,15 +17,18 @@ export async function repeatWeekly(
   source: ScheduledSession,
   weeks: number,
   idGenerator: () => string,
-): Promise<void> {
-  if (weeks <= 0) return;
+): Promise<Result<void, Error>> {
+  if (weeks <= 0) return ok(undefined);
   for (let w = 1; w <= weeks; w++) {
     const targetDate = addDays(source.date, 7 * w);
-    await repo.upsertOnDate({
+    const result = await repo.upsertOnDate({
       id: idGenerator(),
       date: targetDate,
       routineId: source.routineId,
       createdAt: new Date(),
     });
+    if (!result.ok) return result;
   }
+  return ok(undefined);
 }
+

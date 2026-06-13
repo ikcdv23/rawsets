@@ -1,3 +1,4 @@
+import type { Result } from '@/shared/result';
 import type { Exercise } from '../domain/exercise';
 
 // Port (interface) del repositorio de ejercicios.
@@ -9,7 +10,7 @@ import type { Exercise } from '../domain/exercise';
 //
 // `createdAt` lo estampa el adapter, no el caller — por eso `Omit` en `create`.
 export type ExerciseRepo = {
-  list(): Promise<Exercise[]>;
-  findById(id: string): Promise<Exercise | null>;
-  create(exercise: Omit<Exercise, 'createdAt'>): Promise<void>;
+  list(): Promise<Result<Exercise[]>>;
+  findById(id: string): Promise<Result<Exercise | null>>;
+  create(exercise: Omit<Exercise, 'createdAt'>): Promise<Result<void>>;
 };

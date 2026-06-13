@@ -1,3 +1,4 @@
+import type { Result } from '@/shared/result';
 import type { UpdateSetInput, WorkoutRepo } from '../ports/workout-repo';
 
 /**
@@ -10,6 +11,6 @@ import type { UpdateSetInput, WorkoutRepo } from '../ports/workout-repo';
  * sobreviva a un refresh. Es passthrough hoy — mañana puede emitir un evento
  * para "PR detectado" o sembrar el timer de descanso.
  */
-export function logSet(repo: WorkoutRepo, input: UpdateSetInput): Promise<void> {
+export function logSet(repo: WorkoutRepo, input: UpdateSetInput): Promise<Result<void>> {
   return repo.updateSet(input);
 }

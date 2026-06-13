@@ -1,9 +1,8 @@
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { isOnboarded } from '@/features/user/domain/user-profile';
 import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-profile';
 import { Redirect } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 // Root route. Lee el perfil y decide:
@@ -16,22 +15,30 @@ import { View } from 'react-native';
 // la dependencia. Mejor mantenerla en el "router endpoint" y dejarle al
 // layout su único trabajo: proveer la DB.
 export default function Root() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [target, setTarget] = useState<'/home' | '/welcome' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo)
-      .then((profile) => {
-        if (cancelled) return;
-        setTarget(isOnboarded(profile) ? '/home' : '/welcome');
-      })
-      .catch((err) => {
-        console.error('[root] profile read error, defaulting to onboarding:', err);
-        if (!cancelled) setTarget('/welcome');
-      });
+    getOrCreateProfile(repo).then((result) => {
+      if (cancelled) return;
+
+      if (result.ok) {
+        const profile = result.value;
+        const onboarded = isOnboarded(profile);
+        console.log('[root] profile check:', {
+          id: profile.id,
+          name: profile.displayName,
+          onboardedAt: profile.onboardedAt?.toISOString(),
+          onboarded,
+        });
+        setTarget(onboarded ? '/home' : '/welcome');
+      } else {
+        console.error('[root] profile read error, defaulting to onboarding:', result.error);
+        setTarget('/welcome');
+      }
+    });
     return () => {
       cancelled = true;
     };

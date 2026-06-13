@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SectionHeader } from '@/components/ui/section-header';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import {
   GOALS,
   type Goal,
@@ -27,7 +26,7 @@ import {
   Venus,
   Zap,
 } from 'lucide-react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -102,8 +101,7 @@ const SEX_OPTIONS: IconOption<Sex>[] = [
 // sin guardar (back o cancelar), nada cambia — diferencia clave con el
 // onboarding que persiste paso a paso.
 export default function ProfileEditScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   // Form state — local hasta que el usuario decida guardar.
   const [loading, setLoading] = useState(true);
@@ -122,21 +120,24 @@ export default function ProfileEditScreen() {
   // Cargar el perfil al montar.
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo).then((p) => {
+    getOrCreateProfile(repo).then((result) => {
       if (cancelled) return;
-      setDisplayName(p.displayName ?? '');
-      if (GOALS.includes(p.goal)) setGoal(p.goal);
-      if (UNITS.includes(p.unit)) setUnit(p.unit);
-      // Mostramos el peso en la unidad guardada (kg internamente).
-      if (p.bodyWeight !== null) {
-        const display = p.unit === 'lb' ? p.bodyWeight * 2.20462 : p.bodyWeight;
-        setBodyWeight(display.toFixed(1).replace(/\.0$/, ''));
-      }
-      if (p.sex && SEXES.includes(p.sex)) setSex(p.sex);
-      if (p.birthDate) {
-        setBirthDay(String(p.birthDate.getDate()));
-        setBirthMonth(String(p.birthDate.getMonth() + 1));
-        setBirthYear(String(p.birthDate.getFullYear()));
+      if (result.ok) {
+        const p = result.value;
+        setDisplayName(p.displayName ?? '');
+        if (GOALS.includes(p.goal)) setGoal(p.goal);
+        if (UNITS.includes(p.unit)) setUnit(p.unit);
+        // Mostramos el peso en la unidad guardada (kg internamente).
+        if (p.bodyWeight !== null) {
+          const display = p.unit === 'lb' ? p.bodyWeight * 2.20462 : p.bodyWeight;
+          setBodyWeight(display.toFixed(1).replace(/\.0$/, ''));
+        }
+        if (p.sex && SEXES.includes(p.sex)) setSex(p.sex);
+        if (p.birthDate) {
+          setBirthDay(String(p.birthDate.getDate()));
+          setBirthMonth(String(p.birthDate.getMonth() + 1));
+          setBirthYear(String(p.birthDate.getFullYear()));
+        }
       }
       setLoading(false);
     });
@@ -199,7 +200,9 @@ export default function ProfileEditScreen() {
       // Si solo algunos vacíos, NO seteamos birthDate — el usuario sigue
       // editando y no queremos sobreescribir con un valor inválido.
 
-      await updateProfile(repo, patch);
+      const result = await updateProfile(repo, patch);
+      if (!result.ok) throw result.error;
+
       safeBack('/profile');
     } catch (err) {
       console.error('[profile/edit] save error:', err);

@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { SectionHeader } from '@/components/ui/section-header';
 import { useDb } from '@/db/db-provider';
+import { useRepos } from '@/db/repo-provider';
 import type { Badge } from '@/features/achievements/domain/badge';
 import { BADGE_CATALOG } from '@/features/achievements/domain/badge-catalog';
 import {
@@ -13,9 +14,7 @@ import {
 import { BadgeDetailModal } from '@/features/achievements/ui/components/badge-detail-modal';
 import { BadgeGrid } from '@/features/achievements/ui/components/badge-grid';
 import { XPBar } from '@/features/achievements/ui/components/xp-bar';
-import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
 import { listRoutines } from '@/features/routines/use-cases/list-routines';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
 import {
   type Goal,
   type Sex,
@@ -30,7 +29,7 @@ import { safeBack } from '@/lib/safe-back';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import { ChevronLeft, Pencil, RefreshCcw, Trash2 } from 'lucide-react-native';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 const GOAL_LABELS: Record<Goal, string> = {
@@ -64,9 +63,8 @@ const SEX_LABELS: Record<Sex, string> = {
 //   - Acciones destructivas: reset onboarding + wipe all data
 //   - Footer: versión + made by
 export default function ProfileScreen() {
-  const { db, sqlite } = useDb();
-  const profileRepo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
-  const routineRepo = useMemo(() => new DrizzleSqliteRoutineRepo(db, sqlite), [db, sqlite]);
+  const { sqlite } = useDb();
+  const { user: profileRepo, routine: routineRepo } = useRepos();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [routinesCount, setRoutinesCount] = useState(0);
@@ -79,11 +77,17 @@ export default function ProfileScreen() {
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      Promise.all([getOrCreateProfile(profileRepo), listRoutines(routineRepo)]).then(([p, rs]) => {
-        if (cancelled) return;
-        setProfile(p);
-        setRoutinesCount(rs.length);
-      });
+      Promise.all([getOrCreateProfile(profileRepo), listRoutines(routineRepo)]).then(
+        ([profileRes, routinesResult]) => {
+          if (cancelled) return;
+          if (profileRes.ok) setProfile(profileRes.value);
+          if (routinesResult.ok) setRoutinesCount(routinesResult.value.length);
+
+          if (!profileRes.ok) console.error('[profile] getProfile error:', profileRes.error);
+          if (!routinesResult.ok)
+            console.error('[profile] listRoutines error:', routinesResult.error);
+        },
+      );
       return () => {
         cancelled = true;
       };
@@ -93,7 +97,9 @@ export default function ProfileScreen() {
   const handleResetOnboarding = async () => {
     setResetModalOpen(false);
     try {
-      await resetOnboarding(profileRepo);
+      const result = await resetOnboarding(profileRepo);
+      if (!result.ok) throw result.error;
+
       // Replace para que back no devuelva al perfil.
       router.replace('/welcome');
     } catch (err) {
@@ -104,7 +110,9 @@ export default function ProfileScreen() {
   const handleWipeAllData = async () => {
     setWipeConfirmOpen(false);
     try {
-      await wipeAllData(sqlite);
+      const result = await wipeAllData(sqlite);
+      if (!result.ok) throw result.error;
+
       router.replace('/welcome');
     } catch (err) {
       console.error('[profile] wipe error:', err);

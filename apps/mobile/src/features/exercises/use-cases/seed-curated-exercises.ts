@@ -1,3 +1,4 @@
+import { type Result, ok } from '@/shared/result';
 import { CURATED_EXERCISES } from '../domain/curated-exercises';
 import type { ExerciseRepo } from '../ports/exercise-repo';
 
@@ -10,11 +11,16 @@ import type { ExerciseRepo } from '../ports/exercise-repo';
 // un curado, su versión gana (ADR-0002 §3: "no hay reset to default" en Fase 1).
 // Si en una release futura cambias el seed (más ejercicios), los nuevos
 // aparecen sin pisar el trabajo del usuario.
-export async function seedCuratedExercises(repo: ExerciseRepo): Promise<{
-  inserted: number;
-  skipped: number;
-}> {
-  const existing = await repo.list();
+export async function seedCuratedExercises(repo: ExerciseRepo): Promise<
+  Result<{
+    inserted: number;
+    skipped: number;
+  }>
+> {
+  const existingResult = await repo.list();
+  if (!existingResult.ok) return existingResult;
+
+  const existing = existingResult.value;
   const existingIds = new Set(existing.map((e) => e.id));
 
   let inserted = 0;
@@ -25,9 +31,10 @@ export async function seedCuratedExercises(repo: ExerciseRepo): Promise<{
       skipped++;
       continue;
     }
-    await repo.create({ ...curated, isCustom: false });
+    const createResult = await repo.create({ ...curated, isCustom: false });
+    if (!createResult.ok) return createResult;
     inserted++;
   }
 
-  return { inserted, skipped };
+  return ok({ inserted, skipped });
 }

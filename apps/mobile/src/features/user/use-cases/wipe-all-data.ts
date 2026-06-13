@@ -1,3 +1,4 @@
+import { type Result, toResult } from '@/shared/result';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 // Nuke total: vacía TODAS las tablas de datos del usuario.
@@ -25,23 +26,27 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 //
 // La transacción asegura que o se borra TODO o no se borra nada — sin
 // estados intermedios si peta a la mitad.
-export async function wipeAllData(sqlite: SQLiteDatabase): Promise<void> {
-  const tables = [
-    'sets',
-    'routine_exercises',
-    'exercise_muscle_groups',
-    'workouts',
-    'scheduled_sessions',
-    'routines',
-    'exercises',
-    'user_profile',
-  ];
+export async function wipeAllData(sqlite: SQLiteDatabase): Promise<Result<void>> {
+  return toResult(
+    (async () => {
+      const tables = [
+        'sets',
+        'routine_exercises',
+        'exercise_muscle_groups',
+        'workouts',
+        'scheduled_sessions',
+        'routines',
+        'exercises',
+        'user_profile',
+      ];
 
-  await sqlite.withTransactionAsync(async () => {
-    for (const table of tables) {
-      await sqlite.runAsync(`DELETE FROM ${table}`);
-    }
-  });
+      await sqlite.withTransactionAsync(async () => {
+        for (const table of tables) {
+          await sqlite.runAsync(`DELETE FROM ${table}`);
+        }
+      });
 
-  console.log('[wipe-all-data] OK — todas las tablas vaciadas.');
+      console.log('[wipe-all-data] OK — todas las tablas vaciadas.');
+    })(),
+  );
 }

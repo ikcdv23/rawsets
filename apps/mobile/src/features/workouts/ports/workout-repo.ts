@@ -1,4 +1,5 @@
 import type { MuscleGroup } from '@/features/exercises/domain/muscle-groups';
+import type { Result } from '@/shared/result';
 import type { Workout } from '../domain/workout';
 
 // Port del repositorio de workouts. Mismo patrón Hexagonal que RoutineRepo:
@@ -20,31 +21,31 @@ export type WorkoutRepo = {
    * weight=0, reps=0) en una sola transacción. Tras esto, cada interacción
    * del usuario es un UPDATE puntual vía updateSet().
    */
-  startWorkout(input: StartWorkoutInput): Promise<void>;
+  startWorkout(input: StartWorkoutInput): Promise<Result<void>>;
 
   /**
    * Actualiza UN set ya existente (creado por startWorkout). Se identifica
    * por la tupla (workoutId, exerciseId, setNumber). Si done pasa de
    * false→true, el adapter también escribe completed_at.
    */
-  updateSet(input: UpdateSetInput): Promise<void>;
+  updateSet(input: UpdateSetInput): Promise<Result<void>>;
 
   /** Cierra el workout (workouts.finished_at = finishedAt). */
-  finishWorkout(workoutId: string, finishedAt: Date): Promise<void>;
+  finishWorkout(workoutId: string, finishedAt: Date): Promise<Result<void>>;
 
   /**
    * Devuelve el workout en curso (finished_at IS NULL) o null. Para
    * rehidratar el context al montar el provider tras refresh / reapertura.
    * Si hubiera varios (no debería), devuelve el más reciente.
    */
-  findActiveOrNull(): Promise<Workout | null>;
+  findActiveOrNull(): Promise<Result<Workout | null>>;
 
   /**
    * Devuelve los sets done del último workout FINALIZADO que tenga registros
    * de este ejercicio. Ordenados por setNumber asc — index 0 = serie 1.
    * Para la columna "Previa". Array vacío si no hay histórico.
    */
-  getPreviousSetValues(exerciseId: string): Promise<PreviousSetValue[]>;
+  getPreviousSetValues(exerciseId: string): Promise<Result<PreviousSetValue[]>>;
 
   /**
    * Volumen acumulado por grupo muscular para sets done en [from, to). El
@@ -57,7 +58,7 @@ export type WorkoutRepo = {
   aggregateMuscleVolumeInRange(
     from: Date,
     to: Date,
-  ): Promise<Array<{ muscleGroup: MuscleGroup; volumeKg: number }>>;
+  ): Promise<Result<Array<{ muscleGroup: MuscleGroup; volumeKg: number }>>>;
 };
 
 export type StartWorkoutInput = {

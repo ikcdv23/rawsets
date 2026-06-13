@@ -2,6 +2,7 @@ import '@/global.css';
 
 import { SplashScreen } from '@/components/ui/splash-screen';
 import { DbProvider } from '@/db/db-provider';
+import { RepoProvider } from '@/db/repo-provider';
 import { WorkoutSheet } from '@/features/workouts/ui/components/workout-sheet';
 import { WorkoutSessionProvider } from '@/features/workouts/ui/contexts/workout-session-context';
 import {
@@ -38,20 +39,22 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DbProvider>
-        <WorkoutSessionProvider>
-          <View className="flex-1 items-center bg-background">
-            <StatusBar style="light" />
-            <View className="w-full max-w-[440px] flex-1">
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: '#0A0A0A' },
-                }}
-              />
+        <RepoProvider>
+          <WorkoutSessionProvider>
+            <View className="flex-1 items-center bg-background">
+              <StatusBar style="light" />
+              <View className="w-full max-w-[440px] flex-1">
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: { backgroundColor: '#0A0A0A' },
+                  }}
+                />
+              </View>
+              <WorkoutSheet />
             </View>
-            <WorkoutSheet />
-          </View>
-        </WorkoutSessionProvider>
+          </WorkoutSessionProvider>
+        </RepoProvider>
       </DbProvider>
     </GestureHandlerRootView>
   );

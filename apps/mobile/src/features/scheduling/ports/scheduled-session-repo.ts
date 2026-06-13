@@ -1,3 +1,4 @@
+import type { Result } from '@/shared/result';
 import type { ScheduledSession } from '../domain/scheduled-session';
 
 // Port del repositorio de calendario.
@@ -9,9 +10,9 @@ import type { ScheduledSession } from '../domain/scheduled-session';
 export type ScheduledSessionRepo = {
   // Devuelve sesiones cuyo `date` cae en [from, to). End-exclusivo para que
   // calcular un mes/semana/etc no requiera trampas con milisegundos.
-  listInRange(from: Date, to: Date): Promise<ScheduledSession[]>;
+  listInRange(from: Date, to: Date): Promise<Result<ScheduledSession[]>>;
   // Atomicamente: si existe sesión en ese día, la reemplaza; si no, la crea.
-  upsertOnDate(session: ScheduledSession): Promise<void>;
+  upsertOnDate(session: ScheduledSession): Promise<Result<void>>;
   // Borra la sesión del día indicado. Idempotente — no error si no existía.
-  removeByDate(date: Date): Promise<void>;
+  removeByDate(date: Date): Promise<Result<void>>;
 };

@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { completeOnboarding } from '@/features/user/use-cases/complete-onboarding';
 import { router } from 'expo-router';
 import { Check } from 'lucide-react-native';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 
 // Step 5 — Done. Sella `onboardedAt` y manda al workspace.
@@ -12,8 +11,7 @@ import { Animated, Text, View } from 'react-native';
 // UX: animación de check exitoso, mensaje cálido, botón "Empezar a entrenar".
 // On press: replace (no push) para que el back gesture NO vuelva al onboarding.
 export default function OnboardingDoneScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -58,7 +56,9 @@ export default function OnboardingDoneScreen() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      await completeOnboarding(repo);
+      const result = await completeOnboarding(repo);
+      if (!result.ok) throw result.error;
+
       // replace para que no se pueda volver al onboarding con back.
       router.replace('/home');
     } catch (err) {

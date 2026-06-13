@@ -1,9 +1,8 @@
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { initialsFromName } from '@/features/user/domain/user-profile';
 import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-profile';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, Text } from 'react-native';
 
 // AvatarIcon — círculo con iniciales derivadas del displayName del perfil.
@@ -17,15 +16,16 @@ import { Pressable, Text } from 'react-native';
 //   - useFocusEffect recarga cuando vuelves a una pantalla → el avatar se
 //     actualiza solo si cambias el nombre en Settings y vuelves a Home.
 export function AvatarIcon() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
   const [initials, setInitials] = useState('?');
 
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      getOrCreateProfile(repo).then((p) => {
-        if (!cancelled) setInitials(initialsFromName(p.displayName));
+      getOrCreateProfile(repo).then((result) => {
+        if (!cancelled && result.ok) {
+          setInitials(initialsFromName(result.value.displayName));
+        }
       });
       return () => {
         cancelled = true;

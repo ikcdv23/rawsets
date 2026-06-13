@@ -1,8 +1,5 @@
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteExerciseRepo } from '@/features/exercises/adapters/drizzle-sqlite-exercise-repo';
+import { useRepos } from '@/db/repo-provider';
 import { listExercises } from '@/features/exercises/use-cases/list-exercises';
-import { DrizzleSqliteRoutineRepo } from '@/features/routines/adapters/drizzle-sqlite-routine-repo';
-import { DrizzleSqliteWorkoutRepo } from '@/features/workouts/adapters/drizzle-sqlite-workout-repo';
 import { finishWorkout as finishWorkoutUseCase } from '@/features/workouts/use-cases/finish-workout';
 import { logSet } from '@/features/workouts/use-cases/log-set';
 import { startWorkout as startWorkoutUseCase } from '@/features/workouts/use-cases/start-workout';
@@ -140,10 +137,11 @@ function emptySets(count: number): SetLog[] {
 }
 
 export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
-  const { db, sqlite } = useDb();
-  const workoutRepo = useMemo(() => new DrizzleSqliteWorkoutRepo(db, sqlite), [db, sqlite]);
-  const exerciseRepo = useMemo(() => new DrizzleSqliteExerciseRepo(db, sqlite), [db, sqlite]);
-  const routineRepo = useMemo(() => new DrizzleSqliteRoutineRepo(db, sqlite), [db, sqlite]);
+  const {
+    workout: workoutRepo,
+    exercise: exerciseRepo,
+    routine: routineRepo,
+  } = useRepos();
 
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -162,14 +160,19 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const persisted = await workoutRepo.findActiveOrNull();
-      if (cancelled || !persisted) return;
+      const persistedRes = await workoutRepo.findActiveOrNull();
+      if (cancelled || !persistedRes.ok || !persistedRes.value) return;
 
-      const [catalog, routine] = await Promise.all([
+      const persisted = persistedRes.value;
+
+      const [catalogRes, routineRes] = await Promise.all([
         listExercises(exerciseRepo),
         persisted.routineId ? routineRepo.findById(persisted.routineId) : Promise.resolve(null),
       ]);
       if (cancelled) return;
+
+      const catalog = catalogRes.ok ? catalogRes.value : [];
+      const routine = routineRes && routineRes.ok ? routineRes.value : null;
 
       const exerciseById = new Map(catalog.map((e) => [e.id, e]));
       const routineExById = new Map(routine?.exercises.map((re) => [re.exerciseId, re]) ?? []);
@@ -234,7 +237,7 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
 
       // Persistir primero — necesitamos el id real antes de setear state, para
       // que cualquier write subsiguiente apunte al workout correcto.
-      const { id, startedAt } = await startWorkoutUseCase(workoutRepo, {
+      const result = await startWorkoutUseCase(workoutRepo, {
         routineId: params?.routineId ?? null,
         exercises: rawExercises.map((ex, i) => ({
           exerciseId: ex.id,
@@ -242,6 +245,13 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
           targetSets: ex.targetSets,
         })),
       });
+
+      if (!result.ok) {
+        console.error('[workout] start error:', result.error);
+        return;
+      }
+
+      const { id, startedAt } = result.value;
 
       setActiveWorkout({
         id,
@@ -259,10 +269,9 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
   const finishWorkout = useCallback(async () => {
     const current = activeWorkoutRef.current;
     if (!current) return;
-    try {
-      await finishWorkoutUseCase(workoutRepo, current.id);
-    } catch (err) {
-      console.error('[workout] finish error:', err);
+    const result = await finishWorkoutUseCase(workoutRepo, current.id);
+    if (!result.ok) {
+      console.error('[workout] finish error:', result.error);
     }
     setActiveWorkout(null);
     setIsSheetOpen(false);
@@ -294,7 +303,9 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
           weight: s.weight,
           reps: s.reps,
           done: s.done,
-        }).catch((err) => console.error('[workout] persist updateSet error:', err));
+        }).then((res) => {
+          if (!res.ok) console.error('[workout] persist updateSet error:', res.error);
+        });
       }
     },
     [workoutRepo],
@@ -322,7 +333,9 @@ export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
           weight: s.weight,
           reps: s.reps,
           done: s.done,
-        }).catch((err) => console.error('[workout] persist toggleSetDone error:', err));
+        }).then((res) => {
+          if (!res.ok) console.error('[workout] persist toggleSetDone error:', res.error);
+        });
       }
     },
     [workoutRepo],

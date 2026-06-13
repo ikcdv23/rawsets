@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { GOALS, type Goal } from '@/features/user/domain/user-profile';
 import { OnboardingShell } from '@/features/user/ui/onboarding/onboarding-shell';
 import { SelectCard } from '@/features/user/ui/onboarding/select-card';
@@ -16,7 +15,7 @@ import {
   type LucideIcon,
   Zap,
 } from 'lucide-react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 // Step 2 — Objetivo. Una sola selección, requerido (todos los usuarios
@@ -48,16 +47,18 @@ const OPTIONS: GoalOption[] = [
 ];
 
 export default function OnboardingGoalScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [selected, setSelected] = useState<Goal | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo).then((p) => {
-      if (!cancelled && p.goal && GOALS.includes(p.goal)) setSelected(p.goal);
+    getOrCreateProfile(repo).then((result) => {
+      if (!cancelled && result.ok) {
+        const p = result.value;
+        if (p.goal && GOALS.includes(p.goal)) setSelected(p.goal);
+      }
     });
     return () => {
       cancelled = true;
@@ -68,7 +69,8 @@ export default function OnboardingGoalScreen() {
     if (!selected || saving) return;
     setSaving(true);
     try {
-      await updateProfile(repo, { goal: selected });
+      const result = await updateProfile(repo, { goal: selected });
+      if (!result.ok) throw result.error;
       router.push('/unit');
     } catch (err) {
       console.error('[onboarding/goal] save error:', err);

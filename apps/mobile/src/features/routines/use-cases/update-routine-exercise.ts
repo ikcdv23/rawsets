@@ -1,3 +1,4 @@
+import { Result, ok, err } from '@/shared/result';
 import type { RoutineExercise } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -17,12 +18,17 @@ export async function updateRoutineExercise(
   routineId: string,
   exerciseId: string,
   patch: UpdateRoutineExerciseInput,
-): Promise<void> {
-  const routine = await repo.findById(routineId);
-  if (!routine) throw new Error(`Rutina ${routineId} no encontrada.`);
+): Promise<Result<void, Error>> {
+  const result = await repo.findById(routineId);
+  if (!result.ok) return result;
+  const routine = result.value;
+
+  if (!routine) return err(new Error(`Rutina ${routineId} no encontrada.`));
 
   // Aplica el patch sobre el ejercicio target manteniendo el resto intactos.
   let touched = false;
+  let validationError: Error | null = null;
+
   const next: RoutineExercise[] = routine.exercises.map((re) => {
     if (re.exerciseId !== exerciseId) return re;
     touched = true;
@@ -30,24 +36,24 @@ export async function updateRoutineExercise(
 
     // Invariantes de dominio.
     if (merged.targetSets < 1) {
-      throw new Error('targetSets debe ser >= 1.');
-    }
-    if (merged.targetRepsMin < 1 || merged.targetRepsMax < 1) {
-      throw new Error('targetReps debe ser >= 1.');
-    }
-    if (merged.targetRepsMin > merged.targetRepsMax) {
-      throw new Error('targetRepsMin no puede ser mayor que targetRepsMax.');
-    }
-    if (merged.targetWeight !== null && merged.targetWeight < 0) {
-      throw new Error('targetWeight debe ser >= 0.');
+      validationError = new Error('targetSets debe ser >= 1.');
+    } else if (merged.targetRepsMin < 1 || merged.targetRepsMax < 1) {
+      validationError = new Error('targetReps debe ser >= 1.');
+    } else if (merged.targetRepsMin > merged.targetRepsMax) {
+      validationError = new Error('targetRepsMin no puede ser mayor que targetRepsMax.');
+    } else if (merged.targetWeight !== null && merged.targetWeight < 0) {
+      validationError = new Error('targetWeight debe ser >= 0.');
     }
 
     return merged;
   });
 
+  if (validationError) return err(validationError);
+
   if (!touched) {
-    throw new Error(`Ejercicio ${exerciseId} no está en la rutina ${routineId}.`);
+    return err(new Error(`Ejercicio ${exerciseId} no está en la rutina ${routineId}.`));
   }
 
-  await repo.setExercises(routineId, next);
+  return repo.setExercises(routineId, next);
 }
+

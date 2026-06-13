@@ -1,19 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useDb } from '@/db/db-provider';
-import { DrizzleSqliteUserProfileRepo } from '@/features/user/adapters/drizzle-sqlite-user-profile-repo';
+import { useRepos } from '@/db/repo-provider';
 import { OnboardingShell } from '@/features/user/ui/onboarding/onboarding-shell';
 import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-profile';
 import { updateProfile } from '@/features/user/use-cases/update-profile';
 import { router } from 'expo-router';
 import { ArrowRight } from 'lucide-react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Step 1 — Nombre. Único campo obligatorio (lo usamos para las iniciales del
 // avatar y para saludar).
 export default function OnboardingNameScreen() {
-  const { db, sqlite } = useDb();
-  const repo = useMemo(() => new DrizzleSqliteUserProfileRepo(db, sqlite), [db, sqlite]);
+  const { user: repo } = useRepos();
 
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -21,8 +19,11 @@ export default function OnboardingNameScreen() {
   // Pre-rellena si el usuario ya pasó por aquí y vuelve atrás.
   useEffect(() => {
     let cancelled = false;
-    getOrCreateProfile(repo).then((p) => {
-      if (!cancelled && p.displayName) setName(p.displayName);
+    getOrCreateProfile(repo).then((result) => {
+      if (!cancelled && result.ok) {
+        const p = result.value;
+        if (p.displayName) setName(p.displayName);
+      }
     });
     return () => {
       cancelled = true;
@@ -36,7 +37,8 @@ export default function OnboardingNameScreen() {
     if (!canContinue) return;
     setSaving(true);
     try {
-      await updateProfile(repo, { displayName: trimmed });
+      const result = await updateProfile(repo, { displayName: trimmed });
+      if (!result.ok) throw result.error;
       router.push('/goal');
     } catch (err) {
       console.error('[onboarding/name] save error:', err);
@@ -61,7 +63,7 @@ export default function OnboardingNameScreen() {
         label="Nombre"
         value={name}
         onChangeText={setName}
-        placeholder="Javier"
+        placeholder="¿Como te llamas?"
         autoFocus
         returnKeyType="next"
         onSubmitEditing={handleContinue}

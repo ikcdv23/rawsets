@@ -1,5 +1,6 @@
 import type { Db } from '@/db/connection';
 import type { MuscleGroup } from '@/features/exercises/domain/muscle-groups';
+import { type Result, toResult } from '@/shared/result';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import type { SetLog, Workout, WorkoutExercise } from '../domain/workout';
 import type {
@@ -24,84 +25,99 @@ export class DrizzleSqliteWorkoutRepo implements WorkoutRepo {
     private readonly sqlite: SQLiteDatabase,
   ) {}
 
-  async startWorkout(input: StartWorkoutInput): Promise<void> {
+  async startWorkout(input: StartWorkoutInput): Promise<Result<void>> {
     // INSERT workout + N*M placeholders. Lo envolvemos en una transacción
     // para que un crash a mitad no deje un workout huérfano sin sus sets.
-    await this.sqlite.withTransactionAsync(async () => {
-      await this.sqlite.runAsync(
-        'INSERT INTO workouts (id, routine_id, started_at, finished_at, notes) VALUES (?, ?, ?, NULL, NULL)',
-        [input.id, input.routineId, input.startedAt.getTime()],
-      );
-      for (const ex of input.exercises) {
-        for (let setNumber = 1; setNumber <= ex.targetSets; setNumber++) {
-          await this.sqlite.runAsync(
-            `INSERT INTO sets
+    return toResult(
+      this.sqlite.withTransactionAsync(async () => {
+        await this.sqlite.runAsync(
+          'INSERT INTO workouts (id, routine_id, started_at, finished_at, notes) VALUES (?, ?, ?, NULL, NULL)',
+          [input.id, input.routineId, input.startedAt.getTime()],
+        );
+        for (const ex of input.exercises) {
+          for (let setNumber = 1; setNumber <= ex.targetSets; setNumber++) {
+            await this.sqlite.runAsync(
+              `INSERT INTO sets
                (id, workout_id, exercise_id, position, set_number, weight, reps, done, completed_at, rpe, rest_seconds)
                VALUES (?, ?, ?, ?, ?, 0, 0, 0, NULL, NULL, NULL)`,
-            [crypto.randomUUID(), input.id, ex.exerciseId, ex.position, setNumber],
-          );
+              [crypto.randomUUID(), input.id, ex.exerciseId, ex.position, setNumber],
+            );
+          }
         }
-      }
-    });
-  }
-
-  async updateSet(input: UpdateSetInput): Promise<void> {
-    // Si done pasa a true ahora, sellamos completed_at. Si pasa a false,
-    // lo limpiamos — un toggle indeciso no debería dejar timestamp huérfano.
-    const completedAt = input.done ? Date.now() : null;
-    await this.sqlite.runAsync(
-      `UPDATE sets
-          SET weight = ?, reps = ?, done = ?, completed_at = ?
-        WHERE workout_id = ? AND exercise_id = ? AND set_number = ?`,
-      [
-        input.weight,
-        input.reps,
-        input.done ? 1 : 0,
-        completedAt,
-        input.workoutId,
-        input.exerciseId,
-        input.setNumber,
-      ],
+      }),
     );
   }
 
-  async finishWorkout(workoutId: string, finishedAt: Date): Promise<void> {
-    await this.sqlite.runAsync('UPDATE workouts SET finished_at = ? WHERE id = ?', [
-      finishedAt.getTime(),
-      workoutId,
-    ]);
+  async updateSet(input: UpdateSetInput): Promise<Result<void>> {
+    // Si done pasa a true ahora, sellamos completed_at. Si pasa a false,
+    // lo limpiamos — un toggle indeciso no debería dejar timestamp huérfano.
+    return toResult(
+      (async () => {
+        const completedAt = input.done ? Date.now() : null;
+        await this.sqlite.runAsync(
+          `UPDATE sets
+          SET weight = ?, reps = ?, done = ?, completed_at = ?
+        WHERE workout_id = ? AND exercise_id = ? AND set_number = ?`,
+          [
+            input.weight,
+            input.reps,
+            input.done ? 1 : 0,
+            completedAt,
+            input.workoutId,
+            input.exerciseId,
+            input.setNumber,
+          ],
+        );
+      })(),
+    );
   }
 
-  async findActiveOrNull(): Promise<Workout | null> {
-    const rows = await this.sqlite.getAllAsync<WorkoutRow>(
-      `SELECT id, routine_id AS routineId, started_at AS startedAt, finished_at AS finishedAt
+  async finishWorkout(workoutId: string, finishedAt: Date): Promise<Result<void>> {
+    return toResult(
+      this.sqlite
+        .runAsync('UPDATE workouts SET finished_at = ? WHERE id = ?', [
+          finishedAt.getTime(),
+          workoutId,
+        ])
+        .then(() => {}),
+    );
+  }
+
+  async findActiveOrNull(): Promise<Result<Workout | null>> {
+    return toResult(
+      (async () => {
+        const rows = await this.sqlite.getAllAsync<WorkoutRow>(
+          `SELECT id, routine_id AS routineId, started_at AS startedAt, finished_at AS finishedAt
          FROM workouts
         WHERE finished_at IS NULL
         ORDER BY started_at DESC
         LIMIT 1`,
-    );
-    const row = rows[0];
-    if (!row) return null;
-    const setRows = await this.sqlite.getAllAsync<SetRow>(
-      `SELECT exercise_id AS exerciseId, position, set_number AS setNumber, weight, reps, done
+        );
+        const row = rows[0];
+        if (!row) return null;
+        const setRows = await this.sqlite.getAllAsync<SetRow>(
+          `SELECT exercise_id AS exerciseId, position, set_number AS setNumber, weight, reps, done
          FROM sets
         WHERE workout_id = ?
         ORDER BY position ASC, set_number ASC`,
-      [row.id],
+          [row.id],
+        );
+        return toDomainWorkout(row, setRows);
+      })(),
     );
-    return toDomainWorkout(row, setRows);
   }
 
-  async getPreviousSetValues(exerciseId: string): Promise<PreviousSetValue[]> {
+  async getPreviousSetValues(exerciseId: string): Promise<Result<PreviousSetValue[]>> {
     // El "anterior" es el último workout FINALIZADO que tenga sets done de
     // este ejercicio. Excluimos el activo (finished_at IS NULL) porque ese
     // ES el actual — la columna se llama "Previa", no "Esta".
-    const rows = await this.sqlite.getAllAsync<{
-      setNumber: number;
-      weight: number;
-      reps: number;
-    }>(
-      `SELECT s.set_number AS setNumber, s.weight, s.reps
+    return toResult(
+      this.sqlite.getAllAsync<{
+        setNumber: number;
+        weight: number;
+        reps: number;
+      }>(
+        `SELECT s.set_number AS setNumber, s.weight, s.reps
          FROM sets s
         WHERE s.exercise_id = ?
           AND s.done = 1
@@ -116,15 +132,15 @@ export class DrizzleSqliteWorkoutRepo implements WorkoutRepo {
              LIMIT 1
           )
         ORDER BY s.set_number ASC`,
-      [exerciseId, exerciseId],
+        [exerciseId, exerciseId],
+      ),
     );
-    return rows;
   }
 
   async aggregateMuscleVolumeInRange(
     from: Date,
     to: Date,
-  ): Promise<Array<{ muscleGroup: MuscleGroup; volumeKg: number }>> {
+  ): Promise<Result<Array<{ muscleGroup: MuscleGroup; volumeKg: number }>>> {
     // SUM(reps * weight * contribution) — la contribución vive en
     // exercise_muscle_groups.weight (0..1). Press banca → pecho 0.7,
     // tríceps 0.2, hombro 0.1. Un set de 100kg × 10 reps "vale" 700kg
@@ -133,8 +149,9 @@ export class DrizzleSqliteWorkoutRepo implements WorkoutRepo {
     // Rango semi-abierto [from, to) — el caller hace "últimos 14 días" con
     // from = hoy-14, to = ahora+1 para incluir el momento actual sin
     // pensar en floor/ceil.
-    return this.sqlite.getAllAsync<{ muscleGroup: MuscleGroup; volumeKg: number }>(
-      `SELECT emg.muscle_group AS muscleGroup,
+    return toResult(
+      this.sqlite.getAllAsync<{ muscleGroup: MuscleGroup; volumeKg: number }>(
+        `SELECT emg.muscle_group AS muscleGroup,
               SUM(s.reps * s.weight * emg.weight) AS volumeKg
          FROM sets s
          JOIN workouts w ON w.id = s.workout_id
@@ -145,7 +162,8 @@ export class DrizzleSqliteWorkoutRepo implements WorkoutRepo {
           AND w.started_at >= ?
           AND w.started_at < ?
         GROUP BY emg.muscle_group`,
-      [from.getTime(), to.getTime()],
+        [from.getTime(), to.getTime()],
+      ),
     );
   }
 }

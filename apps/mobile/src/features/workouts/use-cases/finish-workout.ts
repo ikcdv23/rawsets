@@ -1,3 +1,4 @@
+import type { Result } from '@/shared/result';
 import type { WorkoutRepo } from '../ports/workout-repo';
 
 /**
@@ -9,6 +10,6 @@ export function finishWorkout(
   repo: WorkoutRepo,
   workoutId: string,
   finishedAt: Date = new Date(),
-): Promise<void> {
+): Promise<Result<void>> {
   return repo.finishWorkout(workoutId, finishedAt);
 }
