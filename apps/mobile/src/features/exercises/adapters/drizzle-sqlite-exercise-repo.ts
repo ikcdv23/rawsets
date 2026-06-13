@@ -18,14 +18,14 @@ export class DrizzleSqliteExerciseRepo implements ExerciseRepo {
   async list(): Promise<Result<Exercise[]>> {
     return toResult(
       (async () => {
-        const rows = await this.sqlite.getAllAsync<ExerciseRow>(
+        const rows = await this.sqlite.getAllAsync<any>(
           `SELECT id, name, equipment,
               is_bodyweight AS isBodyweight,
               is_custom AS isCustom,
               created_at AS createdAt
          FROM exercises`,
         );
-        const allMg = await this.sqlite.getAllAsync<MuscleGroupRow>(
+        const allMg = await this.sqlite.getAllAsync<any>(
           `SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
          FROM exercise_muscle_groups`,
         );
@@ -37,7 +37,7 @@ export class DrizzleSqliteExerciseRepo implements ExerciseRepo {
   async findById(id: string): Promise<Result<Exercise | null>> {
     return toResult(
       (async () => {
-        const rows = await this.sqlite.getAllAsync<ExerciseRow>(
+        const rows = await this.sqlite.getAllAsync<any>(
           `SELECT id, name, equipment,
               is_bodyweight AS isBodyweight,
               is_custom AS isCustom,
@@ -47,7 +47,7 @@ export class DrizzleSqliteExerciseRepo implements ExerciseRepo {
         );
         const row = rows[0];
         if (!row) return null;
-        const mg = await this.sqlite.getAllAsync<MuscleGroupRow>(
+        const mg = await this.sqlite.getAllAsync<any>(
           `SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
          FROM exercise_muscle_groups WHERE exercise_id = ?`,
           [id],
@@ -112,5 +112,17 @@ function toDomain(row: ExerciseRow, allMuscleGroups: MuscleGroupRow[]): Exercise
     muscleGroups: allMuscleGroups
       .filter((mg) => mg.exerciseId === row.id)
       .map((mg) => ({ group: mg.muscleGroup, weight: mg.weight })),
+  };
+}
+n tipos inconsistentes.
+    isBodyweight: Boolean(isBodyweight),
+    isCustom: Boolean(isCustom),
+    createdAt: new Date(createdAt ?? Date.now()),
+    muscleGroups: allMuscleGroups
+      .filter((mg) => getVal(mg, 'exerciseId') === rowId)
+      .map((mg) => ({
+        group: getVal(mg, 'muscleGroup'),
+        weight: mg.weight ?? mg.WEIGHT,
+      })),
   };
 }
