@@ -1,128 +1,105 @@
-import type { Db } from '@/db/connection';
-import { type Result, toResult } from '@/shared/result';
-import type { SQLiteDatabase } from 'expo-sqlite';
-import type { Equipment } from '../domain/equipment';
-import type { Exercise } from '../domain/exercise';
-import type { MuscleGroup } from '../domain/muscle-groups';
-import type { ExerciseRepo } from '../ports/exercise-repo';
+import type { Db } from "@/db/connection";
+import { type Result, toResult } from "@/shared/result";
+import type { SQLiteDatabase } from "expo-sqlite";
+import type { Equipment } from "../domain/equipment";
+import type { Exercise } from "../domain/exercise";
+import type { MuscleGroup } from "../domain/muscle-groups";
+import type { ExerciseRepo } from "../ports/exercise-repo";
 
-// Adapter de ExerciseRepo basado en SQL crudo. Misma razón que en RoutineRepo:
-// Drizzle usa la API sync de expo-sqlite que en web trunca buffers. Bajamos
-// a `getAllAsync` / `runAsync` para que funcione en ambos targets sin parches.
 export class DrizzleSqliteExerciseRepo implements ExerciseRepo {
-  constructor(
-    private readonly _db: Db,
-    private readonly sqlite: SQLiteDatabase,
-  ) {}
+	constructor(
+		private readonly _db: Db,
+		private readonly sqlite: SQLiteDatabase,
+	) {}
 
-  async list(): Promise<Result<Exercise[]>> {
-    return toResult(
-      (async () => {
-        const rows = await this.sqlite.getAllAsync<any>(
-          `SELECT id, name, equipment,
+	async list(): Promise<Result<Exercise[]>> {
+		return toResult(
+			(async () => {
+				const rows = await this.sqlite.getAllAsync<any>(
+					`SELECT id, name, equipment,
               is_bodyweight AS isBodyweight,
               is_custom AS isCustom,
               created_at AS createdAt
          FROM exercises`,
-        );
-        const allMg = await this.sqlite.getAllAsync<any>(
-          `SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
+				);
+				const allMg = await this.sqlite.getAllAsync<any>(
+					`SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
          FROM exercise_muscle_groups`,
-        );
-        return rows.map((row) => toDomain(row, allMg));
-      })(),
-    );
-  }
+				);
+				return rows.map((row) => toDomain(row, allMg));
+			})(),
+		);
+	}
 
-  async findById(id: string): Promise<Result<Exercise | null>> {
-    return toResult(
-      (async () => {
-        const rows = await this.sqlite.getAllAsync<any>(
-          `SELECT id, name, equipment,
+	async findById(id: string): Promise<Result<Exercise | null>> {
+		return toResult(
+			(async () => {
+				const rows = await this.sqlite.getAllAsync<any>(
+					`SELECT id, name, equipment,
               is_bodyweight AS isBodyweight,
               is_custom AS isCustom,
               created_at AS createdAt
          FROM exercises WHERE id = ?`,
-          [id],
-        );
-        const row = rows[0];
-        if (!row) return null;
-        const mg = await this.sqlite.getAllAsync<any>(
-          `SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
+					[id],
+				);
+				const row = rows[0];
+				if (!row) return null;
+				const mg = await this.sqlite.getAllAsync<any>(
+					`SELECT exercise_id AS exerciseId, muscle_group AS muscleGroup, weight
          FROM exercise_muscle_groups WHERE exercise_id = ?`,
-          [id],
-        );
-        return toDomain(row, mg);
-      })(),
-    );
-  }
+					[id],
+				);
+				return toDomain(row, mg);
+			})(),
+		);
+	}
 
-  async create(exercise: Omit<Exercise, 'createdAt'>): Promise<Result<void>> {
-    return toResult(
-      (async () => {
-        const now = Date.now();
-        await this.sqlite.runAsync(
-          'INSERT INTO exercises (id, name, equipment, is_bodyweight, is_custom, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-          [
-            exercise.id,
-            exercise.name,
-            exercise.equipment,
-            exercise.isBodyweight ? 1 : 0,
-            exercise.isCustom ? 1 : 0,
-            now,
-          ],
-        );
-        for (const mg of exercise.muscleGroups) {
-          await this.sqlite.runAsync(
-            'INSERT INTO exercise_muscle_groups (exercise_id, muscle_group, weight) VALUES (?, ?, ?)',
-            [exercise.id, mg.group, mg.weight],
-          );
-        }
-      })(),
-    );
-  }
+	async create(exercise: Omit<Exercise, "createdAt">): Promise<Result<void>> {
+		return toResult(
+			(async () => {
+				const now = Date.now();
+				await this.sqlite.runAsync(
+					"INSERT INTO exercises (id, name, equipment, is_bodyweight, is_custom, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+					[
+						exercise.id,
+						exercise.name,
+						exercise.equipment,
+						exercise.isBodyweight ? 1 : 0,
+						exercise.isCustom ? 1 : 0,
+						now,
+					],
+				);
+				for (const mg of exercise.muscleGroups) {
+					await this.sqlite.runAsync(
+						"INSERT INTO exercise_muscle_groups (exercise_id, muscle_group, weight) VALUES (?, ?, ?)",
+						[exercise.id, mg.group, mg.weight],
+					);
+				}
+			})(),
+		);
+	}
 }
 
-// SQLite devuelve booleans como 0/1 enteros. Tipamos así y convertimos en toDomain.
-type ExerciseRow = {
-  id: string;
-  name: string;
-  equipment: Equipment;
-  isBodyweight: number;
-  isCustom: number;
-  createdAt: number;
-};
+function toDomain(row: any, allMuscleGroups: any[]): Exercise {
+	const getVal = (obj: any, key: string) => obj[key] ?? obj[key.toLowerCase()];
 
-type MuscleGroupRow = {
-  exerciseId: string;
-  muscleGroup: MuscleGroup;
-  weight: number;
-};
+	const rowId = row.id ?? row.ID;
+	const createdAt = getVal(row, "createdAt");
+	const isBodyweight = getVal(row, "isBodyweight");
+	const isCustom = getVal(row, "isCustom");
 
-function toDomain(row: ExerciseRow, allMuscleGroups: MuscleGroupRow[]): Exercise {
-  return {
-    id: row.id,
-    name: row.name,
-    equipment: row.equipment,
-    // SQLite devuelve 0/1. Forzamos booleano por si expo-sqlite o el
-    // target (web/móvil) devuelven tipos inconsistentes.
-    isBodyweight: Boolean(row.isBodyweight),
-    isCustom: Boolean(row.isCustom),
-    createdAt: new Date(row.createdAt),
-    muscleGroups: allMuscleGroups
-      .filter((mg) => mg.exerciseId === row.id)
-      .map((mg) => ({ group: mg.muscleGroup, weight: mg.weight })),
-  };
-}
-n tipos inconsistentes.
-    isBodyweight: Boolean(isBodyweight),
-    isCustom: Boolean(isCustom),
-    createdAt: new Date(createdAt ?? Date.now()),
-    muscleGroups: allMuscleGroups
-      .filter((mg) => getVal(mg, 'exerciseId') === rowId)
-      .map((mg) => ({
-        group: getVal(mg, 'muscleGroup'),
-        weight: mg.weight ?? mg.WEIGHT,
-      })),
-  };
+	return {
+		id: rowId,
+		name: row.name ?? row.NAME,
+		equipment: row.equipment ?? row.EQUIPMENT,
+		isBodyweight: Boolean(isBodyweight),
+		isCustom: Boolean(isCustom),
+		createdAt: new Date(createdAt ?? Date.now()),
+		muscleGroups: allMuscleGroups
+			.filter((mg) => getVal(mg, "exerciseId") === rowId)
+			.map((mg) => ({
+				group: getVal(mg, "muscleGroup"),
+				weight: mg.weight ?? mg.WEIGHT,
+			})),
+	};
 }

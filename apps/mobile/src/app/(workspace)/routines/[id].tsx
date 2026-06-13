@@ -115,6 +115,10 @@ export default function RoutineDetailScreen() {
     ? (catalogById.get(editing.exerciseId)?.name ?? 'Ejercicio')
     : '';
 
+  function onStart(event: GestureResponderEvent): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ headerShown: false }} />
@@ -263,9 +267,7 @@ export default function RoutineDetailScreen() {
           {!reorderMode ? (
             <View className="mt-4">
               <Button
-                onPress={() => {
-                  console.log('[routine-detail] start workout — workouts/ slice pendiente');
-                }}
+                onPress={onStart}
                 disabled={routine.exercises.length === 0}
               >
                 Empezar entreno
