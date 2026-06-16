@@ -15,9 +15,6 @@ type ConfirmationModalProps = {
   onCancel: () => void; // función que ejecuta el padre al cancelar / tocar fuera
 };
 
-// Cada "situación" decide: icono, color del icono, fondo del badge y qué
-// variante usa el botón de confirmar. Datos, no condicionales sueltos.
-// (Los colores van en hex porque lucide recibe el color como prop JS, no como clase.)
 const tones: Record<
   Situation,
   { Icon: LucideIcon; iconColor: string; badge: string; confirm: 'primary' | 'destructive' }

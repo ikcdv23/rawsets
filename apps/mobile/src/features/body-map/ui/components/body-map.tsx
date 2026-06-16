@@ -8,6 +8,7 @@ import {
 // Si en algún momento Metro deja restos, valoramos copiar los datos al repo.
 import { BACK_MUSCLES, FRONT_MUSCLES, type MuscleDef } from 'body-muscles';
 import { useMemo } from 'react';
+import { Platform } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
 // BodyMap — renderiza el SVG del cuerpo humano (anterior o posterior),
@@ -95,6 +96,13 @@ export function BodyMap({
         {muscles.map((m) => {
           const group = groupForMuscleId(m.id);
           const handlePress = onPressGroup && group ? () => onPressGroup(group) : undefined;
+
+          // React Native SVG en Web inyecta props de responder (onResponderTerminate, etc)
+          // que el DOM no reconoce cuando se usa `onPress`. Para evitar warnings,
+          // usamos `onClick` directamente en web.
+          const interactionProps =
+            Platform.OS === 'web' ? { onClick: handlePress } : { onPress: handlePress };
+
           return (
             <Path
               key={m.id}
@@ -102,7 +110,7 @@ export function BodyMap({
               fill={fillPerMuscle[m.id]}
               stroke="#0A0A0A"
               strokeWidth={0.08}
-              onPress={handlePress}
+              {...interactionProps}
             />
           );
         })}

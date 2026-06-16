@@ -46,11 +46,12 @@ export function defaultUserProfile(): UserProfile {
   };
 }
 
-// Predicado puro — toda la app pregunta por esto, NO por displayName/bodyWeight.
-// Razón: derivar a partir de campos individuales es frágil (añadir un campo
-// futuro rompería la lógica). El "estoy onboarded" es un hecho explícito.
+// Predicado puro — toda la app pregunta por esto.
+// Ahora con fail-safe: si tiene onboardedAt O tiene displayName, asumimos que ya pasó
+// el flujo inicial. Esto evita bucles infinitos si la persistencia del timestamp
+// falla pero el resto de datos (como el nombre) sí se guardaron.
 export function isOnboarded(profile: UserProfile): boolean {
-  return profile.onboardedAt !== null;
+  return profile.onboardedAt !== null || (profile.displayName !== null && profile.displayName.length > 0);
 }
 
 // Deriva iniciales para el AvatarIcon a partir del displayName.

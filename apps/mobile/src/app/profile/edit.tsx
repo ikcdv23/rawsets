@@ -111,8 +111,6 @@ export default function ProfileEditScreen() {
   const [unit, setUnit] = useState<Unit>('kg');
   const [bodyWeight, setBodyWeight] = useState('');
   const [sex, setSex] = useState<Sex | null>(null);
-  // Fecha en 3 inputs separados (sin librerías). Cada uno guarda string
-  // para poder dejar vacíos parciales mientras se edita.
   const [birthDay, setBirthDay] = useState('');
   const [birthMonth, setBirthMonth] = useState('');
   const [birthYear, setBirthYear] = useState('');
