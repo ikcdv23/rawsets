@@ -166,13 +166,3 @@ function toDomain(row: RoutineRow, allExercises: RoutineExerciseRow[]): Routine 
       ),
   };
 }
- ?? re.POSITION,
-          targetSets: getVal(re, 'targetSets'),
-          targetRepsMin: getVal(re, 'targetRepsMin'),
-          targetRepsMax: getVal(re, 'targetRepsMax'),
-          targetWeight: getVal(re, 'targetWeight'),
-          notes: re.notes ?? re.NOTES,
-        }),
-      ),
-  };
-}

@@ -25,16 +25,6 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-// Pantalla Rutinas. Dos modos:
-//
-//   Normal      → calendario + lista. Tap card abre detalle. Long-press entra
-//                 en selección. Tap día del calendario abre sheet de asignar.
-//   Selección   → tap toggle marca/desmarca. Header reemplazado por barra
-//                 cancel + N seleccionadas + borrar (con confirmation modal).
-//
-// El rango del calendario que cargamos es el del MES VISIBLE expandido a
-// 6 semanas — basta para pintar la grid. Si el usuario navega mes, hacemos
-// re-fetch.
 export default function RoutinesScreen() {
   const router = useRouter();
   const {

@@ -22,20 +22,67 @@ RAWSETS is a workout tracker focused on **muscle balance analysis**. It is a loc
 The project follows a "Clean Architecture" approach optimized for a single developer.
 
 - **Vertical Slicing:** Code is organized by feature (e.g., `features/workouts`, `features/exercises`).
-- **Hexagonal Layers:**
-    - `domain/`: Pure logic, entities, and value objects. No external dependencies.
-    - `use-cases/`: Application logic. Orchestrates domain and ports.
-    - `ports/`: Interfaces (contracts) for external dependencies (e.g., repositories).
-    - `adapters/`: Implementations of ports (e.g., Drizzle repositories, API clients).
-    - `ui/`: React components, hooks, and styles.
+- **Hexagonal Layers (Strict Boundaries):**
+    - `domain/`: Pure logic, entities, and value objects. **PROHIBITED:** Importing React, Expo, Hooks, or any UI-related library.
+    - `use-cases/`: Application logic. Orchestrates domain and ports. No UI logic.
+    - `ports/`: Interfaces (contracts) for external dependencies.
+    - `adapters/`: Implementations of ports (e.g., Drizzle repositories).
+    - `ui/`: React components, styles, and **Hooks** (must reside in `ui/hooks`).
 - **Shared Logic:** `packages/domain` contains logic shared between the mobile app and future backend (Fase 2).
 
-### Coding Standards
-- **Functional Domain:** Prefer pure functions and objects over classes. Use **Branded Types** and **Smart Constructors** for domain entities.
-- **Error Handling:** Use a `Result<Ok, Err>` pattern for fallible operations in Use Cases and Adapters. Avoid `throw` for expected business errors.
-- **Symmetry:** Both reads and writes should pass through a Use Case to maintain architectural consistency.
-- **DI:** Manual Dependency Injection using factory functions (e.g., `makeLogSet(repo)`). No DI libraries.
-- **Design Tokens:** Use semantic tokens via NativeWind (e.g., `bg-background`, `text-primary`).
+## Development Workflow & Safety
+
+### 1. Mandatory Planning ("Luz Verde" Protocol)
+- **Research:** Identify the root cause and affected files.
+- **Strategy:** Present a detailed plan (What, Why, How) including the exact code changes. Include a "**💡 Architectural Note**" to explain the reasoning behind the layer placement and terminology.
+- **Confirmation:** WAIT for the user to provide "Luz verde" before executing any `replace`, `write_file`, or `run_shell_command`.
+- **Validation:** After every change, run `pnpm lint` and `pnpm typecheck` to ensure no regressions.
+
+### 2. Surgical Edits
+- Prioritize fixing the root cause over patching symptoms.
+- Maintain consistency with existing patterns and naming conventions.
+
+## Mentorship & Code Quality
+
+### 1. Architectural Integrity Check
+- **Context Awareness:** Before implementing a task, verify if the current file structure respects Hexagonal boundaries.
+- **Proactive Refactoring:** If a file is misplaced (e.g., a hook in `domain/`), suggest moving it as part of the strategy.
+- **Explanation:** Always explain the role of each layer involved in a change (Domain, Use Case, Adapter, or UI) to facilitate learning.
+
+### 2. Standardized Naming & Locations
+- **Hooks:** Always `use-[name].ts` inside `ui/hooks/`. No hooks inside `components/`.
+- **Components:** PascalCase (e.g., `RoutineCard.tsx`) inside `ui/components/`.
+- **Use Cases:** kebab-case with descriptive verbs (e.g., `calculate-muscle-balance.ts`) inside `use-cases/`.
+- **Domain Entities:** Singular nouns (e.g., `workout.ts`) inside `domain/`. Use Branded Types for IDs.
+
+## Teaching & UX Principles
+
+### 1. Active Mentorship
+- **Pattern Identification:** Before implementing, name the pattern (e.g., Dependency Inversion, Singleton) and why it's chosen.
+- **Code Smells:** Explicitly point out coupling, logic leaks, or "any" types, even if the code "works". Explain the SOLID principle being violated.
+- **Socratic Method:** If a solution can be reasoned out, ask "What does your intuition say?" before providing the answer.
+
+### 2. UX as a Primary Citizen
+- **States:** Loading, Error, and Empty states must be designed alongside the happy path.
+- **Offline-First Mindset:** Assume gym networks are poor. Optimize for perceived speed (Optimistic Updates).
+- **PWA-ready:** Every new dependency MUST be verified for web compatibility (`react-native-web`).
+
+### 3. Visual & Technical Consistency
+- **Colors:** NEVER use literal colors (e.g., `bg-white`). ALWAYS use semantic tokens from `global.css` (e.g., `bg-background`, `text-primary`).
+- **Typography:** `ZenDots` ONLY for the logo. `Inter` for UI. `JetBrains Mono` for technical numbers and metrics.
+- **Units:** Internal logic always in **kg**.
+
+## Teaching Style & Communication
+
+### 1. Progressive Explanation (Socratic & Layered)
+- **Step 1 (Simple):** Start with a high-level explanation and the "why". Avoid technical jargon unless necessary.
+- **Step 2 (Deep Dive):** Only if the user asks (e.g., "No entiendo", "Profundiza"), provide detailed technical implementation, low-level details, and theory.
+- **Focus:** Ensure Javier learns the "why" behind Hexagonal Architecture and DDD.
+
+### 2. Code Review Phase (Simplicity & Optimization)
+- After any significant change, offer a **"Review & Refactor"** turn.
+- Identify "clever" but confusing code and suggest simpler, more readable alternatives.
+- Prioritize readability for a junior profile over extreme performance micro-optimizations.
 
 ## Project Structure
 ```text

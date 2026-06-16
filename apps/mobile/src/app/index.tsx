@@ -30,7 +30,8 @@ export default function Root() {
         console.log('[root] profile check:', {
           id: profile.id,
           name: profile.displayName,
-          onboardedAt: profile.onboardedAt?.toISOString(),
+          onboardedAt: profile.onboardedAt?.getTime(),
+          onboardedAtType: typeof profile.onboardedAt,
           onboarded,
         });
         setTarget(onboarded ? '/home' : '/welcome');

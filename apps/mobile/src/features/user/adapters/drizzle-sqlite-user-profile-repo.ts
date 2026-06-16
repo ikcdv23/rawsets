@@ -5,9 +5,9 @@ import type { Goal, Sex, Unit, UserProfile } from '../domain/user-profile';
 import type { UserProfileRepo } from '../ports/user-profile-repo';
 
 // Adapter del UserProfileRepo singleton.
-// SQL crudo por las mismas razones del resto: Drizzle usa la API sync de
-// expo-sqlite que en web trunca buffers. Aquí los reads/writes son sobre una
-// sola fila ('me'), trivial.
+// IMPORTANTE: Usamos la API ASYNC de sqlite directamente (no Drizzle .select/.insert)
+// porque en Web la API síncrona bloquea el Access Handle del sistema de archivos
+// y provoca NoModificationAllowedError.
 export class DrizzleSqliteUserProfileRepo implements UserProfileRepo {
   constructor(
     private readonly _db: Db,
@@ -61,25 +61,13 @@ export class DrizzleSqliteUserProfileRepo implements UserProfileRepo {
             profile.goal,
             profile.unit,
             profile.bodyWeight,
-            profile.birthDate ? profile.birthDate.getTime() : null,
+            profile.birthDate instanceof Date ? profile.birthDate.getTime() : profile.birthDate,
             profile.sex,
-            profile.createdAt.getTime(),
-            profile.onboardedAt ? profile.onboardedAt.getTime() : null,
+            profile.createdAt instanceof Date ? profile.createdAt.getTime() : profile.createdAt,
+            profile.onboardedAt instanceof Date ? profile.onboardedAt.getTime() : profile.onboardedAt,
           ],
         );
       })(),
     );
   }
 }
-
-type UserProfileRow = {
-  id: 'me';
-  displayName: string | null;
-  goal: Goal;
-  unit: Unit;
-  bodyWeight: number | null;
-  birthDate: number | null;
-  sex: Sex | null;
-  createdAt: number;
-  onboardedAt: number | null;
-};

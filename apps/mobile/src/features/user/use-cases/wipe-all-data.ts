@@ -29,14 +29,15 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 export async function wipeAllData(sqlite: SQLiteDatabase): Promise<Result<void>> {
   return toResult(
     (async () => {
+      // Tablas de datos dinámicos del usuario que SÍ se borran.
+      // Se excluyen 'exercises' y 'exercise_muscle_groups' para no perder el
+      // catálogo base sembrado al inicio.
       const tables = [
         'sets',
         'routine_exercises',
-        'exercise_muscle_groups',
         'workouts',
         'scheduled_sessions',
         'routines',
-        'exercises',
         'user_profile',
       ];
 
@@ -46,7 +47,7 @@ export async function wipeAllData(sqlite: SQLiteDatabase): Promise<Result<void>>
         }
       });
 
-      console.log('[wipe-all-data] OK — todas las tablas vaciadas.');
+      console.log('[wipe-all-data] OK — datos de usuario eliminados, catálogo preservado.');
     })(),
   );
 }
