@@ -8,7 +8,6 @@ import { RoutineHeroCard } from "@/features/routines/ui/components/routine-hero-
 import { RoutineNameModal } from "@/features/routines/ui/components/routine-name-modal";
 import { RoutineStatTile } from "@/features/routines/ui/components/routine-stat-tile";
 import { useRoutineDetail } from "@/features/routines/ui/hooks/use-routine-detail";
-import { ActiveWorkoutStrip } from "@/features/workouts/ui/components/active-workout-strip";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { ChevronLeft, MoreVertical, Plus } from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -52,9 +51,9 @@ export default function RoutineDetailScreen() {
 		);
 	}
 
-	return (
-		<View className="flex-1 bg-background">
-			<Stack.Screen options={{ headerShown: false }} />
+  return (
+    <View className="flex-1 bg-background">
+      <Stack.Screen options={{ headerShown: false }} />
 
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View className="gap-4 px-6 pb-32 pt-16">
@@ -188,24 +187,19 @@ export default function RoutineDetailScreen() {
 						</Pressable>
 					) : null}
 
-					{/* CTA principal: empezar entreno. Disabled en modo reorder y si rutina vacía. */}
-					{!reorderMode ? (
-						<View className="mt-4">
-							{}
-							<Button
-								onPress={actions.startWorkout}
-								disabled={routine.exercises.length === 0}>
-								{/*!ActiveWorkout ?(
-
-								) : (
-									<ActiveWorkoutStrip />
-								)*/ }
-								Empezar entreno
-							</Button>
-						</View>
-					) : null}
-				</View>
-			</ScrollView>
+          {/* CTA principal: empezar entreno. Disabled en modo reorder y si rutina vacía. */}
+          {!reorderMode ? (
+            <View className="mt-4">
+              <Button
+                onPress={actions.startWorkout}
+                disabled={routine.exercises.length === 0}
+              >
+                Empezar entreno
+              </Button>
+            </View>
+          ) : null}
+        </View>
+      </ScrollView>
 
 			<ExercisePickerModal
 				visible={ui.isPickerVisible}
@@ -254,5 +248,5 @@ export default function RoutineDetailScreen() {
 				onConfirm={actions.deleteRoutine}
 			/>
 		</View>
-	);
+  );
 }

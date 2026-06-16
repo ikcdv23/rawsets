@@ -29,10 +29,10 @@ export class DrizzleSqliteRoutineRepo implements RoutineRepo {
   async list(): Promise<Result<Routine[]>> {
     return toResult(
       (async () => {
-        const rows = await this.sqlite.getAllAsync<RoutineRow>(
+        const rows = await this.sqlite.getAllAsync<any>(
           'SELECT id, name, created_at AS createdAt FROM routines',
         );
-        const allEx = await this.sqlite.getAllAsync<RoutineExerciseRow>(
+        const allEx = await this.sqlite.getAllAsync<any>(
           `SELECT routine_id AS routineId, exercise_id AS exerciseId, position,
               target_sets AS targetSets, target_reps_min AS targetRepsMin,
               target_reps_max AS targetRepsMax, target_weight AS targetWeight, notes
@@ -46,13 +46,13 @@ export class DrizzleSqliteRoutineRepo implements RoutineRepo {
   async findById(id: string): Promise<Result<Routine | null>> {
     return toResult(
       (async () => {
-        const rows = await this.sqlite.getAllAsync<RoutineRow>(
+        const rows = await this.sqlite.getAllAsync<any>(
           'SELECT id, name, created_at AS createdAt FROM routines WHERE id = ?',
           [id],
         );
         const row = rows[0];
         if (!row) return null;
-        const ex = await this.sqlite.getAllAsync<RoutineExerciseRow>(
+        const ex = await this.sqlite.getAllAsync<any>(
           `SELECT routine_id AS routineId, exercise_id AS exerciseId, position,
               target_sets AS targetSets, target_reps_min AS targetRepsMin,
               target_reps_max AS targetRepsMax, target_weight AS targetWeight, notes
@@ -162,6 +162,16 @@ function toDomain(row: RoutineRow, allExercises: RoutineExerciseRow[]): Routine 
           targetRepsMax: re.targetRepsMax,
           targetWeight: re.targetWeight,
           notes: re.notes,
+        }),
+      ),
+  };
+}
+ ?? re.POSITION,
+          targetSets: getVal(re, 'targetSets'),
+          targetRepsMin: getVal(re, 'targetRepsMin'),
+          targetRepsMax: getVal(re, 'targetRepsMax'),
+          targetWeight: getVal(re, 'targetWeight'),
+          notes: re.notes ?? re.NOTES,
         }),
       ),
   };

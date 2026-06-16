@@ -26,16 +26,23 @@ export class DrizzleSqliteUserProfileRepo implements UserProfileRepo {
         const row = rows[0];
         if (!row) return null;
 
+        // Expo SQLite en web a veces devuelve las keys en lowercase a pesar del alias AS.
+        const getVal = (key: string) => row[key] ?? row[key.toLowerCase()];
+
+        const createdAt = getVal('createdAt');
+        const onboardedAt = getVal('onboardedAt');
+        const birthDate = getVal('birthDate');
+
         return {
           id: 'me',
-          displayName: row.displayName,
-          goal: row.goal,
-          unit: row.unit,
-          bodyWeight: row.bodyWeight,
-          birthDate: row.birthDate ? new Date(row.birthDate) : null,
-          sex: row.sex,
-          createdAt: new Date(row.createdAt),
-          onboardedAt: row.onboardedAt ? new Date(row.onboardedAt) : null,
+          displayName: getVal('displayName'),
+          goal: getVal('goal'),
+          unit: getVal('unit'),
+          bodyWeight: getVal('bodyWeight'),
+          birthDate: birthDate ? new Date(birthDate) : null,
+          sex: getVal('sex'),
+          createdAt: new Date(createdAt ?? Date.now()),
+          onboardedAt: onboardedAt ? new Date(onboardedAt) : null,
         };
       })(),
     );
