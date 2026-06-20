@@ -1,23 +1,29 @@
-import { useRepos } from "@/db/repo-provider";
-import type { Exercise } from "@/features/exercises/domain/exercise";
-import type { MuscleGroup } from "@/features/exercises/domain/muscle-groups";
-import { MUSCLE_TARGETS } from "@/features/exercises/domain/muscle-targets";
-import type { Routine } from "@/features/routines/domain/routine";
-import { addDays, startOfDay } from "@/features/scheduling/domain/dates";
-import type { ScheduledSession } from "@/features/scheduling/domain/scheduled-session";
-import { listScheduledInRange } from "@/features/scheduling/use-cases/list-scheduled-in-range";
-import { listExercises } from "@/features/exercises/use-cases/list-exercises";
-import { computeMuscleVolumeByRange, type MuscleBalanceItem } from "@/features/workouts/use-cases/compute-muscle-volume-by-range";
-import { useWorkoutSession, type StartWorkoutExercise } from "@/features/workouts/ui/contexts/workout-session-context";
-import type { RadarAxis } from "@/components/ui/radar-chart";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import type { RadarAxis } from '@/components/ui/radar-chart';
+import { useRepos } from '@/db/repo-provider';
+import type { Exercise } from '@/features/exercises/domain/exercise';
+import type { MuscleGroup } from '@/features/exercises/domain/muscle-groups';
+import { MUSCLE_TARGETS } from '@/features/exercises/domain/muscle-targets';
+import { listExercises } from '@/features/exercises/use-cases/list-exercises';
+import type { Routine } from '@/features/routines/domain/routine';
+import { addDays, startOfDay } from '@/features/scheduling/domain/dates';
+import type { ScheduledSession } from '@/features/scheduling/domain/scheduled-session';
+import { listScheduledInRange } from '@/features/scheduling/use-cases/list-scheduled-in-range';
+import {
+  type StartWorkoutExercise,
+  useWorkoutSession,
+} from '@/features/workouts/ui/contexts/workout-session-context';
+import {
+  type MuscleBalanceItem,
+  computeMuscleVolumeByRange,
+} from '@/features/workouts/use-cases/compute-muscle-volume-by-range';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 
 // --- TIPOS ---
 
-export type TodayState = 
-  | { kind: 'workout'; routine: Routine } 
-  | { kind: 'rest' } 
+export type TodayState =
+  | { kind: 'workout'; routine: Routine }
+  | { kind: 'rest' }
   | { kind: 'free' };
 
 // --- CONSTANTES ---
@@ -99,11 +105,8 @@ export function useHome() {
     () => buildRadarAxes(muscleBalance),
     [muscleBalance],
   );
-  
-  const hasHistory = useMemo(
-    () => muscleBalance.some((b) => b.volumeKg > 0),
-    [muscleBalance]
-  );
+
+  const hasHistory = useMemo(() => muscleBalance.some((b) => b.volumeKg > 0), [muscleBalance]);
 
   const todayState: TodayState = useMemo(() => {
     if (!todaySession) return { kind: 'free' };
@@ -114,19 +117,22 @@ export function useHome() {
   }, [todaySession, routinesById]);
 
   // Acciones
-  const handleStartWorkout = useCallback(async (routine: Routine) => {
-    const exercises = buildWorkoutExercises(routine, catalogById);
-    try {
-      await startWorkout({
-        routineId: routine.id,
-        routineName: routine.name,
-        routineSubtitle: null,
-        exercises,
-      });
-    } catch (err) {
-      console.error('[useHome] startWorkout error:', err);
-    }
-  }, [catalogById, startWorkout]);
+  const handleStartWorkout = useCallback(
+    async (routine: Routine) => {
+      const exercises = buildWorkoutExercises(routine, catalogById);
+      try {
+        await startWorkout({
+          routineId: routine.id,
+          routineName: routine.name,
+          routineSubtitle: null,
+          exercises,
+        });
+      } catch (err) {
+        console.error('[useHome] startWorkout error:', err);
+      }
+    },
+    [catalogById, startWorkout],
+  );
 
   const handleFinishWorkoutDev = useCallback(async () => {
     try {
@@ -155,7 +161,7 @@ export function useHome() {
     actions: {
       startWorkout: handleStartWorkout,
       finishWorkoutDev: handleFinishWorkoutDev,
-    }
+    },
   };
 }
 

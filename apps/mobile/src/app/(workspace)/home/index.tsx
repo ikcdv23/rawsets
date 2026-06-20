@@ -3,11 +3,11 @@ import { InfoModal } from '@/components/ui/info-modal';
 import { AvatarIcon } from '@/components/ui/profile/avatar-icon';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Stat } from '@/components/ui/stat';
+import { FreeDayBlock } from '@/features/workouts/ui/components/home/free-day-block';
+import { RestDayCard } from '@/features/workouts/ui/components/home/rest-day-card';
+import { TodayWorkoutCard } from '@/features/workouts/ui/components/home/today-workout-card';
 import { BalanceRadar } from '@/features/workouts/ui/components/radar';
 import { useHome } from '@/features/workouts/ui/hooks/use-home';
-import { TodayWorkoutCard } from '@/features/workouts/ui/components/home/today-workout-card';
-import { RestDayCard } from '@/features/workouts/ui/components/home/rest-day-card';
-import { FreeDayBlock } from '@/features/workouts/ui/components/home/free-day-block';
 import { ScrollView, Text, View } from 'react-native';
 
 export default function HomeScreen() {

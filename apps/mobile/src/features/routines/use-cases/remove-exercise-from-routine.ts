@@ -1,4 +1,4 @@
-import { Result, err } from '@/shared/result';
+import { type Result, err } from '@/shared/result';
 import type { RoutineRepo } from '../ports/routine-repo';
 
 // Elimina un ejercicio de una rutina y reorganiza las posiciones restantes
@@ -22,4 +22,3 @@ export async function removeExerciseFromRoutine(
 
   return repo.setExercises(routineId, remaining);
 }
-

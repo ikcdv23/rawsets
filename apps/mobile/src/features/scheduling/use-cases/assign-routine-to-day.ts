@@ -1,4 +1,4 @@
-import { Result } from '@/shared/result';
+import type { Result } from '@/shared/result';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
 
 // Asigna una rutina a un día. Si el día ya tenía algo (otra rutina o descanso),
@@ -16,4 +16,3 @@ export async function assignRoutineToDay(
     createdAt: new Date(),
   });
 }
-

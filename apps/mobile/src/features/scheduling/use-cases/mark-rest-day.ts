@@ -1,4 +1,4 @@
-import { Result } from '@/shared/result';
+import type { Result } from '@/shared/result';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
 
 // Marca un día como descanso PLANIFICADO (distinto de "no asignado").
@@ -20,4 +20,3 @@ export async function markRestDay(
     createdAt: new Date(),
   });
 }
-

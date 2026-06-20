@@ -38,6 +38,7 @@ type CuratedJsonEntry = {
   equipment: Equipment;
   isBodyweight: boolean;
   muscleGroups: Array<{ group: MuscleGroup; weight: number }>;
+  imagePath?: string;
 };
 
 const curated = curatedJson as CuratedJsonEntry[];

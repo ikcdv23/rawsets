@@ -137,11 +137,7 @@ function emptySets(count: number): SetLog[] {
 }
 
 export function WorkoutSessionProvider({ children }: { children: ReactNode }) {
-  const {
-    workout: workoutRepo,
-    exercise: exerciseRepo,
-    routine: routineRepo,
-  } = useRepos();
+  const { workout: workoutRepo, exercise: exerciseRepo, routine: routineRepo } = useRepos();
 
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkout | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);

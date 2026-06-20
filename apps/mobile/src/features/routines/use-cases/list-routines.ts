@@ -1,4 +1,4 @@
-import { Result, ok } from '@/shared/result';
+import { type Result, ok } from '@/shared/result';
 import type { Routine } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -14,4 +14,3 @@ export async function listRoutines(repo: RoutineRepo): Promise<Result<Routine[],
   const sorted = all.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   return ok(sorted);
 }
-

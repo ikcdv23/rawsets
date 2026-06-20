@@ -27,11 +27,7 @@ import { ScrollView, Text, View } from 'react-native';
 
 export default function RoutinesScreen() {
   const router = useRouter();
-  const {
-    routine: routineRepo,
-    exercise: exerciseRepo,
-    schedule: scheduleRepo,
-  } = useRepos();
+  const { routine: routineRepo, exercise: exerciseRepo, schedule: scheduleRepo } = useRepos();
 
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [_catalog, setCatalog] = useState<Exercise[]>([]);
@@ -230,11 +226,8 @@ export default function RoutinesScreen() {
         onClose={() => setSelectedDay(null)}
         onAssignRoutine={async (routineId) => {
           if (!selectedDay) return;
-          const res = await assignRoutineToDay(
-            scheduleRepo,
-            selectedDay,
-            routineId,
-            () => crypto.randomUUID(),
+          const res = await assignRoutineToDay(scheduleRepo, selectedDay, routineId, () =>
+            crypto.randomUUID(),
           );
           if (res.ok) {
             setSelectedDay(null);

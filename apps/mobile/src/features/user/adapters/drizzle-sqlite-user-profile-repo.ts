@@ -64,7 +64,9 @@ export class DrizzleSqliteUserProfileRepo implements UserProfileRepo {
             profile.birthDate instanceof Date ? profile.birthDate.getTime() : profile.birthDate,
             profile.sex,
             profile.createdAt instanceof Date ? profile.createdAt.getTime() : profile.createdAt,
-            profile.onboardedAt instanceof Date ? profile.onboardedAt.getTime() : profile.onboardedAt,
+            profile.onboardedAt instanceof Date
+              ? profile.onboardedAt.getTime()
+              : profile.onboardedAt,
           ],
         );
       })(),

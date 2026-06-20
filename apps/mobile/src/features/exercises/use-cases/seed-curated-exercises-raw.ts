@@ -28,8 +28,8 @@ export async function seedCuratedExercisesRaw(
 
   for (const ex of toInsert) {
     await sqlite.runAsync(
-      'INSERT INTO exercises (id, name, equipment, is_bodyweight, is_custom, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-      [ex.id, ex.name, ex.equipment, ex.isBodyweight ? 1 : 0, 0, now],
+      'INSERT INTO exercises (id, name, equipment, is_bodyweight, is_custom, image_path, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [ex.id, ex.name, ex.equipment, ex.isBodyweight ? 1 : 0, 0, ex.imagePath ?? null, now],
     );
     for (const mg of ex.muscleGroups) {
       await sqlite.runAsync(

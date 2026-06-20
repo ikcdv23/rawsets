@@ -1,4 +1,4 @@
-import { Result, ok } from '@/shared/result';
+import { type Result, ok } from '@/shared/result';
 import { addDays } from '../domain/dates';
 import type { ScheduledSession } from '../domain/scheduled-session';
 import type { ScheduledSessionRepo } from '../ports/scheduled-session-repo';
@@ -31,4 +31,3 @@ export async function repeatWeekly(
   }
   return ok(undefined);
 }
-

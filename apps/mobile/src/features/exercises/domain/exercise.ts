@@ -19,5 +19,6 @@ export type Exercise = {
   isBodyweight: boolean;
   isCustom: boolean;
   muscleGroups: MuscleGroupContribution[];
+  imagePath?: string | null;
   createdAt: Date;
 };

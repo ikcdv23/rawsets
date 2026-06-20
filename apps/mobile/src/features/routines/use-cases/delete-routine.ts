@@ -1,4 +1,4 @@
-import { Result } from '@/shared/result';
+import type { Result } from '@/shared/result';
 import type { RoutineRepo } from '../ports/routine-repo';
 
 // Borra una rutina. Por el ON DELETE CASCADE de routine_exercises, los
@@ -10,4 +10,3 @@ import type { RoutineRepo } from '../ports/routine-repo';
 export async function deleteRoutine(repo: RoutineRepo, id: string): Promise<Result<void, Error>> {
   return repo.delete(id);
 }
-

@@ -1,4 +1,4 @@
-import { Result, ok, err } from '@/shared/result';
+import { type Result, err, ok } from '@/shared/result';
 import type { RoutineExercise } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -64,4 +64,3 @@ export async function addExercisesToRoutine(
 
   return ok({ added: additions.length, skipped: inputs.length - additions.length });
 }
-

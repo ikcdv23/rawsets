@@ -34,7 +34,7 @@ export function TodayWorkoutCard({
 
   const totalSets = routine.exercises.reduce((acc, re) => acc + re.targetSets, 0);
   const exCount = routine.exercises.length;
-  
+
   const metaLine = [
     muscleSummary,
     `${exCount} ejercicio${exCount === 1 ? '' : 's'}`,

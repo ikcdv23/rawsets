@@ -1,14 +1,23 @@
 import { useDb } from '@/db/db-provider';
 import { useRepos } from '@/db/repo-provider';
 import type { Badge } from '@/features/achievements/domain/badge';
-import { levelFromXP, tierForSessions, usernameFromDisplayName } from '@/features/achievements/domain/progression';
+import {
+  levelFromXP,
+  tierForSessions,
+  usernameFromDisplayName,
+} from '@/features/achievements/domain/progression';
 import { listRoutines } from '@/features/routines/use-cases/list-routines';
-import { type UserProfile, initialsFromName, calculateAge, formatWeight } from '@/features/user/domain/user-profile';
+import {
+  type UserProfile,
+  calculateAge,
+  formatWeight,
+  initialsFromName,
+} from '@/features/user/domain/user-profile';
 import { getOrCreateProfile } from '@/features/user/use-cases/get-or-create-profile';
 import { resetOnboarding } from '@/features/user/use-cases/reset-onboarding';
 import { wipeAllData } from '@/features/user/use-cases/wipe-all-data';
-import { useRouter, useFocusEffect } from 'expo-router';
-import { useCallback, useState, useMemo } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 
 export function useProfile() {
   const router = useRouter();
@@ -31,14 +40,15 @@ export function useProfile() {
     try {
       const [profileRes, routinesResult] = await Promise.all([
         getOrCreateProfile(profileRepo),
-        listRoutines(routineRepo)
+        listRoutines(routineRepo),
       ]);
 
       if (profileRes.ok) setProfile(profileRes.value);
       if (routinesResult.ok) setRoutinesCount(routinesResult.value.length);
 
       if (!profileRes.ok) console.error('[useProfile] getProfile error:', profileRes.error);
-      if (!routinesResult.ok) console.error('[useProfile] listRoutines error:', routinesResult.error);
+      if (!routinesResult.ok)
+        console.error('[useProfile] listRoutines error:', routinesResult.error);
     } catch (err) {
       console.error('[useProfile] unexpected error:', err);
     } finally {
@@ -49,7 +59,7 @@ export function useProfile() {
   useFocusEffect(
     useCallback(() => {
       reload();
-    }, [reload])
+    }, [reload]),
   );
 
   // Datos derivados (Memoizados)
@@ -122,6 +132,6 @@ export function useProfile() {
     actions: {
       resetOnboarding: handleResetOnboarding,
       wipeAllData: handleWipeAllData,
-    }
+    },
   };
 }

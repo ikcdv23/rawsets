@@ -1,4 +1,4 @@
-import { Result, ok, err } from '@/shared/result';
+import { type Result, err, ok } from '@/shared/result';
 import type { Routine, RoutineExercise } from '../domain/routine';
 import type { RoutineRepo } from '../ports/routine-repo';
 
@@ -38,4 +38,3 @@ export async function createRoutine(
 
   return ok(id);
 }
-

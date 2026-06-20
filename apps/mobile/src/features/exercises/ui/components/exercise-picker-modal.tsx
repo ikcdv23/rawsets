@@ -1,30 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { Check, Search, X } from 'lucide-react-native';
+import { Check, Info, Search, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { EQUIPMENT, type Equipment } from '../../domain/equipment';
 import type { Exercise } from '../../domain/exercise';
 import { MUSCLE_GROUPS, type MuscleGroup } from '../../domain/muscle-groups';
+import { ExerciseDetailModal } from './exercise-detail-modal';
 
 // Picker del catálogo con búsqueda + filtros + multi-select.
-//
-// Vive en el slice `exercises/` porque su responsabilidad es "mostrar el
-// catálogo para escoger N items". No sabe nada de rutinas u otros consumidores.
-//
-// Filtros:
-//  - Texto libre sobre `name` (case-insensitive, normalizado sin tildes).
-//  - Grupo muscular: filtra ejercicios cuya `muscleGroups[].group` incluya el seleccionado.
-//  - Equipment: match exacto sobre `exercise.equipment`.
-//  Ambos filtros son single-select; "Todos" desactiva ese eje. Componen AND.
-//
-// Multi-select:
-//  - Estado local interno (Set de ids). El parent solo recibe el array final
-//    via `onConfirm(ids)` al pulsar "Añadir N".
-//  - `alreadyAddedIds` siguen disabled — no se pueden añadir dos veces.
-//
-// Por qué se resetea el estado al abrir/cerrar: cada apertura es una "sesión
-// de picker" independiente. Si el usuario cierra sin añadir, no queremos que
-// su próxima apertura llegue con cosas preseleccionadas del intento anterior.
 export type ExercisePickerModalProps = {
   visible: boolean;
   catalog: Exercise[];
@@ -56,13 +39,8 @@ const EQUIPMENT_LABELS: Record<Equipment, string> = {
   otro: 'Otro',
 };
 
-// Normaliza para búsqueda: quita tildes y baja a minúsculas. Así "espalda" y
-// "Espalda" matchean, y "biceps" matchea "bíceps".
-// El bloque ̀-ͯ son los "combining diacritical marks" — lo que
-// queda flotando tras NFD-normalizar (separar carácter base + tilde).
+// Normaliza para búsqueda: quita tildes y baja a minúsculas.
 function normalize(s: string): string {
-  // ̀-ͯ = Combining Diacritical Marks. Tras NFD, las tildes flotan
-  // separadas del carácter base → las quitamos con este rango.
   return s
     .toLowerCase()
     .normalize('NFD')
@@ -81,6 +59,7 @@ export function ExercisePickerModal({
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
+  const [inspectingExercise, setInspectingExercise] = useState<Exercise | null>(null);
 
   // Reset al cerrar — fresh start en cada apertura.
   const resetAndClose = () => {
@@ -184,7 +163,7 @@ export function ExercisePickerModal({
             </View>
           </View>
 
-          {/* Filtros — dos scrolls horizontales */}
+          {/* Filtros */}
           <View className="px-6 pt-3">
             <Text className="font-sans-bold text-[9px] uppercase tracking-[1.4px] text-muted-dim">
               Grupo muscular
@@ -249,13 +228,6 @@ export function ExercisePickerModal({
                     key={ex.id}
                     accessibilityRole="button"
                     accessibilityState={{ selected: isSelected, disabled: isAdded }}
-                    accessibilityLabel={
-                      isAdded
-                        ? `${ex.name} (ya añadido)`
-                        : isSelected
-                          ? `Quitar selección ${ex.name}`
-                          : `Seleccionar ${ex.name}`
-                    }
                     disabled={isAdded}
                     onPress={() => toggle(ex.id)}
                     style={{
@@ -295,11 +267,20 @@ export function ExercisePickerModal({
                       </Text>
                     </View>
 
-                    {isAdded ? (
-                      <Text className="font-sans-bold text-[10px] uppercase tracking-[1.2px] text-primary">
-                        Añadido
-                      </Text>
-                    ) : null}
+                    <View className="flex-row items-center gap-3">
+                      {isAdded && (
+                        <Text className="font-sans-bold text-[10px] uppercase tracking-[1.2px] text-primary">
+                          Añadido
+                        </Text>
+                      )}
+                      <Pressable
+                        onPress={() => setInspectingExercise(ex)}
+                        hitSlop={10}
+                        className="h-8 w-8 items-center justify-center rounded-full bg-border-strong/20"
+                      >
+                        <Info size={16} color="#8A8A8A" />
+                      </Pressable>
+                    </View>
                   </Pressable>
                 );
               })
@@ -317,14 +298,16 @@ export function ExercisePickerModal({
           </View>
         </Pressable>
       </Pressable>
+
+      <ExerciseDetailModal
+        visible={inspectingExercise !== null}
+        exercise={inspectingExercise}
+        onClose={() => setInspectingExercise(null)}
+      />
     </Modal>
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────────── */
-
-// Chip de filtro horizontal — local porque solo se usa aquí. Si aparece en
-// otro picker (workouts, search global), se sube a un componente compartido.
 function FilterChip({
   label,
   active,

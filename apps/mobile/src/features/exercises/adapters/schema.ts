@@ -8,6 +8,7 @@ export const exercises = sqliteTable('exercises', {
   equipment: text('equipment', { enum: EQUIPMENT }).$type<Equipment>().notNull(),
   isBodyweight: integer('is_bodyweight', { mode: 'boolean' }).notNull().default(false),
   isCustom: integer('is_custom', { mode: 'boolean' }).notNull().default(false),
+  imagePath: text('image_path'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });
 

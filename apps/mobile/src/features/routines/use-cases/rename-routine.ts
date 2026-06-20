@@ -1,4 +1,4 @@
-import { Result, err } from '@/shared/result';
+import { type Result, err } from '@/shared/result';
 import type { RoutineRepo } from '../ports/routine-repo';
 
 // Renombra una rutina. Validación de invariante: nombre no vacío tras trim.
@@ -13,4 +13,3 @@ export async function renameRoutine(
   }
   return repo.rename(id, name);
 }
-

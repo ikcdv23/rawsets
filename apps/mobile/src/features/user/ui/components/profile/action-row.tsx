@@ -1,5 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import { Pressable, Text, View } from 'react-native';
 
 interface ActionRowProps {
   icon: LucideIcon;

@@ -5,10 +5,20 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 1.0 },
-      { "group": "hombro", "weight": 0.3 },
-      { "group": "triceps", "weight": 0.4 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 1
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-banca.gif"
   },
   {
     "id": "press-banca-mancuernas",
@@ -16,10 +26,20 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 1.0 },
-      { "group": "hombro", "weight": 0.4 },
-      { "group": "triceps", "weight": 0.3 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 1
+      },
+      {
+        "group": "hombro",
+        "weight": 0.4
+      },
+      {
+        "group": "triceps",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "press-banca-mancuernas.gif"
   },
   {
     "id": "press-inclinado",
@@ -27,10 +47,20 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 0.8 },
-      { "group": "hombro", "weight": 0.6 },
-      { "group": "triceps", "weight": 0.4 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 0.8
+      },
+      {
+        "group": "hombro",
+        "weight": 0.6
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-inclinado.gif"
   },
   {
     "id": "press-inclinado-mancuernas",
@@ -38,38 +68,80 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 0.9 },
-      { "group": "hombro", "weight": 0.6 },
-      { "group": "triceps", "weight": 0.4 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 0.9
+      },
+      {
+        "group": "hombro",
+        "weight": 0.6
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-inclinado-mancuernas.gif"
   },
   {
     "id": "press-declinado",
     "name": "Press declinado",
     "equipment": "barra",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "pecho",
+        "weight": 1
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-declinado.gif"
   },
   {
     "id": "aperturas-mancuernas",
     "name": "Aperturas con mancuernas",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }, { "group": "hombro", "weight": 0.2 }]
+    "muscleGroups": [
+      {
+        "group": "pecho",
+        "weight": 1
+      },
+      {
+        "group": "hombro",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "aperturas-mancuernas.gif"
   },
   {
     "id": "cruces-polea",
     "name": "Cruces en polea",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "pecho",
+        "weight": 1
+      }
+    ],
+    "imagePath": "cruces-polea.gif"
   },
   {
     "id": "pec-deck",
     "name": "Pec deck (contractor)",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pecho", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "pecho",
+        "weight": 1
+      }
+    ],
+    "imagePath": "pec-deck.gif"
   },
   {
     "id": "press-pecho-maquina",
@@ -77,10 +149,20 @@
     "equipment": "maquina",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 1.0 },
-      { "group": "hombro", "weight": 0.3 },
-      { "group": "triceps", "weight": 0.4 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 1
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-pecho-maquina.gif"
   },
   {
     "id": "fondos",
@@ -88,10 +170,20 @@
     "equipment": "peso-corporal",
     "isBodyweight": true,
     "muscleGroups": [
-      { "group": "pecho", "weight": 0.8 },
-      { "group": "hombro", "weight": 0.4 },
-      { "group": "triceps", "weight": 0.6 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 0.8
+      },
+      {
+        "group": "hombro",
+        "weight": 0.4
+      },
+      {
+        "group": "triceps",
+        "weight": 0.6
+      }
+    ],
+    "imagePath": "fondos.gif"
   },
   {
     "id": "flexiones",
@@ -99,11 +191,24 @@
     "equipment": "peso-corporal",
     "isBodyweight": true,
     "muscleGroups": [
-      { "group": "pecho", "weight": 0.8 },
-      { "group": "hombro", "weight": 0.4 },
-      { "group": "triceps", "weight": 0.5 },
-      { "group": "core", "weight": 0.3 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 0.8
+      },
+      {
+        "group": "hombro",
+        "weight": 0.4
+      },
+      {
+        "group": "triceps",
+        "weight": 0.5
+      },
+      {
+        "group": "core",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "flexiones.gif"
   },
   {
     "id": "pull-over",
@@ -111,22 +216,41 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "pecho", "weight": 0.6 },
-      { "group": "espalda", "weight": 0.6 },
-      { "group": "triceps", "weight": 0.2 }
-    ]
+      {
+        "group": "pecho",
+        "weight": 0.6
+      },
+      {
+        "group": "espalda",
+        "weight": 0.6
+      },
+      {
+        "group": "triceps",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "pull-over.gif"
   },
-
   {
     "id": "dominadas",
     "name": "Dominadas",
     "equipment": "peso-corporal",
     "isBodyweight": true,
     "muscleGroups": [
-      { "group": "espalda", "weight": 1.0 },
-      { "group": "biceps", "weight": 0.5 },
-      { "group": "antebrazo", "weight": 0.3 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.5
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "dominadas.gif"
   },
   {
     "id": "dominadas-supinas",
@@ -134,24 +258,54 @@
     "equipment": "peso-corporal",
     "isBodyweight": true,
     "muscleGroups": [
-      { "group": "espalda", "weight": 0.9 },
-      { "group": "biceps", "weight": 0.8 },
-      { "group": "antebrazo", "weight": 0.3 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 0.9
+      },
+      {
+        "group": "biceps",
+        "weight": 0.8
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "dominadas-supinas.gif"
   },
   {
     "id": "jalon-pecho",
     "name": "Jalón al pecho",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "jalon-pecho.gif"
   },
   {
     "id": "jalon-agarre-cerrado",
     "name": "Jalón agarre cerrado",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.5 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.5
+      }
+    ],
+    "imagePath": "jalon-agarre-cerrado.gif"
   },
   {
     "id": "remo-barra",
@@ -159,17 +313,37 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "espalda", "weight": 1.0 },
-      { "group": "biceps", "weight": 0.4 },
-      { "group": "antebrazo", "weight": 0.2 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "remo-barra.gif"
   },
   {
     "id": "remo-mancuerna",
     "name": "Remo con mancuerna",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "remo-mancuerna.gif"
   },
   {
     "id": "remo-en-t",
@@ -177,24 +351,54 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "espalda", "weight": 1.0 },
-      { "group": "biceps", "weight": 0.4 },
-      { "group": "antebrazo", "weight": 0.2 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "remo-en-t.gif"
   },
   {
     "id": "remo-polea-sentado",
     "name": "Remo en polea sentado",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "remo-polea-sentado.gif"
   },
   {
     "id": "remo-maquina",
     "name": "Remo en máquina",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 1.0 }, { "group": "biceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "biceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "remo-maquina.gif"
   },
   {
     "id": "peso-muerto",
@@ -202,12 +406,28 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "espalda", "weight": 0.8 },
-      { "group": "gluteo", "weight": 0.7 },
-      { "group": "isquios", "weight": 0.7 },
-      { "group": "core", "weight": 0.4 },
-      { "group": "antebrazo", "weight": 0.3 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 0.8
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.7
+      },
+      {
+        "group": "isquios",
+        "weight": 0.7
+      },
+      {
+        "group": "core",
+        "weight": 0.4
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "peso-muerto.gif"
   },
   {
     "id": "peso-muerto-sumo",
@@ -215,12 +435,28 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "espalda", "weight": 0.7 },
-      { "group": "gluteo", "weight": 0.9 },
-      { "group": "cuadriceps", "weight": 0.6 },
-      { "group": "isquios", "weight": 0.5 },
-      { "group": "core", "weight": 0.4 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 0.7
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.9
+      },
+      {
+        "group": "cuadriceps",
+        "weight": 0.6
+      },
+      {
+        "group": "isquios",
+        "weight": 0.5
+      },
+      {
+        "group": "core",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "peso-muerto-sumo.gif"
   },
   {
     "id": "peso-muerto-rumano",
@@ -228,10 +464,20 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "isquios", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.7 },
-      { "group": "espalda", "weight": 0.4 }
-    ]
+      {
+        "group": "isquios",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.7
+      },
+      {
+        "group": "espalda",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "peso-muerto-rumano.gif"
   },
   {
     "id": "hiperextension",
@@ -239,78 +485,169 @@
     "equipment": "peso-corporal",
     "isBodyweight": true,
     "muscleGroups": [
-      { "group": "espalda", "weight": 0.8 },
-      { "group": "gluteo", "weight": 0.4 },
-      { "group": "isquios", "weight": 0.4 }
-    ]
+      {
+        "group": "espalda",
+        "weight": 0.8
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.4
+      },
+      {
+        "group": "isquios",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "hiperextension.gif"
   },
   {
     "id": "encogimientos",
     "name": "Encogimientos (shrugs)",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "espalda", "weight": 0.8 }, { "group": "hombro", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 0.8
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "encogimientos.gif"
   },
-
   {
     "id": "press-militar",
     "name": "Press militar",
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "hombro", "weight": 1.0 },
-      { "group": "triceps", "weight": 0.4 },
-      { "group": "core", "weight": 0.2 }
-    ]
+      {
+        "group": "hombro",
+        "weight": 1
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      },
+      {
+        "group": "core",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "press-militar.gif"
   },
   {
     "id": "press-mancuernas-hombros",
     "name": "Press de hombros con mancuernas",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-mancuernas-hombros.gif"
   },
   {
     "id": "press-arnold",
     "name": "Press Arnold",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-arnold.gif"
   },
   {
     "id": "press-hombro-maquina",
     "name": "Press de hombros en máquina",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "triceps", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      },
+      {
+        "group": "triceps",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "press-hombro-maquina.gif"
   },
   {
     "id": "elevaciones-laterales",
     "name": "Elevaciones laterales",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      }
+    ],
+    "imagePath": "elevaciones-laterales.gif"
   },
   {
     "id": "elevaciones-frontales",
     "name": "Elevaciones frontales",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      }
+    ],
+    "imagePath": "elevaciones-frontales.gif"
   },
   {
     "id": "pajaros",
     "name": "Elevaciones posteriores (pájaros)",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 1.0 }, { "group": "espalda", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 1
+      },
+      {
+        "group": "espalda",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "pajaros.gif"
   },
   {
     "id": "face-pull",
     "name": "Face pull",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "hombro", "weight": 0.9 }, { "group": "espalda", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "hombro",
+        "weight": 0.9
+      },
+      {
+        "group": "espalda",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "face-pull.gif"
   },
   {
     "id": "remo-menton",
@@ -318,82 +655,166 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "hombro", "weight": 0.9 },
-      { "group": "espalda", "weight": 0.3 },
-      { "group": "biceps", "weight": 0.2 }
-    ]
+      {
+        "group": "hombro",
+        "weight": 0.9
+      },
+      {
+        "group": "espalda",
+        "weight": 0.3
+      },
+      {
+        "group": "biceps",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "remo-menton.gif"
   },
-
   {
     "id": "curl-barra",
     "name": "Curl con barra",
     "equipment": "barra",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 1
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "curl-barra.gif"
   },
   {
     "id": "curl-mancuernas",
     "name": "Curl con mancuernas",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 1
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "curl-mancuernas.gif"
   },
   {
     "id": "curl-martillo",
     "name": "Curl martillo",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 0.8 }, { "group": "antebrazo", "weight": 0.6 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 0.8
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.6
+      }
+    ],
+    "imagePath": "curl-martillo.gif"
   },
   {
     "id": "curl-predicador",
     "name": "Curl predicador",
     "equipment": "barra",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-predicador.gif"
   },
   {
     "id": "curl-concentrado",
     "name": "Curl concentrado",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-concentrado.gif"
   },
   {
     "id": "curl-polea",
     "name": "Curl en polea",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "biceps", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.2 }]
+    "muscleGroups": [
+      {
+        "group": "biceps",
+        "weight": 1
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "curl-polea.gif"
   },
-
   {
     "id": "extension-triceps-polea",
     "name": "Extensión de tríceps en polea",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "triceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "extension-triceps-polea.gif"
   },
   {
     "id": "triceps-cuerda",
     "name": "Tríceps polea con cuerda",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "triceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "triceps-cuerda.gif"
   },
   {
     "id": "press-frances",
     "name": "Press francés",
     "equipment": "barra",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "triceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "press-frances.gif"
   },
   {
     "id": "patada-triceps",
     "name": "Patada de tríceps (kickback)",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "triceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "triceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "patada-triceps.gif"
   },
   {
     "id": "press-cerrado",
@@ -401,32 +822,63 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "triceps", "weight": 1.0 },
-      { "group": "pecho", "weight": 0.5 },
-      { "group": "hombro", "weight": 0.3 }
-    ]
+      {
+        "group": "triceps",
+        "weight": 1
+      },
+      {
+        "group": "pecho",
+        "weight": 0.5
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "press-cerrado.gif"
   },
   {
     "id": "fondos-banco",
     "name": "Fondos en banco",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "triceps", "weight": 0.9 }, { "group": "hombro", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "triceps",
+        "weight": 0.9
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "fondos-banco.gif"
   },
-
   {
     "id": "curl-muneca",
     "name": "Curl de muñeca",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "antebrazo", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "antebrazo",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-muneca.gif"
   },
   {
     "id": "curl-muneca-inverso",
     "name": "Curl de muñeca inverso",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "antebrazo", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "antebrazo",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-muneca-inverso.gif"
   },
   {
     "id": "farmer-walk",
@@ -434,23 +886,45 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "antebrazo", "weight": 1.0 },
-      { "group": "espalda", "weight": 0.4 },
-      { "group": "core", "weight": 0.4 }
-    ]
+      {
+        "group": "antebrazo",
+        "weight": 1
+      },
+      {
+        "group": "espalda",
+        "weight": 0.4
+      },
+      {
+        "group": "core",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "farmer-walk.gif"
   },
-
   {
     "id": "sentadilla",
     "name": "Sentadilla",
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "cuadriceps", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.5 },
-      { "group": "isquios", "weight": 0.3 },
-      { "group": "core", "weight": 0.3 }
-    ]
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.5
+      },
+      {
+        "group": "isquios",
+        "weight": 0.3
+      },
+      {
+        "group": "core",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "sentadilla.gif"
   },
   {
     "id": "sentadilla-frontal",
@@ -458,10 +932,20 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "cuadriceps", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.4 },
-      { "group": "core", "weight": 0.4 }
-    ]
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.4
+      },
+      {
+        "group": "core",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "sentadilla-frontal.gif"
   },
   {
     "id": "sentadilla-bulgara",
@@ -469,10 +953,20 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "cuadriceps", "weight": 0.9 },
-      { "group": "gluteo", "weight": 0.7 },
-      { "group": "isquios", "weight": 0.3 }
-    ]
+      {
+        "group": "cuadriceps",
+        "weight": 0.9
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.7
+      },
+      {
+        "group": "isquios",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "sentadilla-bulgara.gif"
   },
   {
     "id": "sentadilla-goblet",
@@ -480,31 +974,67 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "cuadriceps", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.5 },
-      { "group": "core", "weight": 0.3 }
-    ]
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.5
+      },
+      {
+        "group": "core",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "sentadilla-goblet.gif"
   },
   {
     "id": "hack-squat",
     "name": "Hack squat",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }, { "group": "gluteo", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "hack-squat.gif"
   },
   {
     "id": "prensa-45",
     "name": "Prensa 45°",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }, { "group": "gluteo", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "prensa-45.gif"
   },
   {
     "id": "extension-cuadriceps",
     "name": "Extensión de cuádriceps",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "cuadriceps", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "cuadriceps",
+        "weight": 1
+      }
+    ],
+    "imagePath": "extension-cuadriceps.gif"
   },
   {
     "id": "zancadas",
@@ -512,32 +1042,63 @@
     "equipment": "mancuerna",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "cuadriceps", "weight": 0.9 },
-      { "group": "gluteo", "weight": 0.6 },
-      { "group": "isquios", "weight": 0.3 }
-    ]
+      {
+        "group": "cuadriceps",
+        "weight": 0.9
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.6
+      },
+      {
+        "group": "isquios",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "zancadas.gif"
   },
   {
     "id": "step-ups",
     "name": "Step-ups",
     "equipment": "mancuerna",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "cuadriceps", "weight": 0.9 }, { "group": "gluteo", "weight": 0.6 }]
+    "muscleGroups": [
+      {
+        "group": "cuadriceps",
+        "weight": 0.9
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.6
+      }
+    ],
+    "imagePath": "step-ups.gif"
   },
-
   {
     "id": "curl-femoral",
     "name": "Curl femoral",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "isquios",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-femoral.gif"
   },
   {
     "id": "curl-femoral-sentado",
     "name": "Curl femoral sentado",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "isquios",
+        "weight": 1
+      }
+    ],
+    "imagePath": "curl-femoral-sentado.gif"
   },
   {
     "id": "peso-muerto-piernas-rigidas",
@@ -545,10 +1106,20 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "isquios", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.6 },
-      { "group": "espalda", "weight": 0.3 }
-    ]
+      {
+        "group": "isquios",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.6
+      },
+      {
+        "group": "espalda",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "peso-muerto-piernas-rigidas.gif"
   },
   {
     "id": "good-mornings",
@@ -556,135 +1127,318 @@
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "isquios", "weight": 1.0 },
-      { "group": "gluteo", "weight": 0.5 },
-      { "group": "espalda", "weight": 0.4 }
-    ]
+      {
+        "group": "isquios",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.5
+      },
+      {
+        "group": "espalda",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "good-mornings.gif"
   },
   {
     "id": "nordic-curl",
     "name": "Curl nórdico",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "isquios", "weight": 1.0 }, { "group": "gluteo", "weight": 0.2 }]
+    "muscleGroups": [
+      {
+        "group": "isquios",
+        "weight": 1
+      },
+      {
+        "group": "gluteo",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "nordic-curl.gif"
   },
-
   {
     "id": "hip-thrust",
     "name": "Hip thrust",
     "equipment": "barra",
     "isBodyweight": false,
     "muscleGroups": [
-      { "group": "gluteo", "weight": 1.0 },
-      { "group": "isquios", "weight": 0.4 },
-      { "group": "cuadriceps", "weight": 0.2 }
-    ]
+      {
+        "group": "gluteo",
+        "weight": 1
+      },
+      {
+        "group": "isquios",
+        "weight": 0.4
+      },
+      {
+        "group": "cuadriceps",
+        "weight": 0.2
+      }
+    ],
+    "imagePath": "hip-thrust.gif"
   },
   {
     "id": "hip-thrust-maquina",
     "name": "Hip thrust en máquina",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }, { "group": "isquios", "weight": 0.4 }]
+    "muscleGroups": [
+      {
+        "group": "gluteo",
+        "weight": 1
+      },
+      {
+        "group": "isquios",
+        "weight": 0.4
+      }
+    ],
+    "imagePath": "hip-thrust-maquina.gif"
   },
   {
     "id": "patada-gluteo",
     "name": "Patada de glúteo en polea",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "gluteo",
+        "weight": 1
+      }
+    ],
+    "imagePath": "patada-gluteo.gif"
   },
   {
     "id": "abductor-maquina",
     "name": "Abductores en máquina",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "gluteo", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "gluteo",
+        "weight": 1
+      }
+    ],
+    "imagePath": "abductor-maquina.gif"
   },
   {
     "id": "puente-gluteo",
     "name": "Puente de glúteo",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "gluteo", "weight": 0.9 }, { "group": "isquios", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "gluteo",
+        "weight": 0.9
+      },
+      {
+        "group": "isquios",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "puente-gluteo.gif"
   },
-
   {
     "id": "gemelos-de-pie",
     "name": "Gemelos de pie",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "pantorrilla",
+        "weight": 1
+      }
+    ],
+    "imagePath": "gemelos-de-pie.gif"
   },
   {
     "id": "gemelos-sentado",
     "name": "Gemelos sentado",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "pantorrilla",
+        "weight": 1
+      }
+    ],
+    "imagePath": "gemelos-sentado.gif"
   },
   {
     "id": "gemelos-prensa",
     "name": "Gemelos en prensa",
     "equipment": "maquina",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "pantorrilla", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "pantorrilla",
+        "weight": 1
+      }
+    ],
+    "imagePath": "gemelos-prensa.gif"
   },
-
   {
     "id": "plancha",
     "name": "Plancha",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      }
+    ],
+    "imagePath": "plancha.gif"
   },
   {
     "id": "plancha-lateral",
     "name": "Plancha lateral",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "hombro", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      },
+      {
+        "group": "hombro",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "plancha-lateral.gif"
   },
   {
     "id": "crunch",
     "name": "Crunch abdominal",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      }
+    ],
+    "imagePath": "crunch.gif"
   },
   {
     "id": "crunch-polea",
     "name": "Crunch en polea",
     "equipment": "polea",
     "isBodyweight": false,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      }
+    ],
+    "imagePath": "crunch-polea.gif"
   },
   {
     "id": "russian-twist",
     "name": "Russian twist",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      }
+    ],
+    "imagePath": "russian-twist.gif"
   },
   {
     "id": "elevacion-piernas",
     "name": "Elevación de piernas",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      }
+    ],
+    "imagePath": "elevacion-piernas.gif"
   },
   {
     "id": "hanging-leg-raise",
     "name": "Elevación de piernas colgado",
     "equipment": "peso-corporal",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "antebrazo", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      },
+      {
+        "group": "antebrazo",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "hanging-leg-raise.gif"
   },
   {
     "id": "rueda-abdominal",
     "name": "Rueda abdominal",
     "equipment": "otro",
     "isBodyweight": true,
-    "muscleGroups": [{ "group": "core", "weight": 1.0 }, { "group": "espalda", "weight": 0.3 }]
+    "muscleGroups": [
+      {
+        "group": "core",
+        "weight": 1
+      },
+      {
+        "group": "espalda",
+        "weight": 0.3
+      }
+    ],
+    "imagePath": "rueda-abdominal.gif"
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "Kettlebell Swing",
+    "equipment": "otro",
+    "isBodyweight": false,
+    "muscleGroups": [
+      {
+        "group": "gluteo",
+        "weight": 1
+      },
+      {
+        "group": "isquios",
+        "weight": 0.8
+      },
+      {
+        "group": "core",
+        "weight": 0.5
+      }
+    ],
+    "imagePath": "kettlebell-swing.gif"
+  },
+  {
+    "id": "muscle-up",
+    "name": "Muscle-up",
+    "equipment": "peso-corporal",
+    "isBodyweight": true,
+    "muscleGroups": [
+      {
+        "group": "espalda",
+        "weight": 1
+      },
+      {
+        "group": "pecho",
+        "weight": 0.8
+      },
+      {
+        "group": "triceps",
+        "weight": 0.7
+      },
+      {
+        "group": "biceps",
+        "weight": 0.5
+      }
+    ],
+    "imagePath": "muscle-up.gif"
   }
 ]

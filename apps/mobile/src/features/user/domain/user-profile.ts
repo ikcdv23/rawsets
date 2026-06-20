@@ -51,7 +51,9 @@ export function defaultUserProfile(): UserProfile {
 // el flujo inicial. Esto evita bucles infinitos si la persistencia del timestamp
 // falla pero el resto de datos (como el nombre) sí se guardaron.
 export function isOnboarded(profile: UserProfile): boolean {
-  return profile.onboardedAt !== null || (profile.displayName !== null && profile.displayName.length > 0);
+  return (
+    profile.onboardedAt !== null || (profile.displayName !== null && profile.displayName.length > 0)
+  );
 }
 
 // Deriva iniciales para el AvatarIcon a partir del displayName.
