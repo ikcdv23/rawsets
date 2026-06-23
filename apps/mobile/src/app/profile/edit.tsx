@@ -126,7 +126,7 @@ export default function ProfileEditScreen() {
         if (GOALS.includes(p.goal)) setGoal(p.goal);
         if (UNITS.includes(p.unit)) setUnit(p.unit);
         // Mostramos el peso en la unidad guardada (kg internamente).
-        if (p.bodyWeight !== null) {
+        if (p.bodyWeight != null) {
           const display = p.unit === 'lb' ? p.bodyWeight * 2.20462 : p.bodyWeight;
           setBodyWeight(display.toFixed(1).replace(/\.0$/, ''));
         }

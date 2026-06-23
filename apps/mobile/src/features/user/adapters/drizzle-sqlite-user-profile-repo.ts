@@ -27,7 +27,7 @@ export class DrizzleSqliteUserProfileRepo implements UserProfileRepo {
         if (!row) return null;
 
         // Expo SQLite en web a veces devuelve las keys en lowercase a pesar del alias AS.
-        const getVal = (key: string) => row[key] ?? row[key.toLowerCase()];
+        const getVal = (key: string) => row[key] ?? row[key.toLowerCase()] ?? null;
 
         const createdAt = getVal('createdAt');
         const onboardedAt = getVal('onboardedAt');
