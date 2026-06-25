@@ -22,3 +22,4 @@ Decisiones técnicas importantes de RAWSETS. Cada ADR documenta el contexto, las
 - [0006 — Modelo de PR y Streak (derivados)](0006-modelo-pr-y-streak.md) — Accepted · 2026-05-28
 - [0007 — Auth: Supabase + Google OAuth](0007-auth-supabase-google.md) — Accepted · 2026-05-28
 - [0008 — Inicialización de DB con SQLiteProvider (async-safe en web)](0008-db-init-sqlite-provider.md) — Accepted · 2026-05-29
+- [0009 — PRs y Badges como subsistema de gamificación](0009-prs-y-badges.md) — Proposed · 2026-06-25

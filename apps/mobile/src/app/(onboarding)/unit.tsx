@@ -49,7 +49,7 @@ export default function OnboardingUnitScreen() {
     try {
       const result = await updateProfile(repo, { unit: selected });
       if (!result.ok) throw result.error;
-      router.push('/body');
+      router.push('/home');
     } catch (err) {
       console.error('[onboarding/unit] save error:', err);
     } finally {
