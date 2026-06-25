@@ -548,6 +548,7 @@ function SheetFooter({ volumeKg, doneSets, onFinish }: SheetFooterProps) {
 // reps entero. null → em-dash en la celda.
 function formatPreviousLabel(label: PreviousSetLabel): string | null {
   if (!label) return null;
+  if (typeof label.weight !== 'number' || typeof label.reps !== 'number') return null;
   const weightStr = Number.isInteger(label.weight) ? String(label.weight) : label.weight.toFixed(1);
   return `${weightStr} × ${label.reps}`;
 }

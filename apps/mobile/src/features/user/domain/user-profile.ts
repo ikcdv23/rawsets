@@ -68,3 +68,31 @@ export function initialsFromName(displayName: string | null): string {
     .join('');
   return letters.toUpperCase() || '?';
 }
+
+// --- HELPERS DE DOMINIO ---
+
+/**
+ * Calcula la edad en años desde una fecha de nacimiento.
+ */
+export function calculateAge(birthDate: Date | null): number | null {
+  if (!birthDate) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  // Si el cumpleaños aún no ha llegado este año, restamos uno.
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+/**
+ * Convierte el peso (siempre almacenado en kg) a la unidad deseada y lo formatea.
+ * Incluye defensa contra valores nulos o indefinidos para evitar crashes.
+ */
+export function formatWeight(kg: number | null | undefined, unit: Unit): string {
+  if (kg === null || kg === undefined || Number.isNaN(kg)) return '—';
+  const value = unit === 'lb' ? kg * 2.20462 : kg;
+  // Una decimal, sin trailing zeros sucios.
+  return value.toFixed(1).replace(/\.0$/, '');
+}
