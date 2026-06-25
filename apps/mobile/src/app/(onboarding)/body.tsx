@@ -44,7 +44,7 @@ export default function OnboardingBodyScreen() {
       if (result.ok) {
         const p = result.value;
         setUnit(p.unit);
-        if (p.bodyWeight !== null) setWeight(String(p.bodyWeight));
+        if (p.bodyWeight != null) setWeight(String(p.bodyWeight));
         if (p.sex && SEXES.includes(p.sex)) setSex(p.sex);
       }
     });
