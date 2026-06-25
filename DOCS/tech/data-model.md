@@ -15,6 +15,7 @@ Mapa de las 8 tablas que viven en SQLite local. Resumen de columnas, FKs e invar
   - `cascade` → borrar padre borra hijo (eventos del workout).
   - `restrict` → no permite borrar padre con hijos vivos (referencias a catálogo).
   - `set null` → suaviza el corte (plan vs ejecución).
+- **FK on update**: todas las FKs usan `ON UPDATE no action`.
 
 ## Diagrama de relaciones
 
@@ -120,6 +121,7 @@ Singleton: una sola fila con `id = 'me'`. Garantía vía caso de uso al insertar
 | `bodyWeight`  | real                   | sí   | —         | kg. Bloquea volumen real de body-weight        |
 | `birthDate`   | integer (timestamp_ms) | sí   | —         | onboarding ligero                              |
 | `sex`         | text (enum `Sex`)      | sí   | —         | male · female · other                          |
+| `onboardedAt` | integer (timestamp_ms) | sí   | —         | null = onboarding pendiente                    |
 | `createdAt`   | integer (timestamp_ms) | no   | —         |                                                |
 
 **Enums** (`features/user/domain/user-profile.ts`):
@@ -233,18 +235,23 @@ Sesión que ocurrió en el tiempo. `routineId` nullable = entreno libre.
 
 ## `sets` — ADR-0003
 
-Log inmutable de series **realmente ejecutadas**. No hay flag `completed`: si existe la fila, ocurrió.
+Registro de series planificadas y ejecutadas en un workout. Al iniciar un entreno se crean filas placeholder con `done=false`. Al completar la serie, se actualiza `done=true` con `weight`, `reps` y `completed_at`.
 
-| Columna       | Tipo    | Null | FK / Constraint                              |
-|---------------|---------|------|----------------------------------------------|
-| `id`          | text    | no   | PK                                           |
-| `workoutId`   | text    | no   | → `workouts.id` ON DELETE CASCADE            |
-| `exerciseId`  | text    | no   | → `exercises.id` ON DELETE RESTRICT          |
-| `setNumber`   | integer | no   | N-ésimo set de ese ejercicio en ese workout (`>= 1`) |
-| `weight`      | real    | no   | kg (`>= 0`). 0 vale para bodyweight puro     |
-| `reps`        | integer | no   | `>= 1` (0 reps = no se persiste)             |
-| `rpe`         | real    | sí   | 0..10 si está definido                       |
-| `restSeconds` | integer | sí   | Descanso tras este set                       |
+> **Nota**: Esto revierte la decisión original del ADR-0003 (§3) que proponía "sin flag completed". Migración 0002 añadió `done` y `completed_at` para soportar el flujo de sets planificados vs ejecutados en una sola tabla. Ver [ADR-0009](../adr/0009-prs-y-badges.md) para el modelo actualizado.
+
+| Columna       | Tipo    | Null | Default | FK / Constraint                              |
+|---------------|---------|------|---------|----------------------------------------------|
+| `id`          | text    | no   | —       | PK                                           |
+| `workoutId`   | text    | no   | —       | → `workouts.id` ON DELETE CASCADE            |
+| `exerciseId`  | text    | no   | —       | → `exercises.id` ON DELETE RESTRICT          |
+| `setNumber`   | integer | no   | —       | N-ésimo set de ese ejercicio en ese workout (`>= 1`) |
+| `position`    | integer | no   | —       | Orden global dentro del workout               |
+| `weight`      | real    | no   | 0       | kg (`>= 0`). 0 para bodyweight puro          |
+| `reps`        | integer | no   | 0       | `>= 0`. 0 = set planificado aún no hecho     |
+| `rpe`         | real    | sí   | —       | 0..10 si está definido                       |
+| `restSeconds` | integer | sí   | —       | Descanso tras este set                       |
+| `done`        | integer (bool) | no | false | false = placeholder, true = ejecutado        |
+| `completedAt` | integer (ts_ms) | sí | —      | null si no completado aún                    |
 
 **Invariantes (caso de uso, no schema):**
 - `reps >= 1`, `weight >= 0`, `rpe ∈ [0,10]` si presente.
@@ -256,9 +263,26 @@ Log inmutable de series **realmente ejecutadas**. No hay flag `completed`: si ex
 
 Calculados al vuelo, no persistidos. Ver ADR-0006.
 
-- **PRs por ejercicio**: `computePRs(exerciseId, sets) → { byRepCount, bestE1RM }` en `features/workouts/domain/prs.ts`.
-- **Racha**: `currentStreak(days)` y `bestStreak(days)` en `features/scheduling/domain/streak.ts`. Combina `scheduled_sessions` + `workouts` por fecha → `DayState ∈ {✅, ❌, ◯}`.
+- **PRs por ejercicio**: persistidos en `personal_records` con flag dirty. Ver [ADR-0009](../adr/0009-prs-y-badges.md).
+- **Racha**: `currentStreak(days)` y `bestStreak(days)` en `features/scheduling/domain/streak.ts` (pendiente de implementar). Combina `scheduled_sessions` + `workouts` por fecha. Ver ADR-0006.
+- **Badges / logros**: persistidos en `badge_state`. Evaluados en tiempo real al completar cada set. Ver [ADR-0009](../adr/0009-prs-y-badges.md).
 
 ## Constantes de dominio (no en DB)
 
-- **`MUSCLE_TARGETS`** (`features/exercises/domain/muscle-targets.ts`): objetivos de volumen por grupo y 14 días. Global en Fase 1, personalizable en Fase 2 (ADR-0002 §4).
+- **`MUSCLE_TARGETS`** (`features/exercises/domain/muscle-targets.ts`): objetivos de volumen por grupo para 14 días. Valores actuales:
+
+  | Grupo | Target (kg·rep) |
+  |---|---|
+  | pecho | 12 000 |
+  | espalda | 14 000 |
+  | cuadriceps | 15 000 |
+  | hombro | 8 000 |
+  | gluteo | 9 000 |
+  | isquios | 8 000 |
+  | biceps | 4 000 |
+  | triceps | 5 000 |
+  | antebrazo | 3 000 |
+  | pantorrilla | 4 000 |
+  | core | 5 000 |
+
+  Global en Fase 1, personalizable en Fase 2 (ADR-0002 §4).

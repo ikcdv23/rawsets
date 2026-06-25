@@ -95,3 +95,7 @@ Tras este ADR, los schemas existentes (`exercises`, `exerciseMuscleGroups`) son 
 1. Añadir columna `equipment` a `exercises`.
 2. Mover los `MUSCLE_TARGETS` a `features/exercises/domain/muscle-targets.ts` (junto a `muscle-groups.ts`).
 3. Crear la función pura `balanceFor(group, sessions)` en el dominio cuando exista el slice del radar real.
+
+---
+
+[← 0001](0001-arquitectura.md) · [Índice](README.md) · [Siguiente → 0003](0003-modelo-set-y-workout.md)

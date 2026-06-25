@@ -161,11 +161,14 @@ El **Domain** es lo más estable: no depende de nada. Todo lo demás depende de 
 - **Leaky abstraction**: detalles de Drizzle filtrándose al dominio o use case. Mitigación: el dominio nunca importa de `adapters/`; los use cases solo importan de `ports/`.
 - **Useless wrappers** en reads: si crecen, reconsiderar D4 (simétrico → asimétrico).
 
+---
+
+[← Índice](README.md) · [Siguiente → 0002](0002-modelo-exercise-y-balance-muscular.md)
+
 ## Referencias
 
 - [Alistair Cockburn — Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) (2005)
 - [Robert C. Martin — The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) (2012)
 - Eric Evans — *Domain-Driven Design* (2003); Vaughn Vernon — *Implementing DDD* (2013)
 - Jimmy Bogard — *Vertical Slice Architecture* (posts y charlas, ~2018)
-- [Lumma `docs/concepts/arquitectura.md`](/home/javier/Personal/Lumma/docs/concepts/arquitectura.md) — patrón previo de Javier, referencia y contrapunto.
-- [`DOCS/ficha-tecnica.md`](../ficha-tecnica.md) — secciones 4 (stack) y 7 (modelo de datos).
+- [Ficha Técnica](../tech/ficha-tecnica.md) — secciones 4 (stack) y 7 (modelo de datos).

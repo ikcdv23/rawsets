@@ -6,7 +6,7 @@
 
 ## Contexto
 
-Tras cerrar `Workout` y `Set` ([ADR-0003](0003-modelo-set-y-workout.md)), queda decidir cómo se modela el "plan" del usuario: la rutina como template y el mecanismo que decide *qué toca hoy*. Este último alimenta la racha (ver [project-rawsets-streak-adherence] en memoria) y la card "Sesión de hoy" del Home.
+Tras cerrar `Workout` y `Set` ([ADR-0003](0003-modelo-set-y-workout.md)), queda decidir cómo se modela el "plan" del usuario: la rutina como template y el mecanismo que decide *qué toca hoy*. Este último alimenta la racha (ver ADR-0006) y la card "Sesión de hoy" del Home.
 
 Dos preguntas en una:
 1. ¿Una `Routine` es una sesión nombrada (Tirón A) o un programa multi-día (PPL 5d)?
@@ -133,3 +133,7 @@ Constantes / funciones puras en dominio:
 - `features/scheduling/domain/` — nueva slice.
   - `schedule.ts`: tipo `ScheduledSession` puro, funciones de "repetir semana" (clonado de fechas).
   - El cálculo de día (compliance) llega con el ADR de racha.
+
+---
+
+[← 0003](0003-modelo-set-y-workout.md) · [Índice](README.md) · [Siguiente → 0005](0005-modelo-user-profile.md)

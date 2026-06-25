@@ -192,3 +192,7 @@ features/personal-records/      ← NUEVO slice (o dentro de achievements si pre
 
 - [ADR-0006](0006-modelo-pr-y-streak.md) — **sección 3 superceded** por este ADR. El resto (fórmulas e1RM, modelo de streak) sigue vigente.
 - [ADR-0003](0003-modelo-set-y-workout.md) — modelo de Set y Workout, base de datos para PRs y badges.
+
+---
+
+[← 0008](0008-db-init-sqlite-provider.md) · [Índice](README.md)

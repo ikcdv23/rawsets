@@ -125,3 +125,7 @@ function Screen() {
 
 - Si la deuda del seed en web bloquea una feature → reescribir adapters para usar `runAsync`/`getAllAsync` puros, y reactivar el seed en web.
 - Si aparece la necesidad de queries a nivel de módulo (ej. configuración leída antes de cualquier render) → considerar materializar el bootstrap en un script externo (Node) que pre-rellene la DB en el build, no en runtime.
+
+---
+
+[← 0007](0007-auth-supabase-google.md) · [Índice](README.md) · [Siguiente → 0009](0009-prs-y-badges.md)

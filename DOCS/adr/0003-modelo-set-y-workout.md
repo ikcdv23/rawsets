@@ -1,8 +1,11 @@
 # 0003 — Modelo de Set y Workout
 
-- **Status**: Accepted
+- **Status**: Superseded (sección 3 — ver nota abajo)
 - **Fecha**: 2026-05-28
+- **Superseded by**: Migración 0002 (`0002_workouts_and_sets.sql`) + [ADR-0009](0009-prs-y-badges.md)
 - **Deciders**: Javier (decisión final) + Claude (sparring)
+
+> ⚠️ **Nota**: La sección 3 ("Sets como eventos reales, sin flag completed") fue revertida en la migración 0002. En la implementación actual, los sets se crean como placeholders con `done=false` al iniciar un workout y se actualizan con `done=true`, `weight`, `reps` y `completed_at` al completarse. Esto permite tener sets planificados y ejecutados en una sola tabla. Ver [ADR-0009](0009-prs-y-badges.md) para el modelo de datos actualizado en `tech/data-model.md`.
 
 ## Contexto
 
@@ -118,3 +121,7 @@ Cambios al schema vs estado actual:
 1. **`sets`**: eliminar columna `completed`.
 2. **`exercises`**: añadir `isBodyweight: boolean default false`. (Junto con `equipment` del ADR-0002, irían en la misma migración.)
 3. Crear constantes / funciones puras en `features/workouts/domain/` para invariantes (validación de Set, cálculo de volumen).
+
+---
+
+[← 0002](0002-modelo-exercise-y-balance-muscular.md) · [Índice](README.md) · [Siguiente → 0004](0004-modelo-routine-y-calendario.md)

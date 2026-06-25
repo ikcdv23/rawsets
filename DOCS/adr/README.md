@@ -2,7 +2,7 @@
 
 Decisiones técnicas importantes de RAWSETS. Cada ADR documenta el contexto, las alternativas y las consecuencias de una decisión en el momento en que se tomó.
 
-**Formato**: MADR-lite. Ver [skill `/adr`](../../.claude/skills/adr/SKILL.md) para el procedimiento.
+**Formato**: MADR-lite.
 
 **Status posibles**:
 - `Proposed` — discutido pero aún no aplicado en código.
@@ -10,7 +10,7 @@ Decisiones técnicas importantes de RAWSETS. Cada ADR documenta el contexto, las
 - `Superseded by ADR-XXXX` — reemplazado por una decisión posterior.
 - `Deprecated` — ya no aplica.
 
-**Distinción con [`DOCS/ficha-tecnica.md`](../ficha-tecnica.md)**: la ficha técnica es la **fuente de verdad** del stack, branding y roadmap (decisiones grandes ya cerradas). Los ADRs documentan decisiones **derivadas** que aparecen durante la construcción.
+**Distinción con [Ficha Técnica](../tech/ficha-tecnica.md)**: la ficha técnica es la **fuente de verdad** del stack, branding y roadmap (decisiones grandes ya cerradas). Los ADRs documentan decisiones **derivadas** que aparecen durante la construcción.
 
 ## Índice
 

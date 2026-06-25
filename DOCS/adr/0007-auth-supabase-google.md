@@ -14,7 +14,7 @@ Las pantallas de auth ([login](../../apps/mobile/src/app/(auth)/login/index.tsx)
 2. ¿Necesitamos backend propio o nos apoyamos en un BaaS?
 3. ¿Email/password + social, o solo social?
 
-Constricciones declaradas en [[project-rawsets-no-paid-services]]: **Fase 1 sin servicios de pago**. Esto descarta cualquier opción que obligue a contratar email transaccional (SendGrid / Mailgun / SES) para verificación de cuenta o reset de contraseña.
+**Decisión explícita desde el inicio del proyecto: Fase 1 sin servicios de pago**. Esto descarta cualquier opción que obligue a contratar email transaccional (SendGrid / Mailgun / SES) para verificación de cuenta o reset de contraseña.
 
 ## Decision drivers
 
@@ -108,3 +108,7 @@ Cubre los drivers:
 
 **Cambios en otros ADRs**:
 - ADR-0005 (UserProfile): añadir columna opcional `supabaseUserId: text?` que enlaza la fila local con la sesión cloud. Mantener `id='me'` como PK del singleton local.
+
+---
+
+[← 0006](0006-modelo-pr-y-streak.md) · [Índice](README.md) · [Siguiente → 0008](0008-db-init-sqlite-provider.md)

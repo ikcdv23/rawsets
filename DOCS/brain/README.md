@@ -1,6 +1,6 @@
 # 🧠 RAWSETS Brain
 
-Bienvenido a tu cerebro digital compartido con Gemini CLI.
+Bienvenido a tu cerebro digital compartido con Claude Code.
 
 Aqui guardaremos:
 - [Arquitectura Interna](Arquitectura%20Interna.md): Cómo está organizado el código.
@@ -9,4 +9,4 @@ Aqui guardaremos:
 - Notas de investigación.
 - Pendientes rápidos.
 
-Yo (Gemini) iré actualizando este índice a medida que trabajemos.
+Claude irá actualizando este índice a medida que trabajemos.

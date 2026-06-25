@@ -141,3 +141,7 @@ Funciones puras en:
   - `bestStreak(days: DayState[]): number`.
 
 Ningún cambio en schema.
+
+---
+
+[← 0005](0005-modelo-user-profile.md) · [Índice](README.md) · [Siguiente → 0007](0007-auth-supabase-google.md)

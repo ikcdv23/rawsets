@@ -131,3 +131,7 @@ Cambio en `features/workouts/domain/`:
 Seed inicial:
 
 - Al primer arranque (o tras registro), insertar fila `user_profile` con `id='me'`, `goal='general'`, `unit='kg'`, resto nulls.
+
+---
+
+[← 0004](0004-modelo-routine-y-calendario.md) · [Índice](README.md) · [Siguiente → 0006](0006-modelo-pr-y-streak.md)
